@@ -42,6 +42,12 @@ supported out-of-the-box.
 Changes
 -------
 
+0.2
+ * fixed various bugs
+ * added ftdi_fn and set_baudrate functions in Driver class
+ * changed interface in BitBangDriver to direction/port properties
+   rather than overriding the read/write functions, which are therefore
+   still available as in the Driver class.
 0.1
  * first release. Tested with libftdi 0.18 on Mac OS X 10.6 and Linux
   (stock EEEPC 701 Xandros Linux, Ubuntu 10.04)
