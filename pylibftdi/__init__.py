@@ -14,12 +14,11 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.2"
+__VERSION__ = "0.3"
 __AUTHOR__ = "Ben Bass"
 
 
-
-__ALL__ = ['Driver', 'BitBangDriver', 'ALL_OUTPUTS', 'ALL_INPUTS']
+__ALL__ = ['Driver', 'BitBangDriver', 'Bus', 'ALL_OUTPUTS', 'ALL_INPUTS']
 
 import functools
 from ctypes import *
@@ -177,3 +176,30 @@ class BitBangDriver(Driver):
     def port(self, value):
         self._latch = value
         return super(BitBangDriver, self).write(chr(value))
+
+
+class Bus(object):
+    """
+    This class is a descriptor for a bus of a given width starting
+    at a given offset (0 = LSB).  Thet driver which does the actual
+    reading and writing is assumed to be a BitBangDriver instance
+    in the 'driver' attribute of the object to which this is attached.
+    """
+    def __init__(self, offset, width=1):
+        self.offset = offset
+        self.width = width
+        self._mask = ((1<<width)-1)
+
+    def __get__(self, obj, type):
+        val = obj.driver.port
+        return (val >> offset) & self._mask
+
+    def __set__(self, obj, value):
+        value = value & self._mask
+        # in a multi-threaded environment, would
+        # want to ensure following was locked, eg
+        # by acquiring a driver lock
+        val = obj.driver.port
+        val &= ~(self._mask << self.offset)
+        val |= value << self.offset
+        obj.driver.port = val

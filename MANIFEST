@@ -1,0 +1,6 @@
+LICENSE
+README
+examples/lcd.py
+examples/led_flash.py
+setup.py
+pylibftdi/__init__.py

@@ -38,10 +38,17 @@ functions are also part of the distribution; following Python's
 batteries included approach, there are various interesting devices
 supported out-of-the-box.
 
+Plans
+-----
+ * Add more examples: SPI devices, knight-rider effects, input devices...
+ * Further support for serial usage (as opposed to BitBang)
 
 Changes
 -------
-
+0.3
+ * added some examples
+ * new Bus class in pylibftdi (though it probably belongs somewhere else)
+ * first release on PyPI
 0.2
  * fixed various bugs
  * added ftdi_fn and set_baudrate functions in Driver class

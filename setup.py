@@ -4,14 +4,14 @@ from distutils.core import setup
 
 setup(
     name="pylibftdi",
-    version="0.2",
+    version="0.3",
     description="Pythonic interface to FTDI devices using libftdi",
     author="Ben Bass",
     author_email="benbass@codedstructure.net",
     url="http://bitbucket.org/codedstructure/pylibftdi",
     packages=["pylibftdi"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
