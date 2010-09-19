@@ -51,6 +51,8 @@ Plans
 
 Changes
 -------
+0.4.1
+ * fix release issue
 0.4
  * fixed embarrassing bug which caused things not to work on Linux 
    (is now find_library('ftdi') instead of find_library('libftdi'))

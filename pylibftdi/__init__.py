@@ -14,7 +14,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.3"
+__VERSION__ = "0.4.1"
 __AUTHOR__ = "Ben Bass"
 
 
@@ -39,6 +39,8 @@ class ParrotEgg(Refuser):
 class DeadParrot(Refuser):
     message = "This object is no more!"
 
+class FtdiError(Exception):
+    pass
 
 class Driver(object):
     def __init__(self):
@@ -56,23 +58,35 @@ class Driver(object):
             return self
         # TODO: provide parameter to select required device
         # (if multiple are attached)
-        self.fdll = CDLL(find_library('libftdi'))
+        ftdi_lib = find_library('ftdi')
+        if ftdi_lib is None:
+            raise FtdiError('libftdi library not found')
+        fdll = CDLL(ftdi_lib)
         # most args/return types are fine with the implicit
         # int/void* which ctypes uses, but some need setting here
-        self.fdll.ftdi_get_error_string.restype = c_char_p
+        fdll.ftdi_get_error_string.restype = c_char_p
+        # Try to open the device.  If this fails, reset things to how
+        # they were, but we can't use self.close as that assumes things
+        # have already been setup.
         # sizeof(struct ftdi_context) seems to be 112 on x86_64, 84 on i386
         # provide a generous 1K buffer for (hopefully) all possibles...
         self.ctx = create_string_buffer(1024)
-        self.fdll.ftdi_init(byref(self.ctx))
-        self.fdll.ftdi_usb_open(byref(self.ctx), 0x0403, 0x6001)
+        if fdll.ftdi_init(byref(self.ctx)) != 0:
+            raise FtdiError(fdll.ftdi_get_error_string(byref(self.ctx)))
+        if fdll.ftdi_usb_open(byref(self.ctx), 0x0403, 0x6001) != 0:
+            fdll.ftdi_deinit(byref(self.ctx))
+            raise FtdiError(fdll.ftdi_get_error_string(byref(self.ctx)))
+        # only at this point do we allow other things to access fdll.
+        # (so if exception is thrown above, there is no access).
+        self.fdll = fdll
         self.opened = True
         return self
 
     def close(self):
         "close our connection, free resources"
         self.opened = False
-        self.fdll.ftdi_usb_close(byref(self.ctx))
-        self.fdll.ftdi_deinit(byref(self.ctx))
+        if self.fdll.ftdi_usb_close(byref(self.ctx)) == 0:
+            self.fdll.ftdi_deinit(byref(self.ctx))
         self.fdll = DeadParrot()
 
     @property
@@ -86,18 +100,24 @@ class Driver(object):
 
     def read(self, length):
         "read a string of upto length bytes from the FTDI device"
-        z = create_string_buffer(length)
-        rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(z), length)
-        return z.raw[:rlen]
+        buf = create_string_buffer(length)
+        rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
+        if rlen == -1:
+            raise FtdiError(self.get_error_string())
+        return buf.raw[:rlen]
 
     def write(self, data):
         "write given data string to the FTDI device"
-        z = create_string_buffer(data)
-        return self.fdll.ftdi_write_data(byref(self.ctx), byref(z), len(data))
+        buf = create_string_buffer(data)
+        written = self.fdll.ftdi_write_data(byref(self.ctx),
+                                            byref(buf), len(data))
+        if written == -1:
+            raise FtdiError(self.get_error_string())
+        return written
 
-    def get_error(self):
+    def get_error_string(self):
         "return error string from libftdi driver"
-        return self.fdll.ftdi_get_error_string(self.ctx)
+        return self.fdll.ftdi_get_error_string(byref(self.ctx))
 
     @property
     def ftdi_fn(self):
