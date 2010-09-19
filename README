@@ -21,6 +21,10 @@ helpful and had fun with it...
 
 History
 -------
+This package is the result of various bits of work using FTDI's
+devices, primarily for controlling external devices.  Some of this
+is documented on the codedstructure blog, codedstructure.blogspot.com
+
 At least two other open-source Python FTDI wrappers exist, and each
 of these may be best for some projects.
 
@@ -42,9 +46,20 @@ Plans
 -----
  * Add more examples: SPI devices, knight-rider effects, input devices...
  * Further support for serial usage (as opposed to BitBang)
+ * Perhaps add support for D2XX driver, though the name then becomes a
+   slight liability ;)
 
 Changes
 -------
+0.4
+ * fixed embarrassing bug which caused things not to work on Linux 
+   (is now find_library('ftdi') instead of find_library('libftdi'))
+ * lots of error checking, new FtdiError exception. Before it just
+   tended to segfault if things weren't just-so.
+ * get_error() is now get_error_string().  It's still early enough
+   to change the API, and if I thought it was get_error_string
+   multiple times when I wrote the error checking code, it probably
+   should be the more natural thing.
 0.3
  * added some examples
  * new Bus class in pylibftdi (though it probably belongs somewhere else)
