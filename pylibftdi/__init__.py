@@ -18,8 +18,20 @@ __VERSION__ = "0.5"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = ['Driver', 'BitBangDriver', 'Bus', 'ALL_OUTPUTS', 'ALL_INPUTS']
+__ALL__ = ['Driver', 'BitBangDriver', 'Bus', 'FtdiError',
+           'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT']
 
-from pylibftdi.util import Bus
-from pylibftdi.driver import Driver
-from pylibftdi.bitbang import BitBangDriver, ALL_OUTPUTS, ALL_INPUTS
+from pylibftdi import _base, driver, util, bitbang
+
+# Bring them in to package scope so we can treat pylibftdi
+# as a module if we want.
+FtdiError = _base.FtdiError
+Bus = util.Bus
+Driver = driver.Driver
+BitBangDriver = bitbang.BitBangDriver
+
+ALL_OUTPUTS = bitbang.ALL_OUTPUTS
+ALL_INPUTS = bitbang.ALL_INPUTS
+BB_OUTPUT = bitbang.BB_OUTPUT
+BB_INPUT = bitbang.BB_INPUT
+

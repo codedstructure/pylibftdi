@@ -5,7 +5,7 @@ import functools
 from ctypes import (CDLL, byref, c_char_p, create_string_buffer)
 from ctypes.util import find_library
 
-from pylibftdi.base import ParrotEgg, DeadParrot, FtdiError
+from pylibftdi._base import ParrotEgg, DeadParrot, FtdiError
 
 class Driver(object):
     def __init__(self):
