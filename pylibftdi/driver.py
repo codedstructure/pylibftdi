@@ -1,4 +1,12 @@
+"""
+pylibftdi - python wrapper for libftdi
 
+Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+See LICENSE file for details and (absence of) warranty
+
+pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+
+"""
 
 import functools
 # be disciplined so pyflakes can check us...
@@ -8,6 +16,10 @@ from ctypes.util import find_library
 from pylibftdi._base import ParrotEgg, DeadParrot, FtdiError
 
 class Driver(object):
+    """
+    This is where it all happens...
+    We load the libftdi library, and use it.
+    """
     def __init__(self):
         self.ctx = None
         self.fdll = ParrotEgg()
@@ -38,11 +50,14 @@ class Driver(object):
         self.ctx = create_string_buffer(1024)
         if fdll.ftdi_init(byref(self.ctx)) != 0:
             raise FtdiError(fdll.ftdi_get_error_string(byref(self.ctx)))
+        # FTDI vendor/product ids required here.
         if fdll.ftdi_usb_open(byref(self.ctx), 0x0403, 0x6001) != 0:
             fdll.ftdi_deinit(byref(self.ctx))
             raise FtdiError(fdll.ftdi_get_error_string(byref(self.ctx)))
         # only at this point do we allow other things to access fdll.
         # (so if exception is thrown above, there is no access).
+        # - maybe this should all be in the constructor. RAII, you know.
+        #   (except we don't have deterministic destructors. oh well.)
         self.fdll = fdll
         self.opened = True
         return self
@@ -56,6 +71,10 @@ class Driver(object):
 
     @property
     def baudrate(self):
+        """
+        get or set the baudrate of the FTDI device. Re-read after setting
+        to ensure baudrate was accepted by the driver.
+        """
         return self._baudrate
     @baudrate.setter
     def baudrate(self, value):

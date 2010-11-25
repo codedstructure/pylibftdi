@@ -1,3 +1,12 @@
+"""
+pylibftdi - python wrapper for libftdi
+
+Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+See LICENSE file for details and (absence of) warranty
+
+pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+
+"""
 
 from pylibftdi.driver import Driver
 from ctypes import byref 
@@ -23,6 +32,7 @@ class BitBangDriver(Driver):
         self._latch = 0
 
     def open(self):
+        "open connection to a FTDI device"
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
         super(BitBangDriver, self).open()
@@ -34,6 +44,10 @@ class BitBangDriver(Driver):
     # is output (if set to 1) or input (set to 0)
     @property
     def direction(self):
+        """
+        get or set the direction of each of the IO lines. LSB=D0, MSB=D7
+        1 for output, 0 for input
+        """
         return self._direction
     @direction.setter
     def direction(self, dir):
@@ -45,6 +59,11 @@ class BitBangDriver(Driver):
     # port property - 8 bit read/write value
     @property
     def port(self):
+        """
+        get or set the state of the IO lines.  The value of output
+        lines is persisted in this object for the purposes of reading,
+        so read-modify-write operations (e.g. drv.port+=1) are valid.
+        """
         result = ord(super(BitBangDriver, self).read(1)[0])
         # replace the 'output' bits with current value of _latch -
         # the last written value. This makes read-modify-write
