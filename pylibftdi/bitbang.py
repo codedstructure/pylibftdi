@@ -1,7 +1,7 @@
 """
 pylibftdi - python wrapper for libftdi
 
-Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
 pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
@@ -19,15 +19,15 @@ BB_INPUT = 0
 class BitBangDriver(Driver):
     """
     simple subclass to support bit-bang mode
-    
+
     Only uses async mode at the moment.
-    
+
     Adds two read/write properties to the base class:
      direction: 8 bit input(0)/output(1) direction control.
      port: 8 bit IO port, as defined by direction.
     """
     def __init__(self, direction = ALL_OUTPUTS):
-        super(BitBangDriver, self).__init__()
+        super(BitBangDriver, self).__init__(mode = 'b')
         self.direction = direction
         self._latch = 0
 
@@ -40,6 +40,7 @@ class BitBangDriver(Driver):
             self.direction = self._direction
         return self
 
+
     # direction property - 8 bit value determining whether an IO line
     # is output (if set to 1) or input (set to 0)
     @property
@@ -49,12 +50,14 @@ class BitBangDriver(Driver):
         1 for output, 0 for input
         """
         return self._direction
+
     @direction.setter
     def direction(self, dir):
         assert 0 <= dir <= 255, 'invalid direction bitmask'
         self._direction = dir
         if self.opened:
             self.fdll.ftdi_set_bitmode(byref(self.ctx), dir, 0x01)
+
 
     # port property - 8 bit read/write value
     @property
@@ -64,12 +67,16 @@ class BitBangDriver(Driver):
         lines is persisted in this object for the purposes of reading,
         so read-modify-write operations (e.g. drv.port+=1) are valid.
         """
-        result = ord(super(BitBangDriver, self).read(1)[0])
+        # the coercion to bytearray here is to make this work
+        # transparently between Python2 and Python3 - equivalent
+        # of ord() for Python2, a time-wasting do-nothing on Python3
+        result = bytearray(super(BitBangDriver, self).read(1))[0]
         # replace the 'output' bits with current value of _latch -
         # the last written value. This makes read-modify-write
         # operations (e.g. 'drv.port |= 0x10') work as expected
         result = (result & ~self._direction) | (self._latch & self._direction)
         return result
+
     @port.setter
     def port(self, value):
         self._latch = value

@@ -1,6 +1,8 @@
 pylibftdi changes
 =================
 
+0.6
+ * same source now works on both Python2.6+ and Python3.
 0.5
  * fix various bugs found by pyflakes
  * improve module organisation, while providing interface compatibility

@@ -9,7 +9,7 @@ example usage:
 >   sleep 5;
 > done
 
-Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
@@ -66,14 +66,14 @@ class LCD(object):
 def display(string):
     "Display the given string on an attached LCD"
     with BitBangDriver() as bb:
-    
+
         # These LCDs are quite slow - and the actual baudrate
         # is 16x this in bitbang mode...
         bb.baudrate = 60
 
         lcd = LCD(bb)
         lcd.init_four_bit()
-    
+
         # 001xxxxx - function set
         lcd.write_cmd(0x20)
         # 00000001 - clear display
@@ -87,7 +87,7 @@ def display(string):
         # bit 1: display cursor
         # bit 0: blinking cursor
         lcd.write_cmd(0x0C)
-    
+
         for i in string:
             lcd.write_data(ord(i))
 
@@ -97,4 +97,4 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         display(sys.argv[1])
     else:
-        print "Usage: %s 'display string'"
+        print("Usage: %s 'display string'")

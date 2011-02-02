@@ -1,13 +1,12 @@
 """
 Flash an LED connected via a FTDI UM232R/245R module using pylibftdi
 
-Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
-from pylibftdi import BitBangDriver
-
 import time
+from pylibftdi import BitBangDriver
 
 def flash_forever(rate):
     "toggle bit zero at rate Hz"

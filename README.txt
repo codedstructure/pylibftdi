@@ -1,7 +1,7 @@
 pylibftdi
 =========
 
-Copyright (c) 2010 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
 
 All rights reserved.
 

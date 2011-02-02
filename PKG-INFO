@@ -1,0 +1,53 @@
+Metadata-Version: 1.0
+Name: pylibftdi
+Version: 0.6
+Summary: Pythonic interface to FTDI devices using libftdi
+Home-page: http://bitbucket.org/codedstructure/pylibftdi
+Author: Ben Bass
+Author-email: benbass@codedstructure.net
+Description: pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi.
+        The primary interface is the ``Driver`` class in the pylibftdi package; this
+        gives serial access on relevant FTDI devices (e.g. the UM232R), providing a
+        file-like interface (read, write).  Baudrate is controlled with the ``baudrate``
+        property.
+
+        If a Driver instance is created with ``mode='t'`` (text mode) then read() and
+        write() can use the given ``encoding`` (defaulting to latin-1). This doesn't
+        make a lot of difference on Python 2, but allows easier integration with passing
+        unicode strings between devices in Python 3.
+
+        For example::
+        
+            >>> with Driver(mode='t') as drv:
+            >>>     drv.baudrate = 115200
+            >>>     drv.write('Hello World')
+
+        The pylibftdi.BitBang wrapper provides access to the parallel IO mode of operation
+        through the ``port`` and ``direction`` properties.  These provide an 8 bit IO port
+        including all the relevant bit operations to make things simple.
+
+        
+            >>> with BitBang() as bb:
+            >>>     bb.direction = 0x0F   # four LSB are output(1), four MSB are input(0).
+            >>>     bb.port |= 2          # set bit 1
+            >>>     bb.port &= 0xFE       # clear bit 0
+
+Keywords: console,interpreter,expressions
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.0
+Classifier: Programming Language :: Python :: 3.1
+Classifier: Programming Language :: Python :: 3.2
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development :: Embedded Systems
+Classifier: Topic :: System :: Hardware
