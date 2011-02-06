@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: pylibftdi
-Version: 0.6
+Version: 0.7
 Summary: Pythonic interface to FTDI devices using libftdi
 Home-page: http://bitbucket.org/codedstructure/pylibftdi
 Author: Ben Bass

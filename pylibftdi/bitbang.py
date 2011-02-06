@@ -8,7 +8,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 """
 
-from pylibftdi.driver import Driver
+from pylibftdi.driver import Device
 from ctypes import byref 
 
 ALL_OUTPUTS = 0xFF
@@ -16,7 +16,7 @@ ALL_INPUTS = 0x00
 BB_OUTPUT = 1
 BB_INPUT = 0
 
-class BitBangDriver(Driver):
+class BitBangDriver(Device):
     """
     simple subclass to support bit-bang mode
 
@@ -56,7 +56,7 @@ class BitBangDriver(Driver):
         assert 0 <= dir <= 255, 'invalid direction bitmask'
         self._direction = dir
         if self.opened:
-            self.fdll.ftdi_set_bitmode(byref(self.ctx), dir, 0x01)
+            self.fdll.ftdi_set_bitmode(self.ctx, dir, 0x01)
 
 
     # port property - 8 bit read/write value

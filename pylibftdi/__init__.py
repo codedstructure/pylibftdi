@@ -14,11 +14,11 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.6"
+__VERSION__ = "0.7"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = ['Driver', 'BitBangDriver', 'Bus', 'FtdiError',
+__ALL__ = ['Driver', 'Device', 'BitBangDriver', 'Bus', 'FtdiError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT']
 
 from pylibftdi import _base, driver, util, bitbang
@@ -28,6 +28,7 @@ from pylibftdi import _base, driver, util, bitbang
 FtdiError = _base.FtdiError
 Bus = util.Bus
 Driver = driver.Driver
+Driver = driver.Device
 BitBangDriver = bitbang.BitBangDriver
 
 ALL_OUTPUTS = bitbang.ALL_OUTPUTS
