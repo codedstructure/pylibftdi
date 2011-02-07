@@ -14,84 +14,12 @@ from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, cast,
                     create_string_buffer, Structure, pointer, POINTER)
 from ctypes.util import find_library
 
-from pylibftdi._base import ParrotEgg, DeadParrot, FtdiError
-
+from pylibftdi._base import FtdiError
 
 class UsbDevList(Structure):
     _fields_ = [('next', c_void_p),
                 ('usb_dev', c_void_p)]
 
-def Follower(x):
-    class _(object):
-        def __getattr__(self, key):
-            obj = getattr(x,key)
-            if callable(obj):
-                class _fn(object):
-                    def __getattr__(s1, key):
-                        return getattr(obj, key)
-                    def __setattr__(s1, key, value):
-                        return setattr(obj, key, value)
-                    def __delattr__(s1, key):
-                        return delattr(obj, key)
-                    def __call__(s1, *o, **k):
-                        print "%s(%s,%s)"%(obj.__name__,o,k),
-                        res = obj(*o, **k)
-                        print "-> %s"%res
-                        return res
-                return _fn()
-            else:
-                return obj
-        def __setattr__(self, key, value):
-            return setattr(x,key,value)
-        def __delattr__(self, key):
-            return delattr(x,key)
-    return _()
-    
-
-class FtdiEnumerate(object):
-    def __init__(self):
-        self.ctx = None
-
-    def list_devices(self):
-        """
-        return a list of triples (manufacturer, description, serial#)
-        for each attached device, e.g.:
-        [('ftdi', 'um245r', 'fte00p4l'),
-         ('ftdi', 'um232r usb <-> serial', 'fte4ffvq')]
-
-        the serial number can be used to open specific devices
-        """
-        # ftdi_usb_find_all sets dev_list_ptr to a linked list
-        # (*next/*usb_device) of usb_devices, each of which can
-        # be passed to ftdi_usb_get_strings() to get info about
-        # them.
-        manuf = create_string_buffer(128)
-        desc = create_string_buffer(128)
-        serial = create_string_buffer(128)
-        ctx = create_string_buffer(1024)
-        fdll.ftdi_init(byref(ctx))
-        usbdevlist = POINTER(UsbDevList)
-        devlistptrtype = pointer(usbdevlist)
-        dev_list_ptr = devlistptrtype()
-        res = fdll.ftdi_usb_find_all(byref(ctx), byref(dev_list_ptr), 0x0403, 0x6001)
-        if res < 0:
-            fdll.ftdi_deinit(byref(self.ctx))
-            raise ftdierror(fdll.ftdi_get_error_string(byref(self.ctx)))
-        # we'll add the info here.
-        devices = []
-        # take a copy of the dev_list for subsequent list_free
-        dev_list_base = pointer(dev_list_ptr.contents)
-        # traverse the linked list...
-        try:
-            while dev_list_ptr:
-                fdll.ftdi_usb_get_strings(byref(ctx), dev_list_ptr.contents.usb_dev,
-                        manuf,127, desc,127, serial,127)
-                devices.append((manuf.value, desc.value, serial.value))
-                # step to next in linked-list if not 
-                dev_list_ptr = cast(dev_list_ptr.contents.next, devlistptrtype)
-        finally:
-           fdll.ftdi_list_free(dev_list_base)
-        return devices
 
 class Driver(object):
     """
@@ -99,22 +27,33 @@ class Driver(object):
     We load the libftdi library, and use it.
     """
 
-    instance = None
+    _instance = None
+    _need_init = True
+
+    def __new__(cls, *o, **k):
+        # make this a singleton. There is only a single
+        # reference to the dynamic library.
+        if Driver._instance is None:
+            Driver._instance = object.__new__(cls)
+        return Driver._instance
 
     def __init__(self):
-        ftdi_lib = find_library('ftdi')
-        if ftdi_lib is None:
-            raise FtdiError('libftdi library not found')
-        fdll = Follower(CDLL(ftdi_lib))
-        # most args/return types are fine with the implicit
-        # int/void* which ctypes uses, but some need setting here
-        fdll.ftdi_get_error_string.restype = c_char_p
-        fdll.ftdi_usb_get_strings.argtypes = (c_void_p, c_void_p,
-                                              c_char_p, c_int,
-                                              c_char_p, c_int,
-                                              c_char_p, c_int)
-        self.fdll = fdll
-        Driver.instance = self
+        if self._need_init:
+            ftdi_lib = find_library('ftdi')
+            if ftdi_lib is None:
+                raise FtdiError('libftdi library not found')
+            fdll = CDLL(ftdi_lib)
+            # most args/return types are fine with the implicit
+            # int/void* which ctypes uses, but some need setting here
+            fdll.ftdi_get_error_string.restype = c_char_p
+            fdll.ftdi_new.restype = c_void_p
+            fdll.ftdi_free.argtypes = (c_void_p,)
+            fdll.ftdi_usb_get_strings.argtypes = (c_void_p, c_void_p,
+                                                  c_char_p, c_int,
+                                                  c_char_p, c_int,
+                                                  c_char_p, c_int)
+            self.fdll = fdll
+        self._need_init = False
 
     def list_devices(self):
         """
@@ -129,41 +68,40 @@ class Driver(object):
         # (*next/*usb_device) of usb_devices, each of which can
         # be passed to ftdi_usb_get_strings() to get info about
         # them.
+        # this will contain the device info to return
+        devices = []
         manuf = create_string_buffer(128)
         desc = create_string_buffer(128)
         serial = create_string_buffer(128)
-        ctx = create_string_buffer(1024)
-        self.fdll.ftdi_init(byref(ctx))
         devlistptrtype = POINTER(UsbDevList)
         dev_list_ptr = devlistptrtype()
-        res = self.fdll.ftdi_usb_find_all(byref(ctx), byref(dev_list_ptr), 0x0403, 0x6001)
-        if res < 0:
-            self.fdll.ftdi_deinit(byref(self.ctx))
-            raise ftdierror(self.fdll.ftdi_get_error_string(byref(self.ctx)))
-        # we'll add the info here.
-        devices = []
-        # take a copy of the dev_list for subsequent list_free
-        dev_list_base = pointer(dev_list_ptr.contents)
-        # traverse the linked list...
+
+        ctx = self.fdll.ftdi_new()
         try:
-            while dev_list_ptr:
-                self.fdll.ftdi_usb_get_strings(byref(ctx), dev_list_ptr.contents.usb_dev,
-                        manuf,127, desc,127, serial,127)
-                devices.append((manuf.value, desc.value, serial.value))
-                # step to next in linked-list if not 
-                dev_list_ptr = cast(dev_list_ptr.contents.next, devlistptrtype)
+            res = self.fdll.ftdi_usb_find_all(ctx, byref(dev_list_ptr), 0x0403, 0x6001)
+            if res < 0:
+                raise FtdiError(self.fdll.ftdi_get_error_string(ctx))
+            elif res > 0:
+                # take a copy of the dev_list for subsequent list_free
+                dev_list_base = pointer(dev_list_ptr.contents)
+                # traverse the linked list...
+                try:
+                    while dev_list_ptr:
+                        self.fdll.ftdi_usb_get_strings(ctx, dev_list_ptr.contents.usb_dev,
+                                manuf,127, desc,127, serial,127)
+                        devices.append((manuf.value, desc.value, serial.value))
+                        # step to next in linked-list if not
+                        dev_list_ptr = cast(dev_list_ptr.contents.next, devlistptrtype)
+                finally:
+                    self.fdll.ftdi_list_free(dev_list_base)
         finally:
-           self.fdll.ftdi_list_free(dev_list_base)
+            self.fdll.ftdi_free(ctx)
         return devices
 
 class Device(object):
     def __init__(self, mode="b", encoding="latin1"):
-        if Driver.instance is None:
-            # initialise it...
-            Driver()
-        self.ctx = self.fdll.ftdi_new()
-        if self.ctx == 0:
-            raise FtdiError("could not create new FTDI context")
+        self.driver = Driver()
+        self.fdll = self.driver.fdll
         self.opened = False
         # mode can be either 'b' for binary, or 't' for text.
         # if set to text, the values returned from read() will
@@ -180,7 +118,10 @@ class Device(object):
         # standard for serial devices.
         self._baudrate = 9600
 
-    fdll = property(lambda self: Driver.instance.fdll)
+    def __del__(self):
+        "tell driver to free the ftdi_context resource"
+        if self.opened:
+            self.close()
 
     def open(self, device_id=None):
         """open connection to a FTDI device
@@ -188,6 +129,10 @@ class Device(object):
         """
         if self.opened:
             return
+        # create context for this device
+        self.ctx = self.fdll.ftdi_new()
+        if self.ctx == 0:
+            raise FtdiError("could not create new FTDI context")
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things
         # have already been setup.
@@ -199,18 +144,14 @@ class Device(object):
             open_args.extend([0, c_char_p(device_id.encode('latin1'))])
             res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
         if res != 0:
-            try:
-                raise FtdiError(self.fdll.ftdi_get_error_string(self.ctx))
-            finally:
-                self.fdll.ftdi_free(self.ctx)
-                self.ctx = None
+            raise FtdiError(self.fdll.ftdi_get_error_string(self.ctx))
         self.opened = True
 
     def close(self):
         "close our connection, free resources"
+        if self.opened:
+            self.fdll.ftdi_free(self.ctx)
         self.opened = False
-        if self.fdll.ftdi_usb_close(self.ctx) == 0:
-            self.fdll.ftdi_deinit(self.ctx)
 
     @property
     def baudrate(self):

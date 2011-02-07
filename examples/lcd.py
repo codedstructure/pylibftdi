@@ -13,7 +13,7 @@ Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
-from pylibftdi import BitBangDriver, Bus
+from pylibftdi import BitBangDevice, Bus
 
 
 class LCD(object):
@@ -65,7 +65,7 @@ class LCD(object):
 
 def display(string):
     "Display the given string on an attached LCD"
-    with BitBangDriver() as bb:
+    with BitBangDevice() as bb:
 
         # These LCDs are quite slow - and the actual baudrate
         # is 16x this in bitbang mode...

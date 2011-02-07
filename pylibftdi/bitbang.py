@@ -9,14 +9,13 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 from pylibftdi.driver import Device
-from ctypes import byref 
 
 ALL_OUTPUTS = 0xFF
 ALL_INPUTS = 0x00
 BB_OUTPUT = 1
 BB_INPUT = 0
 
-class BitBangDriver(Device):
+class BitBangDevice(Device):
     """
     simple subclass to support bit-bang mode
 
@@ -27,7 +26,7 @@ class BitBangDriver(Device):
      port: 8 bit IO port, as defined by direction.
     """
     def __init__(self, direction = ALL_OUTPUTS):
-        super(BitBangDriver, self).__init__(mode = 'b')
+        super(BitBangDevice, self).__init__(mode = 'b')
         self.direction = direction
         self._latch = 0
 
@@ -35,7 +34,7 @@ class BitBangDriver(Device):
         "open connection to a FTDI device"
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
-        super(BitBangDriver, self).open()
+        super(BitBangDevice, self).open()
         if self._direction:
             self.direction = self._direction
         return self
@@ -70,7 +69,7 @@ class BitBangDriver(Device):
         # the coercion to bytearray here is to make this work
         # transparently between Python2 and Python3 - equivalent
         # of ord() for Python2, a time-wasting do-nothing on Python3
-        result = bytearray(super(BitBangDriver, self).read(1))[0]
+        result = bytearray(super(BitBangDevice, self).read(1))[0]
         # replace the 'output' bits with current value of _latch -
         # the last written value. This makes read-modify-write
         # operations (e.g. 'drv.port |= 0x10') work as expected
@@ -80,5 +79,5 @@ class BitBangDriver(Device):
     @port.setter
     def port(self, value):
         self._latch = value
-        return super(BitBangDriver, self).write(chr(value))
+        return super(BitBangDevice, self).write(chr(value))
 

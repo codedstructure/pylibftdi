@@ -1,6 +1,9 @@
 pylibftdi changes
 =================
 
+0.7
+ * support multiple attached devices
+ * new API - separation between driver and device
 0.6
  * same source now works on both Python2.6+ and Python3.
 0.5

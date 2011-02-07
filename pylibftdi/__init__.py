@@ -18,7 +18,7 @@ __VERSION__ = "0.7"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = ['Driver', 'Device', 'BitBangDriver', 'Bus', 'FtdiError',
+__ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT']
 
 from pylibftdi import _base, driver, util, bitbang
@@ -28,11 +28,16 @@ from pylibftdi import _base, driver, util, bitbang
 FtdiError = _base.FtdiError
 Bus = util.Bus
 Driver = driver.Driver
-Driver = driver.Device
-BitBangDriver = bitbang.BitBangDriver
+BitBangDevice = bitbang.BitBangDevice
 
 ALL_OUTPUTS = bitbang.ALL_OUTPUTS
 ALL_INPUTS = bitbang.ALL_INPUTS
 BB_OUTPUT = bitbang.BB_OUTPUT
 BB_INPUT = bitbang.BB_INPUT
 
+
+# LEGACY SUPPORT
+
+#__ALL__.append('BitBangDriver')
+#Driver = driver.Device
+#BitBangDriver = bitbang.BitBangDevice
