@@ -28,6 +28,7 @@ class BitBangDevice(Device):
     def __init__(self, direction = ALL_OUTPUTS):
         super(BitBangDevice, self).__init__(mode = 'b')
         self.direction = direction
+        self._last_set_dir = None
         self._latch = 0
 
     def open(self):
@@ -35,7 +36,7 @@ class BitBangDevice(Device):
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
         super(BitBangDevice, self).open()
-        if self._direction:
+        if self._direction != self._last_set_dir:
             self.direction = self._direction
         return self
 
@@ -55,7 +56,8 @@ class BitBangDevice(Device):
         assert 0 <= dir <= 255, 'invalid direction bitmask'
         self._direction = dir
         if self.opened:
-            self.fdll.ftdi_set_bitmode(self.ctx, dir, 0x01)
+            self.ftdi_fn.ftdi_set_bitmode(dir, 0x01)
+            self._last_set_dir = dir
 
 
     # port property - 8 bit read/write value

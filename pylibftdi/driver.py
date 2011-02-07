@@ -20,6 +20,14 @@ class UsbDevList(Structure):
     _fields_ = [('next', c_void_p),
                 ('usb_dev', c_void_p)]
 
+# Note I gave up on attempts to use ftdi_new/ftdi_free (just using
+# ctx instead of byref(ctx) in first param of most ftdi_* functions) as
+# (at least for 64-bit) they only worked if argtypes was declared
+# (c_void_p for ctx), and that's too much like hard work to maintain.
+# So I've reverted to using create_string_buffer for memory management,
+# byref(ctx) to pass in the context instance, and ftdi_init() / 
+# ftdi_deinit() pair to manage the driver resources. It's very nice
+# how layered the libftdi code is, with access to each layer.
 
 class Driver(object):
     """
@@ -46,8 +54,6 @@ class Driver(object):
             # most args/return types are fine with the implicit
             # int/void* which ctypes uses, but some need setting here
             fdll.ftdi_get_error_string.restype = c_char_p
-            fdll.ftdi_new.restype = c_void_p
-            fdll.ftdi_free.argtypes = (c_void_p,)
             fdll.ftdi_usb_get_strings.argtypes = (c_void_p, c_void_p,
                                                   c_char_p, c_int,
                                                   c_char_p, c_int,
@@ -76,18 +82,20 @@ class Driver(object):
         devlistptrtype = POINTER(UsbDevList)
         dev_list_ptr = devlistptrtype()
 
-        ctx = self.fdll.ftdi_new()
+        ctx = create_string_buffer(1024)
+        self.fdll.ftdi_init(byref(ctx))
+
         try:
-            res = self.fdll.ftdi_usb_find_all(ctx, byref(dev_list_ptr), 0x0403, 0x6001)
+            res = self.fdll.ftdi_usb_find_all(byref(ctx), byref(dev_list_ptr), 0x0403, 0x6001)
             if res < 0:
-                raise FtdiError(self.fdll.ftdi_get_error_string(ctx))
+                raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
             elif res > 0:
                 # take a copy of the dev_list for subsequent list_free
                 dev_list_base = pointer(dev_list_ptr.contents)
                 # traverse the linked list...
                 try:
                     while dev_list_ptr:
-                        self.fdll.ftdi_usb_get_strings(ctx, dev_list_ptr.contents.usb_dev,
+                        self.fdll.ftdi_usb_get_strings(byref(ctx), dev_list_ptr.contents.usb_dev,
                                 manuf,127, desc,127, serial,127)
                         devices.append((manuf.value, desc.value, serial.value))
                         # step to next in linked-list if not
@@ -95,7 +103,7 @@ class Driver(object):
                 finally:
                     self.fdll.ftdi_list_free(dev_list_base)
         finally:
-            self.fdll.ftdi_free(ctx)
+            self.fdll.ftdi_deinit(byref(ctx))
         return devices
 
 class Device(object):
@@ -129,28 +137,39 @@ class Device(object):
         """
         if self.opened:
             return
+
         # create context for this device
-        self.ctx = self.fdll.ftdi_new()
-        if self.ctx == 0:
-            raise FtdiError("could not create new FTDI context")
+        self.ctx = create_string_buffer(1024)
+        if self.fdll.ftdi_init(byref(self.ctx)) != 0:
+            msg = self.get_error_string()
+            del self.ctx
+            raise FtdiError(msg)
+
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things
         # have already been setup.
         # FTDI vendor/product ids required here.
-        open_args = [self.ctx, 0x0403, 0x6001]
+        open_args = [byref(self.ctx), 0x0403, 0x6001]
         if device_id is None:
             res = self.fdll.ftdi_usb_open(*tuple(open_args))
         else:
             open_args.extend([0, c_char_p(device_id.encode('latin1'))])
             res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+
         if res != 0:
-            raise FtdiError(self.fdll.ftdi_get_error_string(self.ctx))
+            msg = self.get_error_string()
+            # free the context
+            self.fdll.ftdi_deinit(byref(self.ctx))
+            del self.ctx
+            raise FtdiError(msg)
+
         self.opened = True
 
     def close(self):
         "close our connection, free resources"
         if self.opened:
-            self.fdll.ftdi_free(self.ctx)
+            self.fdll.ftdi_deinit(byref(self.ctx))
+            del self.ctx
         self.opened = False
 
     @property
@@ -175,7 +194,7 @@ class Device(object):
         raw bytes, else decode according to self.encoding
         """
         buf = create_string_buffer(length)
-        rlen = self.fdll.ftdi_read_data(self.ctx, byref(buf), length)
+        rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
         if rlen == -1:
             raise FtdiError(self.get_error_string())
         byte_data = buf.raw[:rlen]
@@ -192,7 +211,7 @@ class Device(object):
             # this will happen if we are Python3 and data is a str.
             byte_data = data.encode(self.encoding)
         buf = create_string_buffer(byte_data)
-        written = self.fdll.ftdi_write_data(self.ctx,
+        written = self.fdll.ftdi_write_data(byref(self.ctx),
                                             byref(buf), len(data))
         if written == -1:
             raise FtdiError(self.get_error_string())
@@ -201,7 +220,7 @@ class Device(object):
 
     def get_error_string(self):
         "return error string from libftdi driver"
-        return self.fdll.ftdi_get_error_string(self.ctx)
+        return self.fdll.ftdi_get_error_string(byref(self.ctx))
 
 
     @property
@@ -210,7 +229,9 @@ class Device(object):
         this allows the vast majority of libftdi functions
         which are called with a pointer to a ftdi_context
         struct as the first parameter to be called here
-        in a nicely encapsulated way:
+        preventing the need to leak self.ctx into the user
+        code (and import byref from ctypes):
+
         >>> with Driver() as drv:
         >>>     # set 8 bit data, 2 stop bits, no parity
         >>>     drv.ftdi_fn.ftdi_set_line_property(8, 2, 0)
@@ -222,7 +243,7 @@ class Device(object):
         class FtdiForwarder(object):
             def __getattr__(innerself, key):
                  return functools.partial(getattr(self.fdll, key),
-                                          self.ctx)
+                                          byref(self.ctx))
         return FtdiForwarder()
 
 
