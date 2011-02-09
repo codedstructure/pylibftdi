@@ -82,11 +82,16 @@ class Driver(object):
         devlistptrtype = POINTER(UsbDevList)
         dev_list_ptr = devlistptrtype()
 
+        # create context for doing the enumeration
         ctx = create_string_buffer(1024)
-        self.fdll.ftdi_init(byref(ctx))
+        if self.fdll.ftdi_init(byref(self.ctx)) != 0:
+            msg = self.fdll.ftdi_get_error_string(byref(ctx))
+            raise FtdiError(msg)
 
         try:
-            res = self.fdll.ftdi_usb_find_all(byref(ctx), byref(dev_list_ptr), 0x0403, 0x6001)
+            res = self.fdll.ftdi_usb_find_all(byref(ctx),
+                                              byref(dev_list_ptr),
+                                              0x0403, 0x6001)
             if res < 0:
                 raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
             elif res > 0:
@@ -95,11 +100,13 @@ class Driver(object):
                 # traverse the linked list...
                 try:
                     while dev_list_ptr:
-                        self.fdll.ftdi_usb_get_strings(byref(ctx), dev_list_ptr.contents.usb_dev,
+                        self.fdll.ftdi_usb_get_strings(byref(ctx),
+                                dev_list_ptr.contents.usb_dev,
                                 manuf,127, desc,127, serial,127)
                         devices.append((manuf.value, desc.value, serial.value))
                         # step to next in linked-list if not
-                        dev_list_ptr = cast(dev_list_ptr.contents.next, devlistptrtype)
+                        dev_list_ptr = cast(dev_list_ptr.contents.next,
+                                            devlistptrtype)
                 finally:
                     self.fdll.ftdi_list_free(dev_list_base)
         finally:
