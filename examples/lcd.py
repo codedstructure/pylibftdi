@@ -63,9 +63,12 @@ class LCD(object):
     def write_data(self, x):
         self._write_raw(1, x)
 
-def display(string):
-    "Display the given string on an attached LCD"
-    with BitBangDevice() as bb:
+def display(string, device_id=None):
+    """
+    Display the given string on an attached LCD
+    an optional `device_id` can be given.
+    """
+    with BitBangDevice(device_id) as bb:
 
         # These LCDs are quite slow - and the actual baudrate
         # is 16x this in bitbang mode...

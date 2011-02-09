@@ -9,6 +9,8 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 import functools
+import warnings
+
 # be disciplined so pyflakes can check us...
 from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, cast,
                     create_string_buffer, Structure, pointer, POINTER)
@@ -61,6 +63,36 @@ class Driver(object):
             self.fdll = fdll
         self._need_init = False
 
+    ## Legacy support - prior to version 0.7, Device and Driver
+    ## were unified (and named 'Driver'). This provides basic
+    ## backwards compatiblity support.
+    LEGACY_ATTRIBUTES = ['open', 'close', 'ftdi_fn', 'baudrate',
+                         'read', 'write', 'get_error_string',
+                         '__enter__', '__exit__']
+    @property
+    def legacy_device(self):
+        warnings.warn("using Device() methods on Driver(); see CHANGES.txt",
+                DeprecationWarning)
+        if not hasattr(self, '_legacy_device'):
+            self._legacy_device = Device(lazy_open=True)
+        return self._legacy_device
+
+    def __getattr__(self, key):
+        if key in Driver.LEGACY_ATTRIBUTES:
+            return getattr(self.legacy_device, key)
+        else:
+            return object.__getattr__(self, key)
+    def __setattr__(self, key, value):
+        if key in Driver.LEGACY_ATTRIBUTES:
+            return setattr(self.legacy_device, key, value)
+        else:
+            self.__dict__[key] = value
+    def __delattr__(self, key):
+        if key in Driver.LEGACY_ATTRIBUTES:
+            delattr(self.legacy_device, key)
+        else:
+            del self.__dict__[key]
+
     def list_devices(self):
         """
         return a list of triples (manufacturer, description, serial#)
@@ -112,6 +144,7 @@ class Driver(object):
         finally:
             self.fdll.ftdi_deinit(byref(ctx))
         return devices
+
 
 class Device(object):
     """
@@ -202,6 +235,7 @@ class Device(object):
     def close(self):
         "close our connection, free resources"
         if self.opened:
+            self.fdll.ftdi_usb_close(byref(self.ctx))
             self.fdll.ftdi_deinit(byref(self.ctx))
             del self.ctx
         self.opened = False

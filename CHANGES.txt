@@ -3,7 +3,14 @@ pylibftdi changes
 
 0.7
  * support multiple attached devices
- * new API - separation between driver and device
+ * API changes:
+   - separation between driver and device. Generally, now use Device() /
+     BitBangDevice() rather than Driver / BitBangDriver(), though older code
+     _should_ still work via some shims (though with Deprecation warnings).
+   - first parameter in Device() and BitBangDevice() is a device ID - the serial
+     number string of the target device.
+   - open() is generally no longer required on Devices. This is to more closely
+     model the file() API.
 0.6
  * same source now works on both Python2.6+ and Python3.
 0.5

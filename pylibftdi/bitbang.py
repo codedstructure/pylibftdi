@@ -8,7 +8,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 """
 
-from pylibftdi.driver import Device
+from pylibftdi.driver import Device, FtdiError
 
 ALL_OUTPUTS = 0xFF
 ALL_INPUTS = 0x00
@@ -25,8 +25,9 @@ class BitBangDevice(Device):
      direction: 8 bit input(0)/output(1) direction control.
      port: 8 bit IO port, as defined by direction.
     """
-    def __init__(self, direction = ALL_OUTPUTS,
+    def __init__(self,
                  device_id = None,
+                 direction = ALL_OUTPUTS,
                  lazy_open = False):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables

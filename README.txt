@@ -9,8 +9,8 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 
  - Supports Python 2 and Python 3
  - Supports parallel and serial devices
- - Cross-platform
  - Support for multiple devices
+ - Cross-platform
 
 :Limitations:
 
@@ -21,39 +21,43 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 Usage
 -----
 
-The primary interface is the ``Driver`` class in the pylibftdi package; this
+The primary interface is the ``Device`` class in the pylibftdi package; this
 gives serial access on relevant FTDI devices (e.g. the UM232R), providing a
 file-like interface (read, write).  Baudrate is controlled with the ``baudrate``
 property.
 
-If a Driver instance is created with ``mode='t'`` (text mode) then read() and
+If a Device instance is created with ``mode='t'`` (text mode) then read() and
 write() can use the given ``encoding`` (defaulting to latin-1). This doesn't
 make a lot of difference on Python 2 (and can be omitted), but allows easier
 integration with passing unicode strings between devices in Python 3.
+
+Multiple devices are supported by passing the desired device serial number (as
+a string) in the ``device_id`` parameter - this is the first parameter in both
+Device() and BitBangDevice() constructors.
 
 Examples
 ~~~~~~~~
 
 ::
 
-    >>> from pylibftdi import Driver
+    >>> from pylibftdi import Device
     >>>
-    >>> with Driver(mode='t') as drv:
-    >>>     drv.baudrate = 115200
-    >>>     drv.write('Hello World')
+    >>> with Device(mode='t') as dev:
+    ...     dev.baudrate = 115200
+    ...     dev.write('Hello World')
 
-The pylibftdi.BitBang wrapper provides access to the parallel IO mode of
+The pylibftdi.BitBangDevice wrapper provides access to the parallel IO mode of
 operation through the ``port`` and ``direction`` properties.  These provide an
 8 bit IO port including all the relevant bit operations to make things simple.
 
 ::
 
-    >>> from pylibftdi import BitBang
+    >>> from pylibftdi import BitBangDevice
     >>>
-    >>> with BitBang() as bb:
-    >>>     bb.direction = 0x0F  # four LSB are output(1), four MSB are input(0)
-    >>>     bb.port |= 2         # set bit 1
-    >>>     bb.port &= 0xFE      # clear bit 0
+    >>> with BitBangDevice('FTE00P4L') as bb:
+    ...     bb.direction = 0x0F  # four LSB are output(1), four MSB are input(0)
+    ...     bb.port |= 2         # set bit 1
+    ...     bb.port &= 0xFE      # clear bit 0
 
 There is support for a number of external devices and protocols, specifically
 for interfacing with HD44780 LCDs using the 4-bit interface.

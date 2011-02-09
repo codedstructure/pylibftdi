@@ -28,6 +28,7 @@ from pylibftdi import _base, driver, util, bitbang
 FtdiError = _base.FtdiError
 Bus = util.Bus
 Driver = driver.Driver
+Device = driver.Device
 BitBangDevice = bitbang.BitBangDevice
 
 ALL_OUTPUTS = bitbang.ALL_OUTPUTS
@@ -38,6 +39,9 @@ BB_INPUT = bitbang.BB_INPUT
 
 # LEGACY SUPPORT
 
-#__ALL__.append('BitBangDriver')
-#Driver = driver.Device
-#BitBangDriver = bitbang.BitBangDevice
+class BitBangDriver(bitbang.BitBangDevice):
+    def __init__(self, direction=ALL_OUTPUTS):
+        import warnings
+        warnings.warn('change BitBangDriver reference to BitBangDevice',
+                      DeprecationWarning)
+        return BitBangDevice.__init__(self, direction=direction, lazy_open=True)
