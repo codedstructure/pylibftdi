@@ -65,8 +65,8 @@ class Driver(object):
         """
         return a list of triples (manufacturer, description, serial#)
         for each attached device, e.g.:
-        [('ftdi', 'um245r', 'fte00p4l'),
-         ('ftdi', 'um232r usb <-> serial', 'fte4ffvq')]
+        [('FTDI', 'UM232R USB <-> Serial', 'FTE4FFVQ'),
+         ('FTDI', 'UM245R', 'FTE00P4L')]
 
         the serial number can be used to open specific devices
         """
@@ -84,7 +84,7 @@ class Driver(object):
 
         # create context for doing the enumeration
         ctx = create_string_buffer(1024)
-        if self.fdll.ftdi_init(byref(self.ctx)) != 0:
+        if self.fdll.ftdi_init(byref(ctx)) != 0:
             msg = self.fdll.ftdi_get_error_string(byref(ctx))
             raise FtdiError(msg)
 
@@ -114,10 +114,34 @@ class Driver(object):
         return devices
 
 class Device(object):
-    def __init__(self, mode="b", encoding="latin1"):
+    """
+    Device([device_id[, mode [, encoding [, lazy_open]]]) -> Device instance
+
+    represents a single FTDI device accessible via the libftdi driver.
+    Supports a basic file-like interface (open/close/read/write, context
+    manager support).
+
+    device_id - an optional serial number of the device to open.
+      if omitted, this refers to the first device found, which is
+      convenient if only one device is attached, but otherwise
+      fairly useless.
+
+    mode - either 'b' (binary) or 't' (text). This primarily affects
+      Python 3 calls to read() and write(), which will accept/return
+      unicode strings which will be encoded/decoded according to the given...
+
+    encoding - the codec name to be used for text operations.
+
+    lazy_open - if True, then the device will not be opened immediately - the
+      user must perform an explicit open() call prior to other operations.
+    """
+    def __init__(self, device_id=None, mode="b",
+                 encoding="latin1", lazy_open=False):
         self.driver = Driver()
         self.fdll = self.driver.fdll
         self.opened = False
+        # device_id is an optional serial number of the requested device.
+        self.device_id = device_id
         # mode can be either 'b' for binary, or 't' for text.
         # if set to text, the values returned from read() will
         # be decoded using encoding before being returned as
@@ -132,15 +156,18 @@ class Device(object):
         # to 9600, which certainly seems to be a de-facto
         # standard for serial devices.
         self._baudrate = 9600
+        # lazy_open tells us not to open immediately.
+        if not lazy_open:
+            self.open()
 
     def __del__(self):
         "tell driver to free the ftdi_context resource"
         if self.opened:
             self.close()
 
-    def open(self, device_id=None):
-        """open connection to a FTDI device
-        device_id: [optional] serial number (string) of device to be opened
+    def open(self):
+        """
+        open connection to a FTDI device
         """
         if self.opened:
             return
@@ -157,10 +184,10 @@ class Device(object):
         # have already been setup.
         # FTDI vendor/product ids required here.
         open_args = [byref(self.ctx), 0x0403, 0x6001]
-        if device_id is None:
+        if self.device_id is None:
             res = self.fdll.ftdi_usb_open(*tuple(open_args))
         else:
-            open_args.extend([0, c_char_p(device_id.encode('latin1'))])
+            open_args.extend([0, c_char_p(self.device_id.encode('latin1'))])
             res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
 
         if res != 0:
@@ -196,10 +223,15 @@ class Device(object):
 
     def read(self, length):
         """
-        read upto length bytes from the FTDI device
+        read(length) -> bytes/string of up to `length` bytes.
+
+        read upto `length` bytes from the FTDI device
         return type depends on self.mode - if 'b' return
         raw bytes, else decode according to self.encoding
         """
+        if not self.opened:
+            raise FtdiError("read() on closed Device")
+
         buf = create_string_buffer(length)
         rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
         if rlen == -1:
@@ -208,10 +240,22 @@ class Device(object):
         if self.mode == 'b':
             return byte_data
         else:
+            # TODO: for some codecs, this may choke if we haven't read the
+            # full required data. If this is the case we should probably trim
+            # a byte at a time from the output until the decoding works, and
+            # buffer the remainder for next time.
             return byte_data.decode(self.encoding)
 
     def write(self, data):
-        "write given data string to the FTDI device"
+        """
+        write(data) -> count of bytes actually written
+
+        write given `data` string to the FTDI device
+        returns count of bytes written, which may be less than `len(data)`
+        """
+        if not self.opened:
+            raise FtdiError("read() on closed Device")
+
         try:
             byte_data = bytes(data)
         except TypeError:
@@ -239,9 +283,9 @@ class Device(object):
         preventing the need to leak self.ctx into the user
         code (and import byref from ctypes):
 
-        >>> with Driver() as drv:
+        >>> with Device() as dev:
         >>>     # set 8 bit data, 2 stop bits, no parity
-        >>>     drv.ftdi_fn.ftdi_set_line_property(8, 2, 0)
+        >>>     dev.ftdi_fn.ftdi_set_line_property(8, 2, 0)
         >>>     ...
         """
         # note this class is constructed on each call, so this

@@ -25,18 +25,28 @@ class BitBangDevice(Device):
      direction: 8 bit input(0)/output(1) direction control.
      port: 8 bit IO port, as defined by direction.
     """
-    def __init__(self, direction = ALL_OUTPUTS):
-        super(BitBangDevice, self).__init__(mode = 'b')
+    def __init__(self, direction = ALL_OUTPUTS,
+                 device_id = None,
+                 lazy_open = False):
+        # initialise the super-class, but don't open yet. We really want
+        # two-part initialisation here - set up all the instance variables
+        # here in the super class, then open it after having set more
+        # of our own variables.
+        super(BitBangDevice, self).__init__(device_id = device_id,
+                                            mode = 'b',
+                                            lazy_open = True)
         self.direction = direction
         self._last_set_dir = None
         self._latch = 0
+        if not lazy_open:
+            self.open()
 
     def open(self):
         "open connection to a FTDI device"
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
         super(BitBangDevice, self).open()
-        if self._direction != self._last_set_dir:
+        if self.direction != self._last_set_dir:
             self.direction = self._direction
         return self
 
@@ -53,7 +63,8 @@ class BitBangDevice(Device):
 
     @direction.setter
     def direction(self, dir):
-        assert 0 <= dir <= 255, 'invalid direction bitmask'
+        if not (0 <= dir <= 255):
+            raise FtdiError("invalid direction bitmask")
         self._direction = dir
         if self.opened:
             self.ftdi_fn.ftdi_set_bitmode(dir, 0x01)
