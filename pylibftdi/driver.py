@@ -31,6 +31,11 @@ class UsbDevList(Structure):
 # ftdi_deinit() pair to manage the driver resources. It's very nice
 # how layered the libftdi code is, with access to each layer.
 
+# These constants determine what type of flush operation to perform
+FLUSH_BOTH = 1
+FLUSH_INPUT = 2
+FLUSH_OUTPUT = 3
+
 class Driver(object):
     """
     This is where it all happens...
@@ -220,8 +225,14 @@ class Device(object):
         if self.device_id is None:
             res = self.fdll.ftdi_usb_open(*tuple(open_args))
         else:
+            # attempt to match device_id to serial number
             open_args.extend([0, c_char_p(self.device_id.encode('latin1'))])
             res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+            if res != 0:
+                # swap last two parameters and try again
+                #  - attempt to match device_id to description
+                open_args[-2:] = open_args[-1:-3:-1]
+                res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
 
         if res != 0:
             msg = self.get_error_string()
@@ -302,11 +313,45 @@ class Device(object):
             raise FtdiError(self.get_error_string())
         return written
 
+    def flush(self, flush_what=FLUSH_BOTH):
+        """
+        Instruct the FTDI device to flush its FIFO buffers
+
+        By default both the input and output buffers will be
+        flushed, but the caller can selectively chose to only
+        flush the input or output buffers using `flush_what`:
+          FLUSH_BOTH - (default)
+          FLUSH_INPUT - (just the rx buffer)
+          FLUSH_OUTPUT - (just the tx buffer)
+        """
+        if flush_what == FLUSH_BOTH:
+            fn = self.fdll.ftdi_usb_purge_buffers
+        elif flush_what == FLUSH_INPUT:
+            fn = self.fdll.ftdi_usb_purge_rx_buffer
+        elif flush_what == FLUSH_OUTPUT:
+            fn = self.fdll.ftdi_usb_purge_tx_buffer
+        else:
+            raise ValueError("Invalid value passed to %s.flush()" %
+                    self.__class__.__name__)
+        res = fn(byref(self.ctx))
+        if res != 0:
+            raise FtdiError(self.get_error_string())
+
+    def flush_input(self):
+        """
+        flush the device input buffer
+        """
+        self.flush(FLUSH_INPUT)
+
+    def flush_output(self):
+        """
+        flush the device output buffer
+        """
+        self.flush(FLUSH_OUTPUT)
 
     def get_error_string(self):
         "return error string from libftdi driver"
         return self.fdll.ftdi_get_error_string(byref(self.ctx))
-
 
     @property
     def ftdi_fn(self):

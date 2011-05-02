@@ -14,7 +14,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.7"
+__VERSION__ = "0.8"
 __AUTHOR__ = "Ben Bass"
 
 
@@ -35,7 +35,9 @@ ALL_OUTPUTS = bitbang.ALL_OUTPUTS
 ALL_INPUTS = bitbang.ALL_INPUTS
 BB_OUTPUT = bitbang.BB_OUTPUT
 BB_INPUT = bitbang.BB_INPUT
-
+FLUSH_BOTH = driver.FLUSH_BOTH
+FLUSH_INPUT = driver.FLUSH_INPUT
+FLUSH_OUTPUT = driver.FLUSH_OUTPUT
 
 # LEGACY SUPPORT
 
