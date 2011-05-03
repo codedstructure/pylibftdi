@@ -1,6 +1,18 @@
 pylibftdi changes
 =================
 
+0.8
+ * added some unit tests
+ * API changes:
+   - when opening a device with a device_id parameter, this will now check
+     against both serial number and (if that fails), the device description.
+     Opening by device type (under the same proviso that an arbitrary device
+     will be selected if multiple matching devices are attached as when no
+     device_id is given) is frequently easier than matching by serial number.
+   - added flush(), flush_input() and flush_output() operations. This is
+     modelled after the pySerial API providing separate flush operations, and
+     gets the Device API closer to that of files.
+   - increased file-API compatibility, with line-oriented methods and iteration
 0.7
  * support multiple attached devices
  * API changes:

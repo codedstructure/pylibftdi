@@ -10,6 +10,7 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
  - Supports Python 2 and Python 3
  - Supports parallel and serial devices
  - Support for multiple devices
+ - File-like interface wherever appropriate
  - Cross-platform
 
 :Limitations:
@@ -33,7 +34,9 @@ integration with passing unicode strings between devices in Python 3.
 
 Multiple devices are supported by passing the desired device serial number (as
 a string) in the ``device_id`` parameter - this is the first parameter in both
-Device() and BitBangDevice() constructors.
+Device() and BitBangDevice() constructors. Alternatively the device 'description'
+can be given, and an attempt will be made to match this if matching by serial
+number fails.
 
 Examples
 ~~~~~~~~

@@ -8,6 +8,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 """
 
+import os
 import functools
 import warnings
 
@@ -175,9 +176,9 @@ class Device(object):
     """
     def __init__(self, device_id=None, mode="b",
                  encoding="latin1", lazy_open=False):
+        self._opened = False
         self.driver = Driver()
         self.fdll = self.driver.fdll
-        self.opened = False
         # device_id is an optional serial number of the requested device.
         self.device_id = device_id
         # mode can be either 'b' for binary, or 't' for text.
@@ -194,26 +195,29 @@ class Device(object):
         # to 9600, which certainly seems to be a de-facto
         # standard for serial devices.
         self._baudrate = 9600
+        # defining softspace allows us to 'print' to this device
+        self.softspace = 0
         # lazy_open tells us not to open immediately.
         if not lazy_open:
             self.open()
 
     def __del__(self):
         "tell driver to free the ftdi_context resource"
-        if self.opened:
+        if self._opened:
             self.close()
 
     def open(self):
         """
         open connection to a FTDI device
         """
-        if self.opened:
+        if self._opened:
             return
 
         # create context for this device
         self.ctx = create_string_buffer(1024)
-        if self.fdll.ftdi_init(byref(self.ctx)) != 0:
-            msg = self.get_error_string()
+        res = self.fdll.ftdi_init(byref(self.ctx))
+        if res != 0:
+            msg = "%s (%d)" % (self.get_error_string(), res)
             del self.ctx
             raise FtdiError(msg)
 
@@ -231,25 +235,25 @@ class Device(object):
             if res != 0:
                 # swap last two parameters and try again
                 #  - attempt to match device_id to description
-                open_args[-2:] = open_args[-1:-3:-1]
+                open_args[-2], open_args[-1] = open_args[-1], open_args[-2]
                 res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
 
         if res != 0:
-            msg = self.get_error_string()
+            msg = "%s (%d)" % (self.get_error_string(), res)
             # free the context
             self.fdll.ftdi_deinit(byref(self.ctx))
             del self.ctx
             raise FtdiError(msg)
 
-        self.opened = True
+        self._opened = True
 
     def close(self):
         "close our connection, free resources"
-        if self.opened:
+        if self._opened:
             self.fdll.ftdi_usb_close(byref(self.ctx))
             self.fdll.ftdi_deinit(byref(self.ctx))
             del self.ctx
-        self.opened = False
+        self._opened = False
 
     @property
     def baudrate(self):
@@ -274,7 +278,7 @@ class Device(object):
         return type depends on self.mode - if 'b' return
         raw bytes, else decode according to self.encoding
         """
-        if not self.opened:
+        if not self._opened:
             raise FtdiError("read() on closed Device")
 
         buf = create_string_buffer(length)
@@ -298,7 +302,7 @@ class Device(object):
         write given `data` string to the FTDI device
         returns count of bytes written, which may be less than `len(data)`
         """
-        if not self.opened:
+        if not self._opened:
             raise FtdiError("read() on closed Device")
 
         try:
@@ -335,7 +339,8 @@ class Device(object):
                     self.__class__.__name__)
         res = fn(byref(self.ctx))
         if res != 0:
-            raise FtdiError(self.get_error_string())
+            msg = "%s (%d)" % (self.get_error_string(), res)
+            raise FtdiError(msg)
 
     def flush_input(self):
         """
@@ -393,4 +398,67 @@ class Device(object):
     def __exit__(self, exc_type, exc_val, tb):
         "support for context manager"
         self.close()
+
+    #
+    # following are various properties and functions to make
+    # this emulate a file-object more closely.
+    #
+
+    @property
+    def closed(self):
+        """
+        The Python file API defines a read-only 'closed' attribute
+        """
+        return not self._opened
+
+    def readline(self, size=0):
+        """
+        readline() for file-like compatibility.
+        """
+        lsl = len(os.linesep)
+        line_buffer = []
+        while True:
+            next_char = self.read(1)
+            if next_char == '' or (size > 0 and len(line_buffer) > size):
+                break
+            line_buffer.append(next_char)
+            if (len(line_buffer) >= lsl and
+                line_buffer[-lsl:] == list(os.linesep)):
+                break
+        return ''.join(line_buffer)
+
+    def readlines(self, sizehint=None):
+        """
+        readlines() for file-like compatibility.
+        """
+        lines = []
+        if sizehint is not None:
+            string_blob = self.read(sizehint)
+            lines.extend(string_blob.split(os.linesep))
+
+        while True:
+            line = self.readline()
+            if not line:
+                break
+            lines.append(line)
+        return lines
+
+    def writelines(self, lines):
+        """
+        writelines for file-like compatibility.
+        """
+        for line in lines:
+            self.write(line)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while True:
+            line = self.readline()
+            if line:
+                return line
+            else:
+                raise StopIteration
+    next = __next__
 
