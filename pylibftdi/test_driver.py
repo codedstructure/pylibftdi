@@ -34,10 +34,7 @@ class SimpleMock(object):
         self.__name = name
 
     def __getattr__(self, key):
-        return self.__dict__.get(key, SimpleMock(key))
-
-    def __setattr__(self, key, value):
-        return self.__dict__.__setitem__(key, value)
+        return SimpleMock(key)
 
     def __call__(self, *o, **k):
         fn_log.append(self.__name)
