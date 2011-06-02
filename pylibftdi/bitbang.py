@@ -67,7 +67,7 @@ class BitBangDevice(Device):
         if not (0 <= dir <= 255):
             raise FtdiError("invalid direction bitmask")
         self._direction = dir
-        if self.opened:
+        if not self.closed:
             self.ftdi_fn.ftdi_set_bitmode(dir, 0x01)
             self._last_set_dir = dir
 
