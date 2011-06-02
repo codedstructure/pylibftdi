@@ -269,6 +269,19 @@ class Device(object):
         if result == 0:
             self._baudrate = value
 
+    def _read(self, length):
+        """
+        actually do the low level reading
+
+        returns a 'bytes' object
+        """
+        buf = create_string_buffer(length)
+        rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
+        if rlen == -1:
+            raise FtdiError(self.get_error_string())
+        byte_data = buf.raw[:rlen]
+
+        return byte_data
 
     def read(self, length):
         """
@@ -281,11 +294,8 @@ class Device(object):
         if not self._opened:
             raise FtdiError("read() on closed Device")
 
-        buf = create_string_buffer(length)
-        rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
-        if rlen == -1:
-            raise FtdiError(self.get_error_string())
-        byte_data = buf.raw[:rlen]
+        # read the data
+        byte_data = self._read(length)
         if self.mode == 'b':
             return byte_data
         else:
@@ -294,6 +304,15 @@ class Device(object):
             # a byte at a time from the output until the decoding works, and
             # buffer the remainder for next time.
             return byte_data.decode(self.encoding)
+
+    def _write(self, byte_data):
+        """
+        actually do the low level writing
+        """
+        buf = create_string_buffer(byte_data)
+        written = self.fdll.ftdi_write_data(byref(self.ctx),
+                                            byref(buf), len(byte_data))
+        return written
 
     def write(self, data):
         """
@@ -310,9 +329,9 @@ class Device(object):
         except TypeError:
             # this will happen if we are Python3 and data is a str.
             byte_data = data.encode(self.encoding)
-        buf = create_string_buffer(byte_data)
-        written = self.fdll.ftdi_write_data(byref(self.ctx),
-                                            byref(buf), len(data))
+
+        # actually write it
+        written = self._write(byte_data)
         if written == -1:
             raise FtdiError(self.get_error_string())
         return written
@@ -414,6 +433,8 @@ class Device(object):
     def readline(self, size=0):
         """
         readline() for file-like compatibility.
+
+        This only works for mode='t' on Python3
         """
         lsl = len(os.linesep)
         line_buffer = []

@@ -31,5 +31,3 @@ class DeadParrot(Refuser):
 class FtdiError(Exception):
     pass
 
-
-

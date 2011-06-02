@@ -1,6 +1,11 @@
 pylibftdi changes
 =================
 
+0.8.1
+ * fix issue with bitbang following API changes in 0.8
+ * add tests for bitbang mode
+ * refactor tests; fix text-based tests in Python3
+ * slight refactor Device() to improve testability (_read and _write methods)
 0.8
  * added some unit tests
  * API changes:
