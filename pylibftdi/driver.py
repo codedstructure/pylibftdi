@@ -37,6 +37,9 @@ FLUSH_BOTH = 1
 FLUSH_INPUT = 2
 FLUSH_OUTPUT = 3
 
+USB_VID = 0x0403
+USB_PID = 0x6001
+
 class Driver(object):
     """
     This is where it all happens...
@@ -129,7 +132,7 @@ class Driver(object):
         try:
             res = self.fdll.ftdi_usb_find_all(byref(ctx),
                                               byref(dev_list_ptr),
-                                              0x0403, 0x6001)
+                                              USB_VID, USB_PID)
             if res < 0:
                 raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
             elif res > 0:
@@ -225,7 +228,7 @@ class Device(object):
         # they were, but we can't use self.close as that assumes things
         # have already been setup.
         # FTDI vendor/product ids required here.
-        open_args = [byref(self.ctx), 0x0403, 0x6001]
+        open_args = [byref(self.ctx), USB_VID, USB_PID]
         if self.device_id is None:
             res = self.fdll.ftdi_usb_open(*tuple(open_args))
         else:
