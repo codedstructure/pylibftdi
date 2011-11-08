@@ -18,7 +18,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 class Bus(object):
     """
     This class is a descriptor for a bus of a given width starting
-    at a given offset (0 = LSB).  Thet driver which does the actual
+    at a given offset (0 = LSB).  The driver which does the actual
     reading and writing is assumed to be a BitBangDriver instance
     in the 'driver' attribute of the object to which this is attached.
     """
