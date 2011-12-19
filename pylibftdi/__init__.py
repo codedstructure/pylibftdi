@@ -19,7 +19,8 @@ __AUTHOR__ = "Ben Bass"
 
 
 __ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
-           'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT']
+           'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
+           'examples', 'tests']
 
 from pylibftdi import _base, driver, util, bitbang
 
@@ -40,6 +41,7 @@ FLUSH_INPUT = driver.FLUSH_INPUT
 FLUSH_OUTPUT = driver.FLUSH_OUTPUT
 
 # LEGACY SUPPORT
+
 
 class BitBangDriver(bitbang.BitBangDevice):
     def __init__(self, direction=ALL_OUTPUTS):

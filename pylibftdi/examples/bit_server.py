@@ -8,10 +8,13 @@ Requires:
  - pylibftdi
 """
 
+import sys
+import threading
+import time
+import webbrowser
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from cStringIO import StringIO
 from SocketServer import ThreadingMixIn
-import sys
 from pylibftdi import BitBangDevice
 
 HTTP_PORT = 8008
@@ -33,7 +36,7 @@ def get_page():
 <div>
 """ % port
     for i in range(8):
-        bit = 7-i
+        bit = 7 - i
         is_on = port & (1 << bit)
         color = '#00FF00' if is_on else '#FF0000'
         page += """
@@ -51,6 +54,7 @@ DATA=%s
 </html>
 """ % port
     return page
+
 
 class ReqHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -71,7 +75,7 @@ class ReqHandler(BaseHTTPRequestHandler):
             if value:
                 switch.port |= (1 << bit)
             else:
-                switch.port &= 255^(1 << bit)
+                switch.port &= 255 ^ (1 << bit)
 
         f = self.send_head()
         if f:
@@ -89,13 +93,13 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.end_headers()
         return f
 
-def runserver(port = HTTP_PORT):
+
+def runserver(port=HTTP_PORT):
     serveraddr = ('', port)
     srvr = ThreadingServer(serveraddr, ReqHandler)
     srvr.serve_forever()
 
 if __name__ == '__main__':
-    import threading, time, webbrowser
     switch = BitBangDevice()
 
     try:
@@ -105,14 +109,14 @@ if __name__ == '__main__':
     except IndexError:
         pass
 
-    t = threading.Thread(target = runserver, args = (HTTP_PORT,))
+    t = threading.Thread(target=runserver, args=(HTTP_PORT,))
     t.setDaemon(True)
     t.start()
     time.sleep(0.5)
     retry = 10
     while retry:
         try:
-            webbrowser.open('http://localhost:%d'%HTTP_PORT)
+            webbrowser.open('http://localhost:%d' % HTTP_PORT)
         except EnvironmentError:
             time.sleep(1)
             retry -= 1
@@ -121,6 +125,7 @@ if __name__ == '__main__':
 
     # wait for Ctrl-C
     try:
-        while 1: time.sleep(1)
+        while 1:
+            time.sleep(1)
     except KeyboardInterrupt:
         pass

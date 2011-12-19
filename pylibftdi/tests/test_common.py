@@ -12,16 +12,17 @@ to be attached.
 """
 
 import sys
-if sys.version_info < (2,7):
+if sys.version_info < (2, 7):
     try:
         import unittest2 as unittest
     except ImportError:
         raise SystemExit("The test functionality is only supported in"
                 "Python 2.7+ unless unittest2 is installed")
 else:
-    import unittest
+    import unittest  # NOQA
 
 VERBOSE = False
+
 
 class SimpleMock(object):
     """
@@ -41,6 +42,7 @@ class SimpleMock(object):
             print("%s(*%s, **%s)" % (self.__name, o, k))
         return 0
 
+
 class CallLog(object):
 
     fn_log = []
@@ -57,12 +59,17 @@ class CallLog(object):
     def get(cls):
         return cls.fn_log[:]
 
+
 class CallCheckMixin(object):
     """
     this should be used as a mixin for unittest.TestCase classes,
     where it allows the calls through the MockDriver to be checked
     this does not support multi-threading.
     """
+
+    def setUp(self):
+        super(CallCheckMixin, self).setUp()
+
     def assertCalls(self, fn, methodname):
         CallLog.reset()
         fn()
@@ -82,6 +89,7 @@ class MockDriver(object):
 
 import pylibftdi.driver
 from pylibftdi.driver import Device
+
 
 class LoopDevice(Device):
     """

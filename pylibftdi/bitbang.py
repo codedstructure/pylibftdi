@@ -15,6 +15,7 @@ ALL_INPUTS = 0x00
 BB_OUTPUT = 1
 BB_INPUT = 0
 
+
 class BitBangDevice(Device):
     """
     simple subclass to support bit-bang mode
@@ -26,16 +27,16 @@ class BitBangDevice(Device):
      port: 8 bit IO port, as defined by direction.
     """
     def __init__(self,
-                 device_id = None,
-                 direction = ALL_OUTPUTS,
-                 lazy_open = False):
+                 device_id=None,
+                 direction=ALL_OUTPUTS,
+                 lazy_open=False):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
         # of our own variables.
-        super(BitBangDevice, self).__init__(device_id = device_id,
-                                            mode = 'b',
-                                            lazy_open = True)
+        super(BitBangDevice, self).__init__(device_id=device_id,
+                                            mode='b',
+                                            lazy_open=True)
         self.direction = direction
         self._last_set_dir = None
         self._latch = 0
@@ -50,7 +51,6 @@ class BitBangDevice(Device):
         if self.direction != self._last_set_dir:
             self.direction = self._direction
         return self
-
 
     # direction property - 8 bit value determining whether an IO line
     # is output (if set to 1) or input (set to 0)
@@ -70,7 +70,6 @@ class BitBangDevice(Device):
         if not self.closed:
             self.ftdi_fn.ftdi_set_bitmode(dir, 0x01)
             self._last_set_dir = dir
-
 
     # port property - 8 bit read/write value
     @property
@@ -94,4 +93,3 @@ class BitBangDevice(Device):
     def port(self, value):
         self._latch = value
         return super(BitBangDevice, self).write(chr(value))
-

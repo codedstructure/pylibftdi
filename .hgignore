@@ -2,5 +2,6 @@ syntax: glob
 *.pyc
 *.pyo
 .idea
+build
 docs/_build
 MANIFEST

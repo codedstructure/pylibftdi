@@ -11,15 +11,16 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from test_common import (LoopDevice, Device, CallCheckMixin, unittest)
+from pylibftdi.tests.test_common import (LoopDevice, Device, CallCheckMixin, unittest)
 
 # and now some test cases...
 
-class DeviceFunctions(unittest.TestCase, CallCheckMixin):
+
+class DeviceFunctions(CallCheckMixin, unittest.TestCase):
 
     def testContextManager(self):
         def _():
-            with Device() as dev:
+            with Device():
                 pass
         self.assertCallsExact(_,
                 ['ftdi_init', 'ftdi_usb_open',
@@ -35,14 +36,15 @@ class DeviceFunctions(unittest.TestCase, CallCheckMixin):
 
     def testReadWrite(self):
         with Device() as dev:
-            self.assertCalls(lambda : dev.write('xxx'), 'ftdi_write_data')
-            self.assertCalls(lambda : dev.read(10), 'ftdi_read_data')
+            self.assertCalls(lambda: dev.write('xxx'), 'ftdi_write_data')
+            self.assertCalls(lambda: dev.read(10), 'ftdi_read_data')
 
     def testFlush(self):
         with Device() as dev:
             self.assertCalls(dev.flush_input, 'ftdi_usb_purge_rx_buffer')
             self.assertCalls(dev.flush_output, 'ftdi_usb_purge_tx_buffer')
             self.assertCalls(dev.flush, 'ftdi_usb_purge_buffers')
+
 
 class LoopbackTest(unittest.TestCase):
     """
@@ -67,7 +69,7 @@ class LoopbackTest(unittest.TestCase):
         d = LoopDevice(mode='t')
         lines = ['Hello\n', 'World\n', 'And\n', 'Goodbye\n']
         d.writelines(lines)
-        for idx,line in enumerate(d):
+        for idx, line in enumerate(d):
             self.assertEqual(line, lines[idx])
 
 

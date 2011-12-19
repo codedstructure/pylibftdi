@@ -15,6 +15,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 # to, which has a 'port' property which is readable and
 # writable.
 
+
 class Bus(object):
     """
     This class is a descriptor for a bus of a given width starting
@@ -25,7 +26,7 @@ class Bus(object):
     def __init__(self, offset, width=1):
         self.offset = offset
         self.width = width
-        self._mask = ((1<<width)-1)
+        self._mask = ((1 << width) - 1)
 
     def __get__(self, obj, type):
         val = obj.driver.port
@@ -40,36 +41,3 @@ class Bus(object):
         val &= ~(self._mask << self.offset)
         val |= value << self.offset
         obj.driver.port = val
-
-def test_bus_class():
-    class MockDriver(object):
-        port = 0
-    class TestBus(object):
-        a = Bus(0, 2)
-        b = Bus(2, 1)
-        c = Bus(3, 5)
-        def __init__(self):
-            self.driver = MockDriver()
-    test_bus = TestBus()
-    # test writing to the bus
-    assert test_bus.driver.port == 0
-    test_bus.a = 3
-    test_bus.b = 1
-    test_bus.c = 31
-    assert test_bus.driver.port == 255
-    test_bus.b = 0
-    assert test_bus.driver.port == 251
-    test_bus.c = 16
-    assert test_bus.driver.port == 131
-    # test reading from the bus
-    test_bus.driver.port = 0x55
-    assert test_bus.a == 1
-    assert test_bus.b == 1
-    assert test_bus.c == 10
-    test_bus.driver.port = 0xAA
-    assert test_bus.a == 2
-    assert test_bus.b == 0
-    assert test_bus.c == 21
-
-if __name__ == '__main__':
-    test_bus_class()

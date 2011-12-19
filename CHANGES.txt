@@ -1,6 +1,11 @@
 pylibftdi changes
 =================
 
+0.9pre
+ * improved and extended tests
+ * added some Sphinx-based documentation
+ * allow the PID/VID to be changed
+ * add new example - basic web server to toggle / read IO bits
 0.8.1
  * fix issue with bitbang following API changes in 0.8
  * add tests for bitbang mode

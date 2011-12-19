@@ -11,21 +11,23 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from test_common import (LoopDevice, CallCheckMixin, unittest)
+from pylibftdi.tests.test_common import (LoopDevice, CallCheckMixin, unittest)
 from pylibftdi.bitbang import BitBangDevice
 from pylibftdi import FtdiError
+
 
 class TestBitBangDevice(BitBangDevice, LoopDevice):
     pass
 
 BitBangDevice = TestBitBangDevice
 
+
 # and now some test cases...
-class BitBangFunctions(unittest.TestCase, CallCheckMixin):
+class BitBangFunctions(CallCheckMixin, unittest.TestCase):
 
     def testContextManager(self):
         def _():
-            with BitBangDevice() as dev:
+            with BitBangDevice():
                 pass
         self.assertCallsExact(_,
                 ['ftdi_init', 'ftdi_usb_open',
@@ -48,9 +50,9 @@ class BitBangFunctions(unittest.TestCase, CallCheckMixin):
 
     def testInitDirection(self):
         # check that a direction can be given on open and is honoured
-        for dir_test in (0,1,4,12,120,255):
+        for dir_test in (0, 1, 4, 12, 120, 255):
 
-            dev = BitBangDevice(direction = dir_test)
+            dev = BitBangDevice(direction=dir_test)
             self.assertEqual(dev.direction, dir_test)
             self.assertEqual(dev._direction, dir_test)
             self.assertEqual(dev._last_set_dir, dir_test)
@@ -60,25 +62,25 @@ class BitBangFunctions(unittest.TestCase, CallCheckMixin):
     def testDirection(self):
         dev = BitBangDevice()
         # check that a direction can be given on open and is honoured
-        for dir_test in (0,1,4,12,120,255):
+        for dir_test in (0, 1, 4, 12, 120, 255):
             def _(dt):
                 dev.direction = dt
-            self.assertCalls(lambda : _(dir_test), 'ftdi_set_bitmode')
+            self.assertCalls(lambda: _(dir_test), 'ftdi_set_bitmode')
             self.assertEqual(dev.direction, dir_test)
             self.assertEqual(dev._direction, dir_test)
             self.assertEqual(dev._last_set_dir, dir_test)
         # check an invalid direction on open gives error
-        def _():
+        def _():  # NOQA
             dev.direction = 300
         self.assertRaises(FtdiError, _)
 
     def testPort(self):
         dev = BitBangDevice()
         # check that a direction can be given on open and is honoured
-        for port_test in (0,1,4,12,120,255):
+        for port_test in (0, 1, 4, 12, 120, 255):
             def _(pt):
                 dev.port = pt
-            self.assertCalls(lambda : _(port_test), 'ftdi_write_data')
+            self.assertCalls(lambda: _(port_test), 'ftdi_write_data')
             self.assertEqual(dev._latch, port_test)
             self.assertEqual(dev.port, port_test)
         # XXX: this is incomplete.
@@ -87,4 +89,3 @@ class BitBangFunctions(unittest.TestCase, CallCheckMixin):
 
 if __name__ == "__main__":
     unittest.main()
-

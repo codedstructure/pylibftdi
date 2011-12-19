@@ -19,6 +19,7 @@ from ctypes.util import find_library
 
 from pylibftdi._base import FtdiError
 
+
 class UsbDevList(Structure):
     _fields_ = [('next', c_void_p),
                 ('usb_dev', c_void_p)]
@@ -28,7 +29,7 @@ class UsbDevList(Structure):
 # (at least for 64-bit) they only worked if argtypes was declared
 # (c_void_p for ctx), and that's too much like hard work to maintain.
 # So I've reverted to using create_string_buffer for memory management,
-# byref(ctx) to pass in the context instance, and ftdi_init() / 
+# byref(ctx) to pass in the context instance, and ftdi_init() /
 # ftdi_deinit() pair to manage the driver resources. It's very nice
 # how layered the libftdi code is, with access to each layer.
 
@@ -39,6 +40,7 @@ FLUSH_OUTPUT = 3
 
 USB_VID = 0x0403
 USB_PID = 0x6001
+
 
 class Driver(object):
     """
@@ -78,6 +80,7 @@ class Driver(object):
     LEGACY_ATTRIBUTES = ['open', 'close', 'ftdi_fn', 'baudrate',
                          'read', 'write', 'get_error_string',
                          '__enter__', '__exit__']
+
     @property
     def legacy_device(self):
         warnings.warn("using Device() methods on Driver(); see CHANGES.txt",
@@ -91,11 +94,13 @@ class Driver(object):
             return getattr(self.legacy_device, key)
         else:
             return object.__getattr__(self, key)
+
     def __setattr__(self, key, value):
         if key in Driver.LEGACY_ATTRIBUTES:
             return setattr(self.legacy_device, key, value)
         else:
             self.__dict__[key] = value
+
     def __delattr__(self, key):
         if key in Driver.LEGACY_ATTRIBUTES:
             delattr(self.legacy_device, key)
@@ -143,7 +148,7 @@ class Driver(object):
                     while dev_list_ptr:
                         self.fdll.ftdi_usb_get_strings(byref(ctx),
                                 dev_list_ptr.contents.usb_dev,
-                                manuf,127, desc,127, serial,127)
+                                manuf, 127, desc, 127, serial, 127)
                         devices.append((manuf.value, desc.value, serial.value))
                         # step to next in linked-list if not
                         dev_list_ptr = cast(dev_list_ptr.contents.next,
@@ -399,10 +404,9 @@ class Device(object):
         # fdll and ctx objects in the closure are up-to-date, though.
         class FtdiForwarder(object):
             def __getattr__(innerself, key):
-                 return functools.partial(getattr(self.fdll, key),
-                                          byref(self.ctx))
+                return functools.partial(getattr(self.fdll, key),
+                                         byref(self.ctx))
         return FtdiForwarder()
-
 
     def __enter__(self):
         """
@@ -485,4 +489,3 @@ class Device(object):
             else:
                 raise StopIteration
     next = __next__
-

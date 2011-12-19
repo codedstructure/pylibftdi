@@ -32,6 +32,11 @@ class LCD(object):
         # attribute which provides a port
         self.driver = driver
 
+    def _trigger(self):
+        "generate a falling edge"
+        self.e = 1
+        self.e = 0
+
     def init_four_bit(self):
         """
         set the LCD's 4 bit mode, since we only have
@@ -41,11 +46,10 @@ class LCD(object):
         """
         self.rs = 0
         self.data = 3
-        self.e = 1; self.e = 0
-        self.e = 1; self.e = 0
-        self.e = 1; self.e = 0
+        for _ in range(3):
+            self._trigger()
         self.data = 2
-        self.e = 1; self.e = 0
+        self._trigger()
 
     def _write_raw(self, rs, x):
         # rs determines whether this is a command
@@ -53,15 +57,16 @@ class LCD(object):
         # nibbles. Ahhh... nibbles. QBasic anyone?
         self.rs = rs
         self.data = x >> 4
-        self.e = 1; self.e = 0
+        self._trigger()
         self.data = x & 0x0F
-        self.e = 1; self.e = 0
+        self._trigger()
 
     def write_cmd(self, x):
         self._write_raw(0, x)
 
     def write_data(self, x):
         self._write_raw(1, x)
+
 
 def display(string, device_id=None):
     """
