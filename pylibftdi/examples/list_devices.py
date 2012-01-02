@@ -1,12 +1,43 @@
+"""
+Report connected FTDI devices. This may be useful in obtaining
+serial numbers to use as the device_id parameter of the Device()
+constructor to communicate with a specific device when more than
+one is present.
+
+example usage:
+
+    $ python pylibftdi/examples/list_devices.py
+    FTDI:UB232R:FTAS1UN5
+    FTDI:UM232R USB <-> Serial:FTE4FFVQ
+
+To open a device specifically to communicate with the second of
+these devices, the following would be used:
+
+    >>> from pylibftdi import Device
+    >>> dev = Device(device_id="FTE4FFVQ")
+    >>>
+
+Copyright (c) 2011 Ben Bass <benbass@codedstructure.net>
+All rights reserved.
+"""
 
 from pylibftdi import Driver
 
 
-def get_devices():
+def get_ftdi_device_list():
+    """
+    return a list of lines, each a colon-separated
+    vendor:product:serial summary of detected devices
+    """
     dev_list = []
     for device in Driver().list_devices():
-        dev_list.append("%s:%s:%s" % (tuple(x.decode('latin1') for x in device)))
-
+        # list_devices returns bytes rather than strings
+        device = map(lambda x: x.decode('latin1'), device)
+        # device must always be this triple
+        vendor, product, serial = device
+        dev_list.append("%s:%s:%s" % (vendor, product, serial))
+    return dev_list
 
 if __name__ == '__main__':
-    print('\n'.join(get_devices()))
+    for device in get_ftdi_device_list():
+        print(device)

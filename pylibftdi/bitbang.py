@@ -9,6 +9,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 from pylibftdi.driver import Device, FtdiError
+from ctypes import c_ubyte, byref
 
 ALL_OUTPUTS = 0xFF
 ALL_INPUTS = 0x00
@@ -20,7 +21,10 @@ class BitBangDevice(Device):
     """
     simple subclass to support bit-bang mode
 
-    Only uses async mode at the moment.
+    Internally uses async mode at the moment, but provides a 'sync'
+    flag (defaulting to True) which controls the behaviour of port
+    reading and writing - if set, the FIFOs are ignored (read) or
+    cleared (write) so operations will appear synchronous
 
     Adds two read/write properties to the base class:
      direction: 8 bit input(0)/output(1) direction control.
@@ -29,7 +33,8 @@ class BitBangDevice(Device):
     def __init__(self,
                  device_id=None,
                  direction=ALL_OUTPUTS,
-                 lazy_open=False):
+                 lazy_open=False,
+                 sync=True):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
@@ -38,6 +43,7 @@ class BitBangDevice(Device):
                                             mode='b',
                                             lazy_open=True)
         self.direction = direction
+        self.sync = sync
         self._last_set_dir = None
         self._latch = 0
         if not lazy_open:
@@ -79,10 +85,18 @@ class BitBangDevice(Device):
         lines is persisted in this object for the purposes of reading,
         so read-modify-write operations (e.g. drv.port+=1) are valid.
         """
-        # the coercion to bytearray here is to make this work
-        # transparently between Python2 and Python3 - equivalent
-        # of ord() for Python2, a time-wasting do-nothing on Python3
-        result = bytearray(super(BitBangDevice, self).read(1))[0]
+        if self.sync:
+            pin_byte = c_ubyte()
+            res = self.fdll.ftdi_read_pins(self.ctx, byref(pin_byte))
+            if res != 0:
+                raise FtdiError("Could not read device pins")
+            result = pin_byte.value
+        else:
+            # the coercion to bytearray here is to make this work
+            # transparently between Python2 and Python3 - equivalent
+            # of ord() for Python2, a time-wasting do-nothing on Python3
+            result = bytearray(super(BitBangDevice, self).read(1))[0]
+
         # replace the 'output' bits with current value of _latch -
         # the last written value. This makes read-modify-write
         # operations (e.g. 'drv.port |= 0x10') work as expected
@@ -92,4 +106,6 @@ class BitBangDevice(Device):
     @port.setter
     def port(self, value):
         self._latch = value
+        if self.sync:
+            self.flush_output()
         return super(BitBangDevice, self).write(chr(value))
