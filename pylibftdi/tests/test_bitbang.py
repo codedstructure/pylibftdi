@@ -83,7 +83,7 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
             self.assertCalls(lambda: _(port_test), 'ftdi_write_data')
             self.assertEqual(dev._latch, port_test)
             self.assertEqual(dev.port, port_test)
-        # XXX: this is incomplete.
+        # TODO: this is incomplete.
         # could check for various directions and how that impacts
         # port read / write, as well as r/m/w operations.
 
