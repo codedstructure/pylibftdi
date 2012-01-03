@@ -1,3 +1,12 @@
+"""
+Display values on input pins of a BitBangDevice.
+
+TODO: add configurable delay, display differences in bold
+(make command line options compatible with 'watch')
+
+Copyright (c) 2011-2012 Ben Bass <benbass@codedstructure.net>
+All rights reserved.
+"""
 
 from pylibftdi import BitBangDevice, ALL_INPUTS
 import time

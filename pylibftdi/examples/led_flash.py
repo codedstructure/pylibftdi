@@ -1,7 +1,7 @@
 """
 Flash an LED connected via a FTDI UM232R/245R module using pylibftdi
 
-Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2012 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 

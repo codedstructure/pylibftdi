@@ -76,7 +76,7 @@ of these may be best for some projects.
 
  * ftd2xx_ - ctypes binding to FTDI's own D2XX driver
  * pyftdi_ - a C extension libftdi binding
- 
+
 .. _ftd2xx: http://pypi.python.org/pypi/ftd2xx
 .. _pyftdi: http://git.marcansoft.com/?p=pyftdi.git
 
@@ -99,7 +99,7 @@ Plans
 License
 -------
 
-Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2012 Ben Bass <benbass@codedstructure.net>
 
 pylibftdi is released under the MIT licence; see the file "LICENSE.txt"
 for information.

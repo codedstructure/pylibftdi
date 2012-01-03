@@ -9,7 +9,7 @@ example usage:
 >   sleep 5;
 > done
 
-Copyright (c) 2010-2011 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2012 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
