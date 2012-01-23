@@ -1,11 +1,16 @@
 pylibftdi changes
 =================
 
-0.9pre
+0.9
  * improved and extended tests
- * added some Sphinx-based documentation
+ * made a start on some Sphinx-based documentation
+ * fixed long-standing issue with input from a BitBangDevice
  * allow the PID/VID to be changed
- * add new example - basic web server to toggle / read IO bits
+ * add new examples
+   - basic web server to toggle / read IO bits
+   - magic_candle.py - example of using input and output together
+   - pin_read.py - read and match values on device pins
+ * All of this needs some tidying, but it fixes some key issues and has been unreleased too long.
 0.8.1
  * fix issue with bitbang following API changes in 0.8
  * add tests for bitbang mode

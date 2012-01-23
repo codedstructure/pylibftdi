@@ -62,8 +62,8 @@ operation through the ``port`` and ``direction`` properties.  These provide an
     ...     bb.port |= 2         # set bit 1
     ...     bb.port &= 0xFE      # clear bit 0
 
-There is support for a number of external devices and protocols, specifically
-for interfacing with HD44780 LCDs using the 4-bit interface.
+There is support for a number of external devices and protocols, including
+interfacing with HD44780 LCDs using the 4-bit interface.
 
 History & Motivation
 --------------------

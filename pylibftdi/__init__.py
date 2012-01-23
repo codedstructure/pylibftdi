@@ -14,7 +14,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.9pre"
+__VERSION__ = "0.9"
 __AUTHOR__ = "Ben Bass"
 
 
