@@ -67,6 +67,7 @@ Plans
  * Add more examples: SPI devices, knight-rider effects, input devices, MIDI...
  * Perhaps add support for D2XX driver, though the name then becomes a
    slight liability ;)
+    * - support multiple backends; D2XX, libftdi, python-ftdi (if you really wanted?)...
  * General code quality improvements: solid unit tests, decent documentation.
 
 License
