@@ -10,7 +10,6 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 import os
 import functools
-import warnings
 
 # be disciplined so pyflakes can check us...
 from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, cast,
@@ -73,39 +72,6 @@ class Driver(object):
                                                   c_char_p, c_int)
             self.fdll = fdll
         self._need_init = False
-
-    ## Legacy support - prior to version 0.7, Device and Driver
-    ## were unified (and named 'Driver'). This provides basic
-    ## backwards compatiblity support.
-    LEGACY_ATTRIBUTES = ['open', 'close', 'ftdi_fn', 'baudrate',
-                         'read', 'write', 'get_error_string',
-                         '__enter__', '__exit__']
-
-    @property
-    def legacy_device(self):
-        warnings.warn("using Device() methods on Driver(); see CHANGES.txt",
-                DeprecationWarning)
-        if not hasattr(self, '_legacy_device'):
-            self._legacy_device = Device(lazy_open=True)
-        return self._legacy_device
-
-    def __getattr__(self, key):
-        if key in Driver.LEGACY_ATTRIBUTES:
-            return getattr(self.legacy_device, key)
-        else:
-            return object.__getattr__(self, key)
-
-    def __setattr__(self, key, value):
-        if key in Driver.LEGACY_ATTRIBUTES:
-            return setattr(self.legacy_device, key, value)
-        else:
-            self.__dict__[key] = value
-
-    def __delattr__(self, key):
-        if key in Driver.LEGACY_ATTRIBUTES:
-            delattr(self.legacy_device, key)
-        else:
-            del self.__dict__[key]
 
     def list_devices(self):
         """
@@ -195,7 +161,7 @@ class Device(object):
         # strings; for binary the raw bytes will be returned.
         # This will only affect Python3.
         self.mode = mode
-        # when giving a str to Driver.write(), it is encoded.
+        # when giving a str to Device.write(), it is encoded.
         # default is latin1, because it provides
         # a one-to-one correspondence for code points 0-FF
         self.encoding = encoding
@@ -210,7 +176,7 @@ class Device(object):
             self.open()
 
     def __del__(self):
-        "tell driver to free the ftdi_context resource"
+        "free the ftdi_context resource"
         if self._opened:
             self.close()
 
@@ -411,11 +377,11 @@ class Device(object):
     def __enter__(self):
         """
         support for context manager.
-        Note the driver is opened and closed automatically
-        when used in a with statement, and the driver object
+        Note the device is opened and closed automatically
+        when used in a with statement, and the device object
         itself is returned:
-        >>> with Driver(mode='t') as drv:
-        >>>     drv.write('Hello World!')
+        >>> with Device(mode='t') as dev:
+        >>>     dev.write('Hello World!')
         >>>
         """
         self.open()
