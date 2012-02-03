@@ -11,7 +11,7 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from test_common import (LoopDevice, CallCheckMixin, unittest)
+from .test_common import (LoopDevice, CallCheckMixin, unittest)
 from pylibftdi.bitbang import BitBangDevice
 from pylibftdi import FtdiError
 

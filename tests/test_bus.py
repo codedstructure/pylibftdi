@@ -1,5 +1,17 @@
+"""
+pylibftdi - python wrapper for libftdi
 
-from test_common import unittest
+Copyright (c) 2010-2012 Ben Bass <benbass@codedstructure.net>
+See LICENSE file for details and (absence of) warranty
+
+pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+
+This module contains some basic tests for the higher-level
+functionality without requiring an actual hardware device
+to be attached.
+"""
+
+from .test_common import unittest
 from pylibftdi.util import Bus
 
 
