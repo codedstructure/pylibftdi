@@ -10,6 +10,7 @@ This module contains some basic tests for the higher-level
 functionality without requiring an actual hardware device
 to be attached.
 """
+import logging
 
 import sys
 if sys.version_info < (2, 7):
@@ -20,8 +21,6 @@ if sys.version_info < (2, 7):
                 "Python 2.7+ unless unittest2 is installed")
 else:
     import unittest  # NOQA
-
-VERBOSE = False
 
 
 class SimpleMock(object):
@@ -38,8 +37,7 @@ class SimpleMock(object):
 
     def __call__(self, *o, **k):
         CallLog.append(self.__name)
-        if VERBOSE:
-            print("%s(*%s, **%s)" % (self.__name, o, k))
+        logging.debug("%s(*%s, **%s)" % (self.__name, o, k))
         return 0
 
 
@@ -114,5 +112,5 @@ class LoopDevice(Device):
 # importing this _does_ things...
 pylibftdi.driver.Driver = MockDriver
 
-if set(['-v', '--verbose']) & set(sys.argv):
-    VERBOSE = True
+verbose = set(['-v', '--verbose']) & set(sys.argv)
+logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
