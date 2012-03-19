@@ -5,6 +5,7 @@ pylibftdi changes
  * moved docs -> /doc
  * moved pylibftdi/tests -> /tests - makes nosetests etc work better
  * removed legacy support for Driver() to acting as a Device()
+ * API for Bus class now requires .device rather than .driver (this still needs fixing at some point)
 0.9
  * improved and extended tests
  * made a start on some Sphinx-based documentation

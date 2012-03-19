@@ -23,7 +23,7 @@ class Candle(object):
         # make the device connection, this is used
         # in the Bus descriptors. Also set direction
         # appropriately.
-        self.driver = BitBangDevice(direction=0xFE)
+        self.device = BitBangDevice(direction=0xFE)
 
     def run(self):
         while True:

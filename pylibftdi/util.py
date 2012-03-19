@@ -20,8 +20,8 @@ class Bus(object):
     """
     This class is a descriptor for a bus of a given width starting
     at a given offset (0 = LSB).  The device which does the actual
-    reading and writing is assumed to be a BitBangDevicer instance
-    in the 'driver' attribute of the object to which this is attached.
+    reading and writing is assumed to be a BitBangDevice instance
+    in the 'device' attribute of the object to which this is attached.
     """
     def __init__(self, offset, width=1):
         self.offset = offset

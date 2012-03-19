@@ -27,10 +27,10 @@ class LCD(object):
     rs = Bus(6)
     e = Bus(7)
 
-    def __init__(self, driver):
-        # The Bus descriptor assumes we have a 'driver'
+    def __init__(self, device):
+        # The Bus descriptor assumes we have a 'device'
         # attribute which provides a port
-        self.driver = driver
+        self.device = device
 
     def _trigger(self):
         "generate a falling edge"

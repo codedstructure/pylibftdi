@@ -6,7 +6,7 @@ setup(
     name="pylibftdi",
     version="0.10pre",
     description="Pythonic interface to FTDI devices using libftdi",
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     author="Ben Bass",
     author_email="benbass@codedstructure.net",
     url="http://bitbucket.org/codedstructure/pylibftdi",
