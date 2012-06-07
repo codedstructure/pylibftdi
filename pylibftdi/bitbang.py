@@ -8,7 +8,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 """
 
-from pylibftdi.driver import Device, FtdiError
+from pylibftdi.driver import Device, FtdiError, BITMODE_BITBANG
 from ctypes import c_ubyte, byref
 
 ALL_OUTPUTS = 0xFF
@@ -74,7 +74,7 @@ class BitBangDevice(Device):
             raise FtdiError("invalid direction bitmask")
         self._direction = dir
         if not self.closed:
-            self.ftdi_fn.ftdi_set_bitmode(dir, 0x01)
+            self.ftdi_fn.ftdi_set_bitmode(dir, BITMODE_BITBANG)
             self._last_set_dir = dir
 
     # port property - 8 bit read/write value
