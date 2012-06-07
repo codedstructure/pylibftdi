@@ -6,14 +6,14 @@ All rights reserved.
 """
 
 import time
-from pylibftdi import BitBangDriver
+from pylibftdi import BitBangDevice
 
 
 def flash_forever(rate):
     "toggle bit zero at rate Hz"
     # put an LED with 1Kohm or similar series resistor
     # on D0 pin
-    with BitBangDriver() as bb:
+    with BitBangDevice() as bb:
         while True:
             time.sleep(1.0 / (2 * rate))
             bb.port ^= 1
