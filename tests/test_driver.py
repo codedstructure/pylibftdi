@@ -23,7 +23,7 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
             with Device():
                 pass
         self.assertCallsExact(_,
-                ['ftdi_init', 'ftdi_usb_open',
+                ['ftdi_init', 'ftdi_usb_open', 'ftdi_set_bitmode',
                  'ftdi_usb_close', 'ftdi_deinit'])
 
     def testOpen(self):
@@ -71,6 +71,15 @@ class LoopbackTest(unittest.TestCase):
         d.writelines(lines)
         for idx, line in enumerate(d):
             self.assertEqual(line, lines[idx])
+
+    def testBuffer(self):
+        d = LoopDevice(mode='t', buffer_size=3)
+        d.write('Hello')
+        d.write(' World\n')
+        d.write('Bye')
+        self.assertEqual(d.readline(), 'Hello World\n')
+        self.assertEqual(d.readline(), 'Bye')
+
 
 
 if __name__ == "__main__":
