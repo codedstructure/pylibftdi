@@ -9,6 +9,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 import os
+import itertools
 import functools
 
 # be disciplined so pyflakes can check us...
@@ -36,9 +37,16 @@ class UsbDevList(Structure):
 FLUSH_BOTH = 1
 FLUSH_INPUT = 2
 FLUSH_OUTPUT = 3
+# Device Modes
+BITMODE_RESET = 0x00
+BITMODE_BITBANG = 0x01
 
+# Default USB IDs
 USB_VID = 0x0403
 USB_PID = 0x6001
+# However, a list of IDs is actually matched against.
+USB_VID_LIST = [USB_VID]
+USB_PID_LIST = [USB_PID, 0x6014]
 
 
 class Driver(object):
@@ -101,26 +109,28 @@ class Driver(object):
             raise FtdiError(msg)
 
         try:
-            res = self.fdll.ftdi_usb_find_all(byref(ctx),
-                                              byref(dev_list_ptr),
-                                              USB_VID, USB_PID)
-            if res < 0:
-                raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
-            elif res > 0:
-                # take a copy of the dev_list for subsequent list_free
-                dev_list_base = pointer(dev_list_ptr.contents)
-                # traverse the linked list...
-                try:
-                    while dev_list_ptr:
-                        self.fdll.ftdi_usb_get_strings(byref(ctx),
-                                dev_list_ptr.contents.usb_dev,
-                                manuf, 127, desc, 127, serial, 127)
-                        devices.append((manuf.value, desc.value, serial.value))
-                        # step to next in linked-list if not
-                        dev_list_ptr = cast(dev_list_ptr.contents.next,
-                                            devlistptrtype)
-                finally:
-                    self.fdll.ftdi_list_free(dev_list_base)
+            for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
+                res = self.fdll.ftdi_usb_find_all(byref(ctx),
+                                                byref(dev_list_ptr),
+                                                usb_vid,
+                                                usb_pid)
+                if res < 0:
+                    raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
+                elif res > 0:
+                    # take a copy of the dev_list for subsequent list_free
+                    dev_list_base = pointer(dev_list_ptr.contents)
+                    # traverse the linked list...
+                    try:
+                        while dev_list_ptr:
+                            self.fdll.ftdi_usb_get_strings(byref(ctx),
+                                    dev_list_ptr.contents.usb_dev,
+                                    manuf, 127, desc, 127, serial, 127)
+                            devices.append((manuf.value, desc.value, serial.value))
+                            # step to next in linked-list if not
+                            dev_list_ptr = cast(dev_list_ptr.contents.next,
+                                                devlistptrtype)
+                    finally:
+                        self.fdll.ftdi_list_free(dev_list_base)
         finally:
             self.fdll.ftdi_deinit(byref(ctx))
         return devices
@@ -199,18 +209,22 @@ class Device(object):
         # they were, but we can't use self.close as that assumes things
         # have already been setup.
         # FTDI vendor/product ids required here.
-        open_args = [byref(self.ctx), USB_VID, USB_PID]
-        if self.device_id is None:
-            res = self.fdll.ftdi_usb_open(*tuple(open_args))
-        else:
-            # attempt to match device_id to serial number
-            open_args.extend([0, c_char_p(self.device_id.encode('latin1'))])
-            res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
-            if res != 0:
-                # swap last two parameters and try again
-                #  - attempt to match device_id to description
-                open_args[-2], open_args[-1] = open_args[-1], open_args[-2]
+        for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
+            open_args = [byref(self.ctx), usb_vid, usb_pid]
+            if self.device_id is None:
+                res = self.fdll.ftdi_usb_open(*tuple(open_args))
+            else:
+                res = self._open_by_desc(open_args)
+                # attempt to match device_id to serial number
+                open_args.extend([0, c_char_p(self.device_id.encode('latin1'))])
                 res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+                if res != 0:
+                    # swap last two parameters and try again
+                    #  - attempt to match device_id to description
+                    open_args[-2], open_args[-1] = open_args[-1], open_args[-2]
+                    res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+            if res == 0:
+                break
 
         if res != 0:
             msg = "%s (%d)" % (self.get_error_string(), res)
@@ -219,6 +233,10 @@ class Device(object):
             del self.ctx
             raise FtdiError(msg)
 
+        # explicitly reset the device to serial mode in case
+        # it had previously been used in bitbang mode
+        # (some later driver versions might do this automatically)
+        self.fdll.ftdi_set_bitmode(byref(self.ctx), 0, BITMODE_RESET)
         self._opened = True
 
     def close(self):
