@@ -1,11 +1,14 @@
 pylibftdi changes
 =================
 
-0.10pre
+0.10
+ * support for FT232H via iteration over lists USB_VID_LIST/USB_PID_LIST in driver.py (FT232H uses different PID)
+ * support for 'buffering' - i.e. chunking reads and writes to allow interruption (i.e. KeyboardInterrupt) in what could otherwise be a very long uninterruptable extension code call.
+ * reset device to serial mode on open() (previously could be left in bitbang mode)
  * moved docs -> /doc
- * moved pylibftdi/tests -> /tests - makes nosetests etc work better
+ * moved pylibftdi/tests -> /tests - makes python -m unittest discover etc work better
  * removed legacy support for Driver() to acting as a Device()
- * API for Bus class now requires .device rather than .driver (this still needs fixing at some point)
+ * API for Bus class now requires .device rather than .driver (this still needs improving at some point)
 0.9
  * improved and extended tests
  * made a start on some Sphinx-based documentation

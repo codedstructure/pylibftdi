@@ -9,12 +9,12 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 libftdi can be found at:
  http://www.intra2net.com/en/developer/libftdi/
-Neither libftdi or Intra2net are associated with this project;
+Neither libftdi nor Intra2net are associated with this project;
 if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.10pre"
+__VERSION__ = "0.10"
 __AUTHOR__ = "Ben Bass"
 
 
