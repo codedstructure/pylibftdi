@@ -105,7 +105,7 @@ if __name__ == '__main__':
     try:
         HTTP_PORT = int(sys.argv[1])
     except TypeError:
-        print "Usage: FtdiWebServer [portnumber]"
+        print("Usage: FtdiWebServer [portnumber]")
     except IndexError:
         pass
 

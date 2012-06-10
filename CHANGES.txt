@@ -1,9 +1,12 @@
 pylibftdi changes
 =================
 
+0.10.2
+ * include examples subpackage
+ * ensure examples work under Python3
+ * 'python -m pylibftdi.examples.led_flash' should now work and pulse D0
 0.10.1
  * maintenance build to fix installation issues
- * 'python -m pylibftdi.examples.led_flash' should now work and pulse D0
  * USB_VID_LIST/USB_PID_LIST exposed directly as pylibftdi attributes
 0.10
  * support for FT232H via iteration over lists USB_VID_LIST/USB_PID_LIST in driver.py (FT232H uses different PID)
