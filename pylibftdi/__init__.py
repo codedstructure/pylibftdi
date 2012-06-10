@@ -22,7 +22,7 @@ __ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
            'USB_VID_LIST', 'USB_PID_LIST', 'examples']
 
-from pylibftdi import _base, driver, util, bitbang, examples
+from pylibftdi import _base, driver, util, bitbang
 
 # Bring them in to package scope so we can treat pylibftdi
 # as a module if we want.
