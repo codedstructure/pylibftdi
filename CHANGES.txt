@@ -1,6 +1,10 @@
 pylibftdi changes
 =================
 
+0.10.1
+ * maintenance build to fix installation issues
+ * 'python -m pylibftdi.examples.led_flash' should now work and pulse D0
+ * USB_VID_LIST/USB_PID_LIST exposed directly as pylibftdi attributes
 0.10
  * support for FT232H via iteration over lists USB_VID_LIST/USB_PID_LIST in driver.py (FT232H uses different PID)
  * support for 'buffering' - i.e. chunking reads and writes to allow interruption (i.e. KeyboardInterrupt) in what could otherwise be a very long uninterruptable extension code call.
