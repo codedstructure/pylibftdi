@@ -1,2 +1,2 @@
 include *.txt *.rst
-recursive-include examples *.txt *.py
+recursive-include pylibftdi *.txt *.py
