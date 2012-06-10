@@ -20,7 +20,7 @@ __AUTHOR__ = "Ben Bass"
 
 __ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
-           'USB_VID_LIST', 'USB_PID_LIST', 'examples']
+           'USB_VID_LIST', 'USB_PID_LIST']
 
 from pylibftdi import _base, driver, util, bitbang
 

@@ -10,7 +10,7 @@ setup(
     author="Ben Bass",
     author_email="benbass@codedstructure.net",
     url="http://bitbucket.org/codedstructure/pylibftdi",
-    packages=["pylibftdi"],
+    packages=["pylibftdi", "pylibftdi.examples"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
