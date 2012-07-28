@@ -1,14 +1,17 @@
-Tutorial
-========
+Basic Usage
+===========
 
-pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
+`pylibftdi` is a minimal Pythonic interface to FTDI devices using libftdi_.
+Rather than simply expose all the methods of the underlying library directly,
+it aims to provide a simpler API for the main use-cases of serial and parallel
+IO, while still allowing the use of the more advanced functions of the library.
 
 .. _libftdi: http://www.intra2net.com/en/developer/libftdi/
 
-Usage
------
+General
+-------
 
-The primary interface is the ``Device`` class in the pylibftdi package; this
+The primary interface is the ``Device`` class in the ``pylibftdi`` package; this
 gives serial access on relevant FTDI devices (e.g. the UM232R), providing a
 file-like interface (read, write).  Baudrate is controlled with the ``baudrate``
 property.

@@ -33,30 +33,6 @@ pylibftdi Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`test_bitbang` Module
---------------------------
-
-.. automodule:: pylibftdi.test_bitbang
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`test_common` Module
--------------------------
-
-.. automodule:: pylibftdi.test_common
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`test_driver` Module
--------------------------
-
-.. automodule:: pylibftdi.test_driver
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`util` Module
 ------------------
 

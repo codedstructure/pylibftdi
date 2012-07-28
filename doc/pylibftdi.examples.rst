@@ -41,3 +41,19 @@ examples Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`magic_candle` Module
+--------------------------
+
+.. automodule:: pylibftdi.examples.magic_candle
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pin_read` Module
+--------------------------
+
+.. automodule:: pylibftdi.examples.pin_read
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
