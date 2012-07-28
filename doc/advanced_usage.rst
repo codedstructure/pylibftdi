@@ -45,9 +45,9 @@ Why this would be wanted is anyone's guess ;-)
     >>> from pylibftdi import Device
     >>>
     >>> with Device() as dev:
-    >>>    dev.fn.ftdi_set_bitmode(1, 0x01)
+    >>>    dev.ftdi_fn.ftdi_set_bitmode(1, 0x01)
     >>>    dev.write('\x00\x01\x00')
-    >>>    dev.fn.ftdi_set_bitmode(0, 0x00)
+    >>>    dev.ftdi_fn.ftdi_set_bitmode(0, 0x00)
     >>>    dev.write('Hello World!!!')
 
 
