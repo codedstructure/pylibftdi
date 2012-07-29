@@ -1,0 +1,93 @@
+pylibftdi questions
+===================
+
+None of these are yet frequently asked, and perhaps they never will be...
+But they are still questions, and they relate to pylibftdi.
+
+Which devices are recommended?
+------------------------------
+
+While I used to do a lot of soldering, I prefer the cleaner way of
+breadboarding nowadays. As such I can strongly recommend the FTDI DIP
+modules which plug into a breadboard nice and easy, can be self-powered
+from USB, and can be re-used for dozens of different projects.
+
+I've used (and test against) the following, all of which have 0.1" pin
+spacing in two rows 0.5" or 0.6" apart, so will sit across the central
+divide of any breadboard:
+
+UB232R
+  a small 8 pin device with mini-USB port; serial and CBUS bit-bang.
+
+UM245R
+  a 24-pin device with parallel FIFO modes. Full-size USB type B socket.
+
+UM232R
+  a 24-pin device with serial and bit-bang modes. Full-size USB type B
+  socket.
+
+UM232H
+  this contains a more modern FT232H device, and libftdi support is
+  fairly recent (requires 0.20 or later). Supports USB 2.0 Hi-Speed mode
+  though, and lots of interesting modes (I2C, SPI, JTAG...) which I've not
+  looked at yet. Mini-USB socket.
+
+Personally I'd go with the UM232R device for compatibility. It works great
+with both UART and bit-bang IO, which I target as the two main use-cases
+for pylibftdi. The UM232H is certainly feature-packed though, and I hope
+to support some of the more interesting modes in future.
+
+How do I set the baudrate?
+--------------------------
+
+In both serial and parallel mode, the internal baudrate generator (BRG) is
+set using the ``baudrate`` property of the ``Device`` instance. Reading this
+will show the current baudrate (which defaults to 9600); writing to it
+will attempt to set the BRG to that value.
+
+On failure to set the baudrate, it will remain at its previous setting.
+
+In parallel mode, the actual bytes-per-second rate of parallel data is
+16x the programmed BRG value. This is an effect of the FTDI devices
+themselves, and is not hidden by pylibftdi.
+
+How do I send unicode over a serial connection?
+-----------------------------------------------
+
+If a ``Device`` instance is created with ``mode='t'``, then text-mode is
+activated. This is analogous to opening files; after all, the API is
+intentionally modelled on file objects whereever possible.
+
+When text-mode is used, an encoding can be specified. The default is
+``latin-1`` for the very practical reason that it is transparent to 8-bit
+binary data; by default a text-mode serial connection looks just like a
+binary mode one.
+
+An alternative encoding can be used provided in the same constructor call
+used to instantiate the ``Device`` class, e.g.::
+
+    >>> dev = Device(mode='t', encoding='utf-8')
+
+Read and write operations will then return / take unicode values.
+
+Whether it is sensible to try and send unicode over a ftdi connection is
+a separate issue... At least consider doing codec operations at a higher
+level in your application.
+
+How do I run the tests?
+-----------------------
+
+Tests aren't included in the distutils distribution, so clone the
+repository and run from there::
+
+    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
+    <various output stuff>
+    $ cd pylibftdi
+    $ python -m unittest discover
+    ...............
+    ----------------------------------------------------------------------
+    Ran 15 tests in 0.025s
+
+    OK
+    $
+

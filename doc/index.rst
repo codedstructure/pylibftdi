@@ -11,6 +11,7 @@ Contents:
    installation
    basic_usage
    advanced_usage
+   how_to
    pylibftdi
 
 Indices and tables
