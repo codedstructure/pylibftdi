@@ -33,6 +33,12 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
         self.assertCalls(lambda: Device(), 'ftdi_usb_open')
         # and given a device_id, it should do a open_desc
         self.assertCalls(lambda: Device('bogus'), 'ftdi_usb_open_desc')
+        # check that opening a specific interface does that
+
+    def testOpenInterface(self):
+        self.assertCalls(lambda: Device(interface=1), 'ftdi_set_interface')
+        # check that opening a specific interface does that
+        self.assertNotCalls(lambda: Device(), 'ftdi_set_interface')
 
     def testReadWrite(self):
         with Device() as dev:
@@ -79,7 +85,6 @@ class LoopbackTest(unittest.TestCase):
         d.write('Bye')
         self.assertEqual(d.readline(), 'Hello World\n')
         self.assertEqual(d.readline(), 'Bye')
-
 
 
 if __name__ == "__main__":

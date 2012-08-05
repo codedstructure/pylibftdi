@@ -160,7 +160,7 @@ class Device(object):
     """
     def __init__(self, device_id=None, mode="b",
                  encoding="latin1", lazy_open=False,
-                 buffer_size=0):
+                 buffer_size=0, interface=None):
         self._opened = False
         self.driver = Driver()
         self.fdll = self.driver.fdll
@@ -185,6 +185,9 @@ class Device(object):
         # buffer_size (if not 0) chunks the reads and writes
         # to allow interruption
         self.buffer_size = buffer_size
+        # interface can be set for devices which have multiple interface
+        # ports (e.g. FT4232, FT2232)
+        self.interface = interface
         # lazy_open tells us not to open immediately.
         if not lazy_open:
             self.open()
@@ -208,6 +211,9 @@ class Device(object):
             msg = "%s (%d)" % (self.get_error_string(), res)
             del self.ctx
             raise FtdiError(msg)
+
+        if self.interface is not None:
+            self.fdll.ftdi_set_interface(byref(self.ctx), self.interface)
 
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things

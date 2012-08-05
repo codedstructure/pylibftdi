@@ -34,16 +34,20 @@ class BitBangDevice(Device):
                  device_id=None,
                  direction=ALL_OUTPUTS,
                  lazy_open=False,
-                 sync=True):
+                 sync=True,
+                 bitbang_mode=BITMODE_BITBANG,
+                 interface=None):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
         # of our own variables.
         super(BitBangDevice, self).__init__(device_id=device_id,
                                             mode='b',
-                                            lazy_open=True)
+                                            lazy_open=True,
+                                            interface=interface)
         self.direction = direction
         self.sync = sync
+        self.bitbang_mode = bitbang_mode
         self._last_set_dir = None
         self._latch = 0
         if not lazy_open:
@@ -74,7 +78,7 @@ class BitBangDevice(Device):
             raise FtdiError("invalid direction bitmask")
         self._direction = dir
         if not self.closed:
-            self.ftdi_fn.ftdi_set_bitmode(dir, BITMODE_BITBANG)
+            self.ftdi_fn.ftdi_set_bitmode(dir, self.bitbang_mode)
             self._last_set_dir = dir
 
     # port property - 8 bit read/write value
@@ -87,7 +91,7 @@ class BitBangDevice(Device):
         """
         if self.sync:
             pin_byte = c_ubyte()
-            res = self.fdll.ftdi_read_pins(self.ctx, byref(pin_byte))
+            res = self.ftdi_fn.ftdi_read_pins(byref(pin_byte))
             if res != 0:
                 raise FtdiError("Could not read device pins")
             result = pin_byte.value

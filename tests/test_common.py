@@ -73,6 +73,11 @@ class CallCheckMixin(object):
         fn()
         self.assertIn(methodname, CallLog.get())
 
+    def assertNotCalls(self, fn, methodname):
+        CallLog.reset()
+        fn()
+        self.assertNotIn(methodname, CallLog.get())
+
     def assertCallsExact(self, fn, call_list):
         CallLog.reset()
         fn()

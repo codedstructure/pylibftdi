@@ -84,10 +84,29 @@ repository and run from there::
     <various output stuff>
     $ cd pylibftdi
     $ python -m unittest discover
-    ...............
+    ................
     ----------------------------------------------------------------------
-    Ran 15 tests in 0.025s
+    Ran 16 tests in 0.025s
 
     OK
     $
 
+How do I use multi-port devices?
+--------------------------------
+
+Use the ``interface`` parameter to the Device (or BitBangDevice) class.
+The value should be one of the following values:
+
+    =================== =============
+    ``interface`` value Meaning
+    ------------------- -------------
+    0                   Any interface
+    1                   INTERFACE A
+    2                   INTERFACE B
+    3                   INTERFACE C
+    4                   INTERFACE D
+    =================== =============
+
+You should be able to open multiple ``Device``\s with different
+``interface`` settings, though I haven't got multi-interface devices
+to test against at the moment, so can't yet confirm this.
