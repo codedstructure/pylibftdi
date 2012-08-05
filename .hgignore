@@ -3,5 +3,6 @@ syntax: glob
 *.pyo
 .idea
 build
+dist
 doc/_build
 MANIFEST

@@ -1,6 +1,9 @@
 pylibftdi changes
 =================
 
+0.10.3
+ * lots more documentation, cleaned up, on readthedocs. Still in progress though.
+ * Experimental support for multi-device interfaces ``Device(interface=1)``
 0.10.2
  * include examples subpackage
  * ensure examples work under Python3

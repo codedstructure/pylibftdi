@@ -26,8 +26,11 @@ something like the following:
 Though hopefully with a different serial number, or else you've either
 stolen mine, or you are me...
 
-Test some actual IO (well, at least O)
---------------------------------------
+Test some actual IO
+-------------------
+
+Output example
+~~~~~~~~~~~~~~
 
 Connect an LED between D0 of your bit-bang capable device and ground, via a
 330 - 1K ohm resistor as appropriate.
@@ -37,3 +40,17 @@ Test the installation and functioning of pylibftdi with the following::
     $ python -m pylibftdi.examples.led_flash
 
 The LED should now flash at approximately 1Hz.
+
+Input example
+~~~~~~~~~~~~~
+
+To test some input, remove any connections from the port lines initially,
+then run the following, which reads and prints the status of the input lines
+regularly::
+
+    $ python -m pylibftdi.examples.pin_read
+
+The ``pin_read`` example is a complete command line application which can
+be used to monitor for particular values on the attached device pins, and
+output an appropriate error code on match. Repeat the above with a trailing
+``--help`` for info.
