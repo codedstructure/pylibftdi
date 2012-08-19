@@ -91,10 +91,17 @@ repository and run from there::
     OK
     $
 
-How do I use multi-port devices?
---------------------------------
+How do I use multiple-interface devices?
+----------------------------------------
 
-Use the ``interface`` parameter to the Device (or BitBangDevice) class.
+Some FTDI devices have multiple interfaces, for example the FT2232H has 2
+and the FT4232H has four. In terms of accessing them, they can be
+considered as independent devices; once a connection is established to one
+of them, it is isolated from the other interfaces.
+
+To select which interface to use when opening a connection to a specific
+interface on a multiple-interface device, use the ``interface`` parameter
+of the Device (or BitBangDevice) class constructor.
 The value should be one of the following values:
 
     =================== =============
@@ -108,5 +115,5 @@ The value should be one of the following values:
     =================== =============
 
 You should be able to open multiple ``Device``\s with different
-``interface`` settings, though I haven't got multi-interface devices
-to test against at the moment, so can't yet confirm this.
+``interface`` settings.
+*Thanks to Daniel Forer for testing multiple device support.*
