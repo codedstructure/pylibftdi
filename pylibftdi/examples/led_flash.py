@@ -6,6 +6,7 @@ All rights reserved.
 """
 
 import time
+import sys
 from pylibftdi import BitBangDevice
 
 
@@ -18,5 +19,14 @@ def flash_forever(rate):
             time.sleep(1.0 / (2 * rate))
             bb.port ^= 1
 
+
+def main():
+    if len(sys.argv) > 1:
+        rate = float(sys.argv[1])
+        flash_forever(rate)
+    else:
+        flash_forever(1)
+
+
 if __name__ == '__main__':
-    flash_forever(1)
+    main()
