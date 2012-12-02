@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name="pylibftdi",
-    version="0.10.3",
+    version="0.11.0pre",
     description="Pythonic interface to FTDI devices using libftdi",
     long_description=open('README.rst').read(),
     author="Ben Bass",
@@ -22,6 +22,8 @@ setup(
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Embedded Systems",
         "Topic :: System :: Hardware"
