@@ -36,7 +36,7 @@ class BitBangDevice(Device):
                  lazy_open=False,
                  sync=True,
                  bitbang_mode=BITMODE_BITBANG,
-                 interface=None):
+                 interface_select=None):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
@@ -44,7 +44,7 @@ class BitBangDevice(Device):
         super(BitBangDevice, self).__init__(device_id=device_id,
                                             mode='b',
                                             lazy_open=True,
-                                            interface=interface)
+                                            interface_select=interface_select)
         self.direction = direction
         self.sync = sync
         self.bitbang_mode = bitbang_mode

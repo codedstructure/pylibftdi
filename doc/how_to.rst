@@ -78,15 +78,22 @@ How do I run the tests?
 -----------------------
 
 Tests aren't included in the distutils distribution, so clone the
-repository and run from there::
+repository and run from there. pylibftdi supports Python 2.6/2.7 as well
+as Python 3.2+, so these tests can be run for each Python version::
 
     $ hg clone http://bitbucket.org/codedstructure/pylibftdi
     <various output stuff>
     $ cd pylibftdi
-    $ python -m unittest discover
+    $ python2.7 -m unittest discover
     ................
     ----------------------------------------------------------------------
-    Ran 16 tests in 0.025s
+    Ran 16 tests in 0.011s
+
+    OK
+    $ python3.3 -m unittest discover
+    ................
+    ----------------------------------------------------------------------
+    Ran 16 tests in 0.015s
 
     OK
     $
@@ -100,20 +107,21 @@ considered as independent devices; once a connection is established to one
 of them, it is isolated from the other interfaces.
 
 To select which interface to use when opening a connection to a specific
-interface on a multiple-interface device, use the ``interface`` parameter
-of the Device (or BitBangDevice) class constructor.
-The value should be one of the following values:
+interface on a multiple-interface device, use the ``interface_select``
+parameter of the Device (or BitBangDevice) class constructor.
+The value should be one of the following values. Symbolic constants are
+provided in the pylibftdi namespace.
 
-    =================== =============
-    ``interface`` value Meaning
-    ------------------- -------------
-    0                   Any interface
-    1                   INTERFACE A
-    2                   INTERFACE B
-    3                   INTERFACE C
-    4                   INTERFACE D
-    =================== =============
+    ==================== =============
+    ``interface_select`` Meaning
+    -------------------- -------------
+    INTERFACE_ANY (0)    Any interface
+    INTERFACE_A (1)      INTERFACE A
+    INTERFACE_B (2)      INTERFACE B
+    INTERFACE_C (3)      INTERFACE C
+    INTERFACE_D (4)      INTERFACE D
+    ==================== =============
 
 You should be able to open multiple ``Device``\s with different
-``interface`` settings.
+``interface_select`` settings.
 *Thanks to Daniel Forer for testing multiple device support.*

@@ -2,6 +2,13 @@ pylibftdi changes
 =================
 
 0.11.0
+ * API change:
+   * Device() parameter 'interface' has been renamed to 'interface_select',
+     as it wasn't clear what this meant. Symbolic constants 'INTERFACE_ANY',
+     'INTERFACE_A'/B/C/D are provided in the pylibftdi package namespace.
+   * Device() parameter 'buffer_size' has been renamed to 'chunk_size'
+     because there isn't any buffering going on, so it was potentially
+     misleading.
  * In progress...
 0.10.3
  * lots more documentation, cleaned up, on readthedocs. Still in progress though.

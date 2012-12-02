@@ -138,29 +138,40 @@ class Driver(object):
 
 class Device(object):
     """
-    Device([device_id[, mode [, encoding [, lazy_open]]]) -> Device instance
-
-    represents a single FTDI device accessible via the libftdi driver.
-    Supports a basic file-like interface (open/close/read/write, context
-    manager support).
-
-    device_id - an optional serial number of the device to open.
-      if omitted, this refers to the first device found, which is
-      convenient if only one device is attached, but otherwise
-      fairly useless.
-
-    mode - either 'b' (binary) or 't' (text). This primarily affects
-      Python 3 calls to read() and write(), which will accept/return
-      unicode strings which will be encoded/decoded according to the given...
-
-    encoding - the codec name to be used for text operations.
-
-    lazy_open - if True, then the device will not be opened immediately - the
-      user must perform an explicit open() call prior to other operations.
+    Represents a connection to a single FTDI device
     """
+
     def __init__(self, device_id=None, mode="b",
                  encoding="latin1", lazy_open=False,
-                 buffer_size=0, interface=None):
+                 chunk_size=0, interface_select=None):
+        """
+        Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
+
+        represents a single FTDI device accessible via the libftdi driver.
+        Supports a basic file-like interface (open/close/read/write, context
+        manager support).
+
+        device_id - an optional serial number of the device to open.
+            if omitted, this refers to the first device found, which is
+            convenient if only one device is attached, but otherwise
+            fairly useless.
+
+        mode - either 'b' (binary) or 't' (text). This primarily affects
+            Python 3 calls to read() and write(), which will accept/return
+            unicode strings which will be encoded/decoded according to the given...
+
+        encoding - the codec name to be used for text operations.
+
+        lazy_open - if True, then the device will not be opened immediately -
+            the user must perform an explicit open() call prior to other
+            operations.
+
+        chunk_size - if non-zero, split read and write operations into chunks
+            of this size. With large or slow accesses, interruptions (i.e.
+            KeyboardInterrupt) may not happen in a timely fashion.
+
+        interface_select - select interface to use on multi-interface devices
+        """
         self._opened = False
         self.driver = Driver()
         self.fdll = self.driver.fdll
@@ -182,12 +193,12 @@ class Device(object):
         self._baudrate = 9600
         # defining softspace allows us to 'print' to this device
         self.softspace = 0
-        # buffer_size (if not 0) chunks the reads and writes
+        # chunk_size (if not 0) chunks the reads and writes
         # to allow interruption
-        self.buffer_size = buffer_size
+        self.chunk_size = chunk_size
         # interface can be set for devices which have multiple interface
         # ports (e.g. FT4232, FT2232)
-        self.interface = interface
+        self.interface_select = interface_select
         # lazy_open tells us not to open immediately.
         if not lazy_open:
             self.open()
@@ -212,8 +223,9 @@ class Device(object):
             del self.ctx
             raise FtdiError(msg)
 
-        if self.interface is not None:
-            self.fdll.ftdi_set_interface(byref(self.ctx), self.interface)
+        if self.interface_select is not None:
+            self.fdll.ftdi_set_interface(byref(self.ctx),
+                self.interface_select)
 
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things
@@ -296,11 +308,11 @@ class Device(object):
             raise FtdiError("read() on closed Device")
 
         # read the data
-        if self.buffer_size != 0:
+        if self.chunk_size != 0:
             remaining = length
             byte_data_list = []
             while remaining > 0:
-                rx_bytes = self._read(min(remaining, self.buffer_size))
+                rx_bytes = self._read(min(remaining, self.chunk_size))
                 if not rx_bytes:
                     break
                 byte_data_list.append(rx_bytes)
@@ -343,12 +355,12 @@ class Device(object):
             byte_data = data.encode(self.encoding)
 
         # actually write it
-        if self.buffer_size != 0:
+        if self.chunk_size != 0:
             remaining = len(byte_data)
             written = 0
             while remaining > 0:
                 start = written
-                length = min(remaining, self.buffer_size)
+                length = min(remaining, self.chunk_size)
                 result = self._write(byte_data[start: start + length])
                 if result == -1:
                     written == result
@@ -433,6 +445,7 @@ class Device(object):
     def __enter__(self):
         """
         support for context manager.
+
         Note the device is opened and closed automatically
         when used in a with statement, and the device object
         itself is returned:

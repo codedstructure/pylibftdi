@@ -41,3 +41,10 @@ BB_INPUT = bitbang.BB_INPUT
 FLUSH_BOTH = driver.FLUSH_BOTH
 FLUSH_INPUT = driver.FLUSH_INPUT
 FLUSH_OUTPUT = driver.FLUSH_OUTPUT
+
+# Use these for interface_select on multiple-interface devices
+INTERFACE_ANY = 0
+INTERFACE_A = 1
+INTERFACE_B = 2
+INTERFACE_C = 3
+INTERFACE_D = 4

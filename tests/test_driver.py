@@ -36,7 +36,8 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
         # check that opening a specific interface does that
 
     def testOpenInterface(self):
-        self.assertCalls(lambda: Device(interface=1), 'ftdi_set_interface')
+        self.assertCalls(lambda: Device(interface_select=1),
+                         'ftdi_set_interface')
         # check that opening a specific interface does that
         self.assertNotCalls(lambda: Device(), 'ftdi_set_interface')
 
@@ -79,7 +80,7 @@ class LoopbackTest(unittest.TestCase):
             self.assertEqual(line, lines[idx])
 
     def testBuffer(self):
-        d = LoopDevice(mode='t', buffer_size=3)
+        d = LoopDevice(mode='t', chunk_size=3)
         d.write('Hello')
         d.write(' World\n')
         d.write('Bye')
