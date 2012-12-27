@@ -49,7 +49,10 @@ class BitBangDevice(Device):
         self.sync = sync
         self.bitbang_mode = bitbang_mode
         self._last_set_dir = None
-        self._latch = 0
+        # latch is the latched state of output pins.
+        # it is initialised to the read value of the pins
+        # 'and'ed with those bits set to OUTPUT (1)
+        self._latch = None
         if not lazy_open:
             self.open()
 
@@ -61,6 +64,40 @@ class BitBangDevice(Device):
         if self.direction != self._last_set_dir:
             self.direction = self._direction
         return self
+
+    def read_pins(self):
+        """
+        read the current 'actual' state of the pins
+
+        :return: 8-bit binary representation of pin state
+        :rtype: int
+        """
+        pin_byte = c_ubyte()
+        res = self.ftdi_fn.ftdi_read_pins(byref(pin_byte))
+        if res != 0:
+            raise FtdiError("Could not read device pins")
+        return pin_byte.value
+
+    @property
+    def latch(self):
+        """
+        latch property - the output latch (in-memory representation
+        of output pin state)
+
+        Note _latch is not masked by direction (except on initialisation),
+        as otherwise a loop incrementing a mixed input/output port would
+        not work, as it would 'stop' on input pins. This is the primary
+        use case for 'latch'. It's basically a `port` which ignores input.
+
+        :return: the state of the output latch
+        """
+        if self._latch is None:
+            self._latch = self.read_pins() & self.direction
+        return self._latch
+
+    @latch.setter
+    def latch(self, value):
+        self.port = value  # this updates ._latch implicitly
 
     # direction property - 8 bit value determining whether an IO line
     # is output (if set to 1) or input (set to 0)
@@ -90,21 +127,18 @@ class BitBangDevice(Device):
         so read-modify-write operations (e.g. drv.port+=1) are valid.
         """
         if self.sync:
-            pin_byte = c_ubyte()
-            res = self.ftdi_fn.ftdi_read_pins(byref(pin_byte))
-            if res != 0:
-                raise FtdiError("Could not read device pins")
-            result = pin_byte.value
+            result = self.read_pins()
         else:
             # the coercion to bytearray here is to make this work
             # transparently between Python2 and Python3 - equivalent
             # of ord() for Python2, a time-wasting do-nothing on Python3
             result = bytearray(super(BitBangDevice, self).read(1))[0]
 
-        # replace the 'output' bits with current value of _latch -
+        # replace the 'output' bits with current value of self.latch -
         # the last written value. This makes read-modify-write
         # operations (e.g. 'drv.port |= 0x10') work as expected
-        result = (result & ~self._direction) | (self._latch & self._direction)
+        result = ((result & ~self._direction) |    # read input
+                  (self.latch & self._direction))  # output latch
         return result
 
     @port.setter
