@@ -42,7 +42,7 @@ def get_page():
         page += """
 <fieldset style="background-color: %s; display: inline-block; margin:0px; padding: 8px;">
 <form action="" method="post" >
-<input type="checkbox" onchange="document.querySelector('[name=bit%d]').value=this.value; document.forms[%d].submit()" %s />
+<input type="checkbox" onchange="document.querySelector('[name=bit%d]').value=this.checked; document.forms[%d].submit()" %s />
 <input type="hidden" name="bit%d" />
 </form>
 </fieldset>
@@ -69,9 +69,10 @@ class ReqHandler(BaseHTTPRequestHandler):
         query = self.rfile.read(nbytes)
         # this is lazy and fragile - assumes only a single
         # query parameter XXX
+        print query
         if query.startswith('bit'):
             bit = int(query[3])
-            value = 1 if query.rsplit('=', 1)[-1] == 'on' else 0
+            value = 1 if query.rsplit('=', 1)[-1] == 'true' else 0
             if value:
                 switch.port |= (1 << bit)
             else:
