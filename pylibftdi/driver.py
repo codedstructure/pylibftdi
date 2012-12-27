@@ -301,8 +301,9 @@ class Device(object):
         read(length) -> bytes/string of up to `length` bytes.
 
         read upto `length` bytes from the FTDI device
-        return type depends on self.mode - if 'b' return
-        raw bytes, else decode according to self.encoding
+        :param length: maximum number of bytes to read
+        :return: value read from device
+        :rtype: bytes if self.mode is 'b', else decode with self.encoding
         """
         if not self._opened:
             raise FtdiError("read() on closed Device")
@@ -332,6 +333,9 @@ class Device(object):
     def _write(self, byte_data):
         """
         actually do the low level writing
+        :param byte_data: data to be written
+        :type byte_data: bytes
+        :return: number of bytes written
         """
         buf = create_string_buffer(byte_data)
         written = self.fdll.ftdi_write_data(byref(self.ctx),
@@ -343,10 +347,13 @@ class Device(object):
         write(data) -> count of bytes actually written
 
         write given `data` string to the FTDI device
-        returns count of bytes written, which may be less than `len(data)`
+
+        :param data: string to be written
+        :type data: string or bytes
+        :return: count of bytes written, which may be less than `len(data)`
         """
         if not self._opened:
-            raise FtdiError("read() on closed Device")
+            raise FtdiError("write() on closed Device")
 
         try:
             byte_data = bytes(data)
@@ -416,7 +423,9 @@ class Device(object):
         self.flush(FLUSH_OUTPUT)
 
     def get_error_string(self):
-        "return error string from libftdi driver"
+        """
+        :return: error string from libftdi driver
+        """
         return self.fdll.ftdi_get_error_string(byref(self.ctx))
 
     @property
@@ -475,6 +484,9 @@ class Device(object):
     def readline(self, size=0):
         """
         readline() for file-like compatibility.
+
+        :param size: maximum amount of data to read looking for a line
+        :return: a line of text, or size bytes if no line-ending found
 
         This only works for mode='t' on Python3
         """

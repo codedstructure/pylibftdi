@@ -12,6 +12,7 @@ to be attached.
 """
 
 from tests.test_common import (LoopDevice, Device, CallCheckMixin, unittest)
+from pylibftdi import FtdiError
 
 # and now some test cases...
 
@@ -51,6 +52,14 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
             self.assertCalls(dev.flush_input, 'ftdi_usb_purge_rx_buffer')
             self.assertCalls(dev.flush_output, 'ftdi_usb_purge_tx_buffer')
             self.assertCalls(dev.flush, 'ftdi_usb_purge_buffers')
+
+    def testClose(self):
+        d = Device()
+        d.close()
+        self.assertRaises(FtdiError, d.write, 'hello')
+        d = Device()
+        d.close()
+        self.assertRaises(FtdiError, d.read, 1)
 
 
 class LoopbackTest(unittest.TestCase):

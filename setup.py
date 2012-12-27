@@ -1,6 +1,11 @@
 #!/usr/bin/python
 
-from distutils.core import setup
+try:
+    # this is primarily to support the 'develop' target
+    # if setuptools/distribute are installed
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 setup(
     name="pylibftdi",
