@@ -31,6 +31,8 @@ pylibftdi changes
       >>> d.port |= 2
 
   would have cleared D0, but now keeps it high (so d.port == 3)
+* setup.py will now use setuptools/distribute if installed, allowing the
+  'develop' target.
 
 0.10.3
 ~~~~~~

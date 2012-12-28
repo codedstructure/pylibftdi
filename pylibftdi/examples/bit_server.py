@@ -69,7 +69,6 @@ class ReqHandler(BaseHTTPRequestHandler):
         query = self.rfile.read(nbytes)
         # this is lazy and fragile - assumes only a single
         # query parameter XXX
-        print query
         if query.startswith('bit'):
             bit = int(query[3])
             value = 1 if query.rsplit('=', 1)[-1] == 'true' else 0
