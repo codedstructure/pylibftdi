@@ -15,7 +15,8 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 
 :Limitations:
 
- - The API might change prior to reaching a 1.0 release.
+ - The API might change prior to reaching a 1.0 release. It already has a
+   couple of times.
 
 Usage
 -----

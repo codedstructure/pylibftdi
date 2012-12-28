@@ -1,8 +1,8 @@
 pylibftdi changes
 =================
 
-0.11.0pre
-~~~~~~~~~
+0.11
+~~~~
 
 * API changes
     * Device() parameter 'interface' has been renamed to 'interface_select',
@@ -15,7 +15,6 @@ pylibftdi changes
       mixed-direction ports.
 * fixed the bit_server example; run as
       python -m pylibftdi.examples.bit_server
-
 * docstring clean-ups
 * BitBangDevice now reads device pin state on startup, so read/rmw operations
   across process runs now work as expected; for example previously running::
@@ -32,7 +31,6 @@ pylibftdi changes
       >>> d.port |= 2
 
   would have cleared D0, but now keeps it high (so d.port == 3)
-* TODO: more docstring tidy-up, tests for latch, doc updates
 
 0.10.3
 ~~~~~~

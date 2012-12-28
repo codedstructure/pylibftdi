@@ -4,8 +4,34 @@ pylibftdi questions
 None of these are yet frequently asked, and perhaps they never will be...
 But they are still questions, and they relate to pylibftdi.
 
+Using pylibftdi - General
+-------------------------
+
+Can I use pylibftdi with device XYZ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the device XYZ is (or uses as it's ) an FTDI device, then possibly. A large
+number of devices *will* work, but won't be recognised due to the limited
+USB Vendor and Product IDs which pylibftdi checks for.
+
+To see the vendor / product IDs which are supported, run the following::
+
+    >>> from pylibftdi import USB_VID_LIST, USB_PID_LIST
+    >>> print(map(hex, USB_VID_LIST))
+    ['0x403']
+    >>> print(map(hex, USB_PID_LIST))
+    ['0x6001', '0x6014']
+
+If a FTDI device with a VID / PID not matching the above is required, then
+the device's values should be appended to the appropriate list after import::
+
+    >>> from pylibftdi import USB_PID_LIST, USB_VID_LIST, Device
+    >>> USB_PID_LIST.append(0x1234)
+    >>>
+    >>> dev = Device()  # will now recognise a device with PID 0x1234.
+
 Which devices are recommended?
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 While I used to do a lot of soldering, I prefer the cleaner way of
 breadboarding nowadays. As such I can strongly recommend the FTDI DIP
@@ -37,8 +63,11 @@ with both UART and bit-bang IO, which I target as the two main use-cases
 for pylibftdi. The UM232H is certainly feature-packed though, and I hope
 to support some of the more interesting modes in future.
 
+Using pylibftdi - Programming
+-----------------------------
+
 How do I set the baudrate?
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In both serial and parallel mode, the internal baudrate generator (BRG) is
 set using the ``baudrate`` property of the ``Device`` instance. Reading this
@@ -52,7 +81,7 @@ In parallel mode, the actual bytes-per-second rate of parallel data is
 themselves, and is not hidden by pylibftdi.
 
 How do I send unicode over a serial connection?
------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a ``Device`` instance is created with ``mode='t'``, then text-mode is
 activated. This is analogous to opening files; after all, the API is
@@ -74,32 +103,9 @@ Whether it is sensible to try and send unicode over a ftdi connection is
 a separate issue... At least consider doing codec operations at a higher
 level in your application.
 
-How do I run the tests?
------------------------
-
-Tests aren't included in the distutils distribution, so clone the
-repository and run from there. pylibftdi supports Python 2.6/2.7 as well
-as Python 3.2+, so these tests can be run for each Python version::
-
-    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
-    <various output stuff>
-    $ cd pylibftdi
-    $ python2.7 -m unittest discover
-    ................
-    ----------------------------------------------------------------------
-    Ran 16 tests in 0.011s
-
-    OK
-    $ python3.3 -m unittest discover
-    ................
-    ----------------------------------------------------------------------
-    Ran 16 tests in 0.015s
-
-    OK
-    $
 
 How do I use multiple-interface devices?
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some FTDI devices have multiple interfaces, for example the FT2232H has 2
 and the FT4232H has four. In terms of accessing them, they can be
@@ -125,3 +131,157 @@ provided in the pylibftdi namespace.
 You should be able to open multiple ``Device``\s with different
 ``interface_select`` settings.
 *Thanks to Daniel Forer for testing multiple device support.*
+
+What is the difference between the ``port`` and ``latch`` BitBangDevice properties?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`latch` reflects the current state of the output latch (i.e. the last value
+written to the port), while ``port`` reflects input states as well. Writing to
+either ``port`` or ``latch`` has an identical effect, so when pylibftdi is used
+only for output, there is no effective difference, and ``port`` is recommended
+for simplicity and consistency.
+
+The place where it does make a difference is during read-modify-write
+operations. Consider the following::
+
+    >>> dev = BitBangDevice()  # 1
+    >>> dev.direction = 0x81   # 2   # set bits 0 and 7 are output
+    >>> dev.port = 0           # 3
+    >>> for _ in range(255):   # 4
+    >>>     dev.port += 1      # 5   # read-modify-write operation
+
+In this (admittedly contrived!) scenario, if one of the input lines D1..D6
+were held low, then they would cause the counter to effectively 'stop'. The
+``+= 1`` operation would never actually set the bit as required (because it is
+an input at 0), and the highest output bit would never get set.
+
+Using ``dev.latch`` in lines 3 and 5 above would resolve this, as the
+read-modify-write operation on line 5 is simply working on the in-memory
+latch value, rather than reading the inputs, and it would simply count up from
+0 to 255 in steps of one, writing the value to the device (which would be
+ignored in the case of input lines).
+
+Similar concepts exist in many microcontrollers, for example see
+http://stackoverflow.com/a/2623498 for a possibly better explanation, though
+in a slightly different context :)
+
+If you aren't using read-modify-write operations (e.g. augmented assignment),
+or you have a direction on the port of either ALL_INPUTS (0) or ALL_OUTPUTS
+(1), then just ignore this section and use ``port`` :)
+
+What is the purpose of the ``chunk_size`` parameter?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While libftdi is performing I/O to the device, it is not really running Python
+code at all, but C library code via ctypes. If there is a significant amount of
+data, especially at low baud-rates, this can be a significant delay during which
+no Python bytecode is executed. The most obvious result of this is that no
+signals are delivered to the Python process during this time, and interrupt
+signals (Ctrl-C) will be ignored.
+
+Try the following::
+
+    >>> dev = Device()
+    >>> dev.baudrate = 120  # nice and slow!
+    >>> dev.write('helloworld' * 1000)
+
+This should take approximately 10 seconds prior to returning, and crucially,
+Ctrl-C interruptions will be deferred for all that time. By setting
+``chunk_size`` on the device (which may be set either as a keyword parameter
+during ``Device`` instantiation, or at a later point as an attribute of the
+``Device`` instance), the I/O operations are performed in chunks of at most
+the specified number of bytes. Setting it to 0, the default value, disables
+this chunking.
+
+Repeat the above command but prior to the write operation, set
+``dev.chunk_size = 10``. A Ctrl-C interruption should now kick-in almost
+instantly. There is a performance trade-off however; if using ``chunk_size`` is
+required, set it as high as is reasonable for your application.
+
+Using pylibftdi - Interfacing
+-----------------------------
+
+How do I control an LED?
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+pylibftdi devices generally have sufficient output current to sink or source
+the 10mA or so which a low(ish) current LED will need. A series resistor is
+essential to protect both the LED and the FTDI device itself; a value between
+220 and 470 ohms should be sufficient depending on required brightness / LED
+efficiency.
+
+How do I control a higher current device?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+FTDI devices will typically provide a few tens of milli-amps, but beyond that
+things either just won't work, or the device could be damaged. For medium
+current operation, a standard bipolar transistor switch will suffice; for
+larger loads a MOSFET or relay should be used. (Note a relay will require a
+low-power transistor switch anyway). Search online for something like
+'mosfet logic switch' or 'transistor relay switch' for more details.
+
+What is the state of an unconnected input pin?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This depends on the device and the EEPROM configuration values. Most devices
+will have weak (typ. 200Kohm) pull-ups on input pins, so there is no harm
+leaving them floating. Consult the datasheet for your device for definitive
+information, but you can always just leave an (unconnected) device and read
+it's pins when set as inputs; chances are they will read 255 / 0xFF::
+
+    >>> dev = BitBangDevice(direction=0)
+    >>> dev.port
+    255
+
+While not recommended for anything serious, this does allow the possibility
+of reading a input switch state by simply connecting a switch between an input
+pin and ground (possibly with a low value - e.g. 100 ohm -  series resistor to
+prevent accidents should it be set to an output and set high...). Note that
+with a normal push-to-make switch, the value will read '1' when the switch is
+not pressed; pressing it will set the input line value to '0'.
+
+Developing pylibftdi
+--------------------
+
+How do I checkout and use the latest development version?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+pylibftdi is currently developed with a Mercurial repository on bitbucket.
+To use / develop on that version, it must first be cloned locally, after
+which it can be 'installed'. Clone the repository to a local directory and
+install (with the 'develop' target ideally) as follows::
+
+    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
+    $ cd pylibftdi
+    $ python setup.py develop
+
+If permission-related issues occur, then consider using the ``--user`` flag to
+setup.py to install for only the local user, or try prefixing the above command
+with ``sudo``.
+
+Note for now there is only the master branch, so need to worry about which
+branch is required.
+
+How do I run the tests?
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Tests aren't included in the distutils distribution, so clone the
+repository and run from there. pylibftdi supports Python 2.6/2.7 as well
+as Python 3.2+, so these tests can be run for each Python version::
+
+    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
+    <various output stuff>
+    $ cd pylibftdi
+    $ python2.7 -m unittest discover
+    ................
+    ----------------------------------------------------------------------
+    Ran 17 tests in 0.011s
+
+    OK
+    $ python3.3 -m unittest discover
+    ................
+    ----------------------------------------------------------------------
+    Ran 17 tests in 0.015s
+
+    OK
+    $

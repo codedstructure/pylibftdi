@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name="pylibftdi",
-    version="0.11.0pre",
+    version="0.11",
     description="Pythonic interface to FTDI devices using libftdi",
     long_description=open('README.rst').read(),
     author="Ben Bass",
