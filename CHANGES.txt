@@ -1,6 +1,11 @@
 pylibftdi changes
 =================
 
+0.12pre
+~~~~~~~
+* Optimisation on writing to an ALL_OUTPUTS port property - don't bother
+  reading the pin state first.
+
 0.11
 ~~~~
 
