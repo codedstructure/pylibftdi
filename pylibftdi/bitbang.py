@@ -126,19 +126,24 @@ class BitBangDevice(Device):
         lines is persisted in this object for the purposes of reading,
         so read-modify-write operations (e.g. drv.port+=1) are valid.
         """
-        if self.sync:
-            result = self.read_pins()
+        if self._direction == ALL_OUTPUTS:
+            # a minor optimisation; no point reading from the port if
+            # we have no input lines set
+            result = self.latch
         else:
-            # the coercion to bytearray here is to make this work
-            # transparently between Python2 and Python3 - equivalent
-            # of ord() for Python2, a time-wasting do-nothing on Python3
-            result = bytearray(super(BitBangDevice, self).read(1))[0]
+            if self.sync:
+                result = self.read_pins()
+            else:
+                # the coercion to bytearray here is to make this work
+                # transparently between Python2 and Python3 - equivalent
+                # of ord() for Python2, a time-wasting do-nothing on Python3
+                result = bytearray(super(BitBangDevice, self).read(1))[0]
 
-        # replace the 'output' bits with current value of self.latch -
-        # the last written value. This makes read-modify-write
-        # operations (e.g. 'drv.port |= 0x10') work as expected
-        result = ((result & ~self._direction) |    # read input
-                  (self.latch & self._direction))  # output latch
+            # replace the 'output' bits with current value of self.latch -
+            # the last written value. This makes read-modify-write
+            # operations (e.g. 'drv.port |= 0x10') work as expected
+            result = ((result & ~self._direction) |    # read input
+                      (self.latch & self._direction))  # output latch
         return result
 
     @port.setter
