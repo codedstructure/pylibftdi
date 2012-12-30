@@ -3,8 +3,9 @@ pylibftdi changes
 
 0.12pre
 ~~~~~~~
-* Optimisation on writing to an ALL_OUTPUTS port property - don't bother
-  reading the pin state first.
+* Optimisation on accessing port property when direction is set to ALL_OUTPUTS
+  - don't bother reading the pins first. Makes ``port`` identical to ``latch``
+  in this case.
 
 0.11
 ~~~~
