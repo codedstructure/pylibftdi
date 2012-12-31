@@ -4,10 +4,12 @@ Quick Start
 Install pylibftdi
 -----------------
 
-See the _installation instructions for more detailed requirements, but
+See the installation_ instructions for more detailed requirements, but
 hopefully things will work by just running the following::
 
     $ pip install pylibftdi
+
+.. _installation: installation.html
 
 Connect and enumerate FTDI devices
 ----------------------------------
