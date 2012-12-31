@@ -38,30 +38,45 @@ I suggest using homebrew_ to install libftdi::
 Linux
 -----
 
+There are two steps in getting a sensible installation in Linux systems:
+
+1. Getting ``libftdi`` and its dependencies installed
+2. Ensuring permissions allow access to the device without requiring root
+   privileges. Symptoms of this not being done are programs only working
+   properly when run with ``sudo``, giving '-4' or '-8' error codes in
+   other cases.
+
+Each of these steps will be slightly different depending on the distribution
+in use. I've tested ``pylibftdi`` on Debian Wheezy (on a Raspberry Pi),
+Ubuntu (various versions, running on a fairly standard ThinkPad laptop),
+and Arch Linux (running on a PogoPlug - one of the early pink ones).
+
+Debian (Raspberry Pi) / Ubuntu etc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 On Debian like systems (including Ubuntu, Mint, Debian, etc), the package
 `libftdi-dev` should give you what you need as far as the libftdi library
-is concerned.
+is concerned::
 
-One potential issue is with permissions to access the device, which can be
-seen as a error when opening devices (with a '-4' or '-8' error code).
-The solution is to add udev rules to deal with the devices - the following
-works for me under Arch linux::
+    $ sudo apt-get install libftdi-dev
 
-   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP=="users", MODE="0660"
-   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP=="users", MODE="0660"
+The following works for both a Raspberry Pi (Debian Wheezy) and Ubuntu 12.04,
+getting ordinary users (e.g. 'pi' on the RPi) access to the FTDI device without
+needing root permissions:
 
-Under other distributions, other group names are probably needed. On Ubuntu
-(12.04 here) I use the ``dialout`` group. Create a file
-``/etc/udev/rules.d/99-libftdi.rules`` containing::
+1. Create a file ``/etc/udev/rules.d/99-libftdi.rules``. You will need sudo
+   access to create this file.
+2. Put the following in the file::
 
-   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP=="dialout", MODE="0660"
-   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP=="dialout", MODE="0660"
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="dialout", MODE="0660"
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP="dialout", MODE="0660"
 
-Some FTDI devices may use other USB PIDs. Use `lsusb` or similar to
-determine the exact values to use (or try checking `dmesg` output on
+Some FTDI devices may use other USB PIDs. You could try removing the match on
+`idProduct` altogether, just matching on the FTDI vendor ID. Or Use `lsusb` or
+similar to determine the exact values to use (or try checking `dmesg` output on
 device insertion / removal). ``udevadm monitor --environment`` is also helpful,
 but note that the environment 'keys' it gives are different to the attributes
-(filenames within /sys/devices/...) which the ATTRS will match. Perhaps ENV{}
+(filenames within /sys/devices/...) which the ATTRS will match.  Perhaps ENV{}
 matches work just as well, though I've only tried matching on ATTRS.
 
 Note that changed udev rules files will be picked up automatically by the udev
@@ -69,6 +84,20 @@ daemon, but will only be acted upon on device actions, so unplug/plug in the
 device to check whether you're latest rules iteration actually works :-)
 
 See http://wiki.debian.org/udev for more on writing udev rules.
+
+Arch Linux
+~~~~~~~~~~
+
+The `libftdi` package (sensibly enough) provides the `libftdi` library::
+
+    $ sudo pacman -S libftdi
+
+Similar udev rules to those above for Debian should be included (again in
+``/etc/udev/rules.d/99-libftdi.rules`` or similar), though the GROUP directive
+should be changed to set the group to 'users'::
+
+   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="users", MODE="0660"
+   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP="users", MODE="0660"
 
 Testing installation
 --------------------
