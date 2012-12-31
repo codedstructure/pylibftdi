@@ -6,7 +6,7 @@ Magic Candle - light falling on the LDR turns on the LED, which due
 LDR (via a transistor switch - dark = '1') - D0
 LED (via series resistor) - D1
 
-pylibftdi - codedstructure 2012
+pylibftdi - codedstructure 2013
 """
 
 import time
