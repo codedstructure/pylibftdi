@@ -26,6 +26,9 @@ available from the picusb_ project on google code.
 
 .. _picusb: http://code.google.com/p/picusb
 
+Things:
+ - installing it in the first place, e.g. via ez_setup.py etc.
+
 Mac OS X
 --------
 

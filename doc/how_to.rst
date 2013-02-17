@@ -285,3 +285,39 @@ as Python 3.2+, so these tests can be run for each Python version::
 
     OK
     $
+
+How can I determine and select the underlying libftdi library?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since pylibftdi 0.12, the Driver exposes a ``libftdi_version`` method,
+which returns a tuple whose first three entries correspond to major, minor,
+and micro versions of the libftdi driver being used.
+
+With the recent (early 2013) release of libftdi1 - which can coexist with
+the earlier 0.x versions - it is now possible to select which library to
+load when instantiating the Driver::
+
+    Python 2.7.2 (default, Jun 20 2012, 16:23:33)
+    [GCC 4.2.1 Compatible Apple Clang 4.0 (tags/Apple/clang-418.0.60)] on darwin
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from pylibftdi import Driver
+    >>> Driver().libftdi_version()
+    (1, 0, 0, '1.0', 'v1.0-6-gafb9082')
+    >>> Driver('ftdi').libftdi_version()
+    (0, 99, 0, '0.99', 'v0.17-305-g50d77f8')
+    >>> Driver('libftdi1').libftdi_version()
+    (1, 0, 0, '1.0', 'v1.0-6-gafb9082')
+    >>> Driver(('libftdi1', 'libftdi')).libftdi_version()
+    (1, 0, 0, '1.0', 'v1.0-6-gafb9082')
+    >>> Driver(('libftdi', 'libftdi1')).libftdi_version()
+    (0, 99, 0, '0.99', 'v0.17-305-g50d77f8')
+    >>> Driver(('libftdi', 'libftdi1')).libftdi_version()
+
+``pylibftdi`` now prefers libftdi1 over libftdi, if both are installed. Since
+different OSs require different parameters to be given to find a library,
+the default search list given to ctypes.util.find_library is as follows::
+
+    Driver._dll_list = ('ftdi1', 'libftdi1', 'ftdi', 'libftdi')
+
+This covers Windows (which requires the 'lib' prefix), Linux (which requires
+its absence), and Mac OS X, which is happy with either.
