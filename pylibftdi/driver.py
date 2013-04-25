@@ -87,7 +87,7 @@ class Driver(object):
         """
         if libftdi_search is None:
             search_list = self._dll_list
-        elif isinstance(libftdi_search, basestring):
+        elif isinstance(libftdi_search, (str, bytes)):
             search_list = (libftdi_search,)
         else:
             search_list = libftdi_search
