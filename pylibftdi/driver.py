@@ -256,8 +256,12 @@ class Device(object):
             raise FtdiError(msg)
 
         if self.interface_select is not None:
-            self.fdll.ftdi_set_interface(byref(self.ctx),
+            res = self.fdll.ftdi_set_interface(byref(self.ctx),
                 self.interface_select)
+            if res != 0:
+                msg = "%s (%d)" % (self.get_error_string(), res)
+                del self.ctx
+                raise FtdiError(msg)
 
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things
@@ -322,7 +326,7 @@ class Device(object):
         """
         buf = create_string_buffer(length)
         rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
-        if rlen == -1:
+        if rlen < 0:
             raise FtdiError(self.get_error_string())
         byte_data = buf.raw[:rlen]
 
@@ -372,6 +376,8 @@ class Device(object):
         buf = create_string_buffer(byte_data)
         written = self.fdll.ftdi_write_data(byref(self.ctx),
                                             byref(buf), len(byte_data))
+        if written < 0:
+            raise FtdiError(self.get_error_string())
         return written
 
     def write(self, data):
@@ -401,10 +407,7 @@ class Device(object):
                 start = written
                 length = min(remaining, self.chunk_size)
                 result = self._write(byte_data[start: start + length])
-                if result == -1:
-                    written == result
-                    break
-                elif result == 0:
+                if result == 0:
                     # don't continue to try writing forever if nothing
                     # is actually being written
                     break
@@ -413,8 +416,6 @@ class Device(object):
                     remaining -= result
         else:
             written = self._write(byte_data)
-        if written == -1:
-            raise FtdiError(self.get_error_string())
         return written
 
     def flush(self, flush_what=FLUSH_BOTH):
