@@ -6,8 +6,26 @@ pylibftdi changes
 * Optimisation on accessing port property when direction is set to ALL_OUTPUTS
   - don't bother reading the pins first. Makes ``port`` identical to ``latch``
   in this case.
-* Support for libftdi 1.x
-* Support for MS Windows
+* Support for libftdi 1.x, used by preference over ftdi 0.x. The specific
+  driver search can be given as a string (or tuple of strings) to the
+  ``Driver`` constructor, e.g. the default is equivalent to::
+
+      >>> d = Driver()
+      >>> # equivalent to...
+      >>> d = Driver(('ftdi1', 'libftdi1', 'ftdi', 'libftdi'))
+      >>> # and if we wanted to use ftdi 0.x on Linux:
+      >>> d = Driver('ftdi')
+
+  The driver in use can be determined by ``Driver.libftdi_version()`` method::
+
+      >>> from pylibftdi import Driver
+      >>> Driver().libftdi_version()
+      (1, 0, 0, '1.0', 'v1.0-6-gafb9082')
+      >>> Driver('ftdi').libftdi_version()
+      (0, 99, 0, '0.99', 'v0.17-305-g50d77f8')
+
+* Support for MS Windows (which requires the 'lib' prefix on ftdi searching -
+  previously absent).
 * Minor bug fixes
 
 0.11
@@ -50,52 +68,52 @@ pylibftdi changes
 
 0.10.2
 ~~~~~~
- * include examples subpackage
- * ensure examples work under Python3
- * 'python -m pylibftdi.examples.led_flash' should now work and pulse D0
+* include examples subpackage
+* ensure examples work under Python3
+* 'python -m pylibftdi.examples.led_flash' should now work and pulse D0
 
 0.10.1
 ~~~~~~
- * maintenance build to fix installation issues
- * USB_VID_LIST/USB_PID_LIST exposed directly as pylibftdi attributes
+* maintenance build to fix installation issues
+* USB_VID_LIST/USB_PID_LIST exposed directly as pylibftdi attributes
 
 0.10
 ~~~~
- * support for FT232H via iteration over lists USB_VID_LIST/USB_PID_LIST in
-   driver.py (FT232H uses different PID)
- * support for 'buffering' - i.e. chunking reads and writes to allow
-   interruption (i.e. KeyboardInterrupt) in what could otherwise be a very long
-   uninterruptable extension code call.
- * reset device to serial mode on open() (previously could be left in bitbang mode)
- * moved docs -> /doc
- * moved pylibftdi/tests -> /tests - makes python -m unittest discover etc work better
- * removed legacy support for Driver() to acting as a Device()
- * API for Bus class now requires .device rather than .driver (this still needs
-   improving at some point)
+* support for FT232H via iteration over lists USB_VID_LIST/USB_PID_LIST in
+  driver.py (FT232H uses different PID)
+* support for 'buffering' - i.e. chunking reads and writes to allow
+  interruption (i.e. KeyboardInterrupt) in what could otherwise be a very long
+  uninterruptable extension code call.
+* reset device to serial mode on open() (previously could be left in bitbang mode)
+* moved docs -> /doc
+* moved pylibftdi/tests -> /tests - makes python -m unittest discover etc work better
+* removed legacy support for Driver() to acting as a Device()
+* API for Bus class now requires .device rather than .driver (this still needs
+  improving at some point)
 
 0.9
 ~~~
- * improved and extended tests
- * made a start on some Sphinx-based documentation
- * fixed long-standing issue with input from a BitBangDevice
- * allow the PID/VID to be changed
- * add new examples
-   - basic web server to toggle / read IO bits
-   - magic_candle.py - example of using input and output together
-   - pin_read.py - read and match values on device pins
- * All of this needs some tidying, but it fixes some key issues and has been unreleased too long.
+* improved and extended tests
+* made a start on some Sphinx-based documentation
+* fixed long-standing issue with input from a BitBangDevice
+* allow the PID/VID to be changed
+* add new examples
+    * basic web server to toggle / read IO bits
+    * magic_candle.py - example of using input and output together
+    * pin_read.py - read and match values on device pins
+* All of this needs some tidying, but it fixes some key issues and has been unreleased too long.
 
 0.8.1
 ~~~~~
- * fix issue with bitbang following API changes in 0.8
- * add tests for bitbang mode
- * refactor tests; fix text-based tests in Python3
- * slight refactor Device() to improve testability (_read and _write methods)
+* fix issue with bitbang following API changes in 0.8
+* add tests for bitbang mode
+* refactor tests; fix text-based tests in Python3
+* slight refactor Device() to improve testability (_read and _write methods)
 
 0.8
 ~~~
- * added some unit tests
- * API changes:
+* added some unit tests
+* API changes:
     * when opening a device with a device_id parameter, this will now check
       against both serial number and (if that fails), the device description.
       Opening by device type (under the same proviso that an arbitrary device
@@ -108,8 +126,8 @@ pylibftdi changes
 
 0.7
 ~~~
- * support multiple attached devices
- * API changes:
+* support multiple attached devices
+* API changes:
     * separation between driver and device. Generally, now use Device() /
       BitBangDevice() rather than Driver / BitBangDriver(), though older code
       _should_ still work via some shims (though with Deprecation warnings).
@@ -120,43 +138,43 @@ pylibftdi changes
 
 0.6
 ~~~
- * same source now works on both Python2.6+ and Python3.
+* same source now works on both Python2.6+ and Python3.
 
 0.5
 ~~~
- * fix various bugs found by pyflakes
- * improve module organisation, while providing interface compatibility
+* fix various bugs found by pyflakes
+* improve module organisation, while providing interface compatibility
 
 0.4.1
 ~~~~~
- * fix release issue
+* fix release issue
 
 0.4
 ~~~
- * fixed embarrassing bug which caused things not to work on Linux 
-   (is now find_library('ftdi') instead of find_library('libftdi'))
- * lots of error checking, new FtdiError exception. Before it just
-   tended to segfault if things weren't just-so.
- * get_error() is now get_error_string().  It's still early enough
-   to change the API, and if I thought it was get_error_string
-   multiple times when I wrote the error checking code, it probably
-   should be the more natural thing.
+* fixed embarrassing bug which caused things not to work on Linux
+  (is now find_library('ftdi') instead of find_library('libftdi'))
+* lots of error checking, new FtdiError exception. Before it just
+  tended to segfault if things weren't just-so.
+* get_error() is now get_error_string().  It's still early enough
+  to change the API, and if I thought it was get_error_string
+  multiple times when I wrote the error checking code, it probably
+  should be the more natural thing.
 
 0.3
 ~~~
- * added some examples
- * new Bus class in pylibftdi (though it probably belongs somewhere else)
- * first release on PyPI
+* added some examples
+* new Bus class in pylibftdi (though it probably belongs somewhere else)
+* first release on PyPI
 
 0.2
 ~~~
- * fixed various bugs
- * added ftdi_fn and set_baudrate functions in Driver class
- * changed interface in BitBangDriver to direction/port properties
-   rather than overriding the read/write functions, which are therefore
-   still available as in the Driver class.
+* fixed various bugs
+* added ftdi_fn and set_baudrate functions in Driver class
+* changed interface in BitBangDriver to direction/port properties
+  rather than overriding the read/write functions, which are therefore
+  still available as in the Driver class.
 
 0.1
 ~~~
- * first release. Tested with libftdi 0.18 on Mac OS X 10.6 and Linux
-   (stock EEEPC 701 Xandros Linux, Ubuntu 10.04)
+* first release. Tested with libftdi 0.18 on Mac OS X 10.6 and Linux
+  (stock EEEPC 701 Xandros Linux, Ubuntu 10.04)
