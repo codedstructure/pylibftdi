@@ -49,12 +49,11 @@ FLUSH_OUTPUT = 3
 BITMODE_RESET = 0x00
 BITMODE_BITBANG = 0x01
 
-# Default USB IDs
-USB_VID = 0x0403
-USB_PID = 0x6001
-# However, a list of IDs is actually matched against.
-USB_VID_LIST = [USB_VID]
-USB_PID_LIST = [USB_PID, 0x6014]
+# Opening / searching for a device uses this list of IDs to search
+# by default. These can be extended directly after import if required.
+FTDI_VENDOR_ID = 0x0403
+USB_VID_LIST = [FTDI_VENDOR_ID]
+USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014]
 
 
 class Driver(object):
@@ -471,9 +470,9 @@ class Device(object):
         code (and import byref from ctypes):
 
         >>> with Device() as dev:
-        >>>     # set 8 bit data, 2 stop bits, no parity
-        >>>     dev.ftdi_fn.ftdi_set_line_property(8, 2, 0)
-        >>>     ...
+        ...     # set 8 bit data, 2 stop bits, no parity
+        ...     dev.ftdi_fn.ftdi_set_line_property(8, 2, 0)
+        ...
         """
         # note this class is constructed on each call, so this
         # won't be particularly quick.  It does ensure that the
@@ -492,8 +491,8 @@ class Device(object):
         when used in a with statement, and the device object
         itself is returned:
         >>> with Device(mode='t') as dev:
-        >>>     dev.write('Hello World!')
-        >>>
+        ...     dev.write('Hello World!')
+        ...
         """
         self.open()
         return self
