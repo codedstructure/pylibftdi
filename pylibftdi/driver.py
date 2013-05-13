@@ -27,10 +27,10 @@ class ftdi_device_list(Structure):
 
 class ftdi_version_info(Structure):
     _fields_ = [('major', c_int),
-        ('minor', c_int),
-        ('micro', c_int),
-        ('version_str', c_char_p),
-        ('snapshot_str', c_char_p)]
+                ('minor', c_int),
+                ('micro', c_int),
+                ('version_str', c_char_p),
+                ('snapshot_str', c_char_p)]
 
 # Note I gave up on attempts to use ftdi_new/ftdi_free (just using
 # ctx instead of byref(ctx) in first param of most ftdi_* functions) as
@@ -75,8 +75,8 @@ class Driver(object):
         # int/void* which ctypes uses, but some need setting here
         self.fdll.ftdi_get_error_string.restype = c_char_p
         self.fdll.ftdi_usb_get_strings.argtypes = (
-                c_void_p, c_void_p,
-                c_char_p, c_int, c_char_p, c_int, c_char_p, c_int)
+            c_void_p, c_void_p,
+            c_char_p, c_int, c_char_p, c_int, c_char_p, c_int)
 
     def _find_libftdi(self, libftdi_search=None):
         """
@@ -139,9 +139,9 @@ class Driver(object):
         try:
             for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
                 res = self.fdll.ftdi_usb_find_all(byref(ctx),
-                                                byref(dev_list_ptr),
-                                                usb_vid,
-                                                usb_pid)
+                                                  byref(dev_list_ptr),
+                                                  usb_vid,
+                                                  usb_pid)
                 if res < 0:
                     raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
                 elif res > 0:
@@ -150,9 +150,10 @@ class Driver(object):
                     # traverse the linked list...
                     try:
                         while dev_list_ptr:
-                            res = self.fdll.ftdi_usb_get_strings(byref(ctx),
-                                    dev_list_ptr.contents.dev,
-                                    manuf, 127, desc, 127, serial, 127)
+                            res = self.fdll.ftdi_usb_get_strings(
+                                byref(ctx),
+                                dev_list_ptr.contents.dev,
+                                manuf, 127, desc, 127, serial, 127)
                             if res < 0:
                                 raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
                             devices.append((manuf.value, desc.value, serial.value))
@@ -256,7 +257,7 @@ class Device(object):
 
         if self.interface_select is not None:
             res = self.fdll.ftdi_set_interface(byref(self.ctx),
-                self.interface_select)
+                                               self.interface_select)
             if res != 0:
                 msg = "%s (%d)" % (self.get_error_string(), res)
                 del self.ctx
@@ -436,7 +437,7 @@ class Device(object):
             fn = self.fdll.ftdi_usb_purge_tx_buffer
         else:
             raise ValueError("Invalid value passed to %s.flush()" %
-                    self.__class__.__name__)
+                             self.__class__.__name__)
         res = fn(byref(self.ctx))
         if res != 0:
             msg = "%s (%d)" % (self.get_error_string(), res)
@@ -478,6 +479,7 @@ class Device(object):
         # won't be particularly quick.  It does ensure that the
         # fdll and ctx objects in the closure are up-to-date, though.
         class FtdiForwarder(object):
+
             def __getattr__(innerself, key):
                 return functools.partial(getattr(self.fdll, key),
                                          byref(self.ctx))
@@ -530,7 +532,7 @@ class Device(object):
                 break
             line_buffer.append(next_char)
             if (len(line_buffer) >= lsl and
-                line_buffer[-lsl:] == list(os.linesep)):
+                    line_buffer[-lsl:] == list(os.linesep)):
                 break
         return ''.join(line_buffer)
 
