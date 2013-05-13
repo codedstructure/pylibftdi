@@ -20,7 +20,7 @@ To see the vendor / product IDs which are supported, run the following::
     >>> print(map(hex, USB_VID_LIST))
     ['0x403']
     >>> print(map(hex, USB_PID_LIST))
-    ['0x6001', '0x6014']
+    ['0x6001', '0x6010', '0x6011', '0x6014']
 
 If a FTDI device with a VID / PID not matching the above is required, then
 the device's values should be appended to the appropriate list after import::
