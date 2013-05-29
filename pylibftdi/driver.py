@@ -143,7 +143,8 @@ class Driver(object):
                                                   usb_vid,
                                                   usb_pid)
                 if res < 0:
-                    raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
+                    msg = "%s (%d)" % (self.get_error_string(), res)
+                    raise FtdiError(msg)
                 elif res > 0:
                     # take a copy of the dev_list for subsequent list_free
                     dev_list_base = pointer(dev_list_ptr.contents)
@@ -154,10 +155,13 @@ class Driver(object):
                                 byref(ctx),
                                 dev_list_ptr.contents.dev,
                                 manuf, 127, desc, 127, serial, 127)
-                            if res < 0:
-                                raise FtdiError(self.fdll.ftdi_get_error_string(byref(ctx)))
+                            # don't error on failure to get all the data
+                            # error codes: -7: manuf, -8: desc, -9: serial
+                            if res < 0 and res not in (-7, -8, -9):
+                                msg = "%s (%d)" % (self.get_error_string(), res)
+                                raise FtdiError(msg)
                             devices.append((manuf.value, desc.value, serial.value))
-                            # step to next in linked-list if not
+                            # step to next in linked-list
                             dev_list_ptr = cast(dev_list_ptr.contents.next,
                                                 devlistptrtype)
                     finally:
