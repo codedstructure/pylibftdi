@@ -104,10 +104,15 @@ class Driver(object):
         """
         return the version of the underlying library being used
         """
-        version = ftdi_version_info()
-        self.fdll.ftdi_get_library_version(byref(version))
-        return (version.major, version.minor, version.micro,
-                version.version_str, version.snapshot_str)
+        if hasattr(self.fdll, 'ftdi_get_library_version'):
+            version = ftdi_version_info()
+            self.fdll.ftdi_get_library_version(byref(version))
+            return (version.major, version.minor, version.micro,
+                    version.version_str, version.snapshot_str)
+        else:
+            # library versions <1.0 don't support this function...
+            return (0, 0, 0,
+                    'unknown - no ftdi_get_library_version()', 'unknown')
 
     def list_devices(self):
         """
