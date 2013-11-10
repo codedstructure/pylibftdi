@@ -38,6 +38,11 @@ a bad idea to delete it, but it can be unloaded as follows::
 
     sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
 
+Similarly to reload it::
+
+    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
+
+
 Diagnosis
 ---------
 
