@@ -38,6 +38,12 @@ I suggest using homebrew_ to install libftdi::
 
 .. _homebrew: http://mxcl.github.com/homebrew/
 
+On OS X Mavericks (and presumably future versions) Apple include a driver for
+FTDI devices. This needs unloading before ``libftdi`` can access FTDI devices
+directly. See the Troubleshooting_ section for instructions.
+
+.. _Troubleshooting: troubleshooting.html#os-x-mavericks
+
 Linux
 -----
 

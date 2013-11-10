@@ -11,8 +11,12 @@ Error messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This indicates a conflict with FTDI's own drivers, and is (as far as I know)
-mainly a problem on Mac OS X, where they can be disabled (until reboot) with
-the following::
+mainly a problem on Mac OS X, where they can be disabled (until reboot) by
+unloading the appropriate kernel module.
+
+OS X Mountain Lion and earlier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Unload the kernel driver::
 
     sudo kextunload /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
@@ -24,6 +28,15 @@ To permanently remove the driver, just delete it::
 
     sudo rm /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
+OS X Mavericks
+~~~~~~~~~~~~~~
+
+Whereas earlier versions of OS X didn't include an FTDI driver directly -
+it would typically be installed as part of some other program - Mavericks
+includes this in the operating system itself. For this reason, it's probably
+a bad idea to delete it, but it can be unloaded as follows::
+
+    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
 
 Diagnosis
 ---------
