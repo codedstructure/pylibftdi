@@ -1,4 +1,3 @@
-syntax: glob
 *.pyc
 *.pyo
 .idea
@@ -6,4 +5,4 @@ build
 dist
 doc/_build
 MANIFEST
-.git
+.hg
