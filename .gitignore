@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 .idea
+.DS_Store
 build
 dist
 doc/_build
