@@ -4,6 +4,11 @@ pylibftdi changes
 0.13pre
 ~~~~~~~
 
+* When finding and opening a device, don't just present the last error (which
+  may well be a 'device not found (-3)' error, but more specific ones. Avoids
+  issues where errors opening a device were being masked as pylibftdi would
+  continue looking for other devices to open, and report on failure to find
+  any of them.
 * Don't error out on failure during string retrieval part of device
   enumeration (list_devices) on failure to read product manufacturer,
   description or serial number (bitbucket issue #10)

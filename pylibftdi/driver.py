@@ -55,6 +55,8 @@ FTDI_VENDOR_ID = 0x0403
 USB_VID_LIST = [FTDI_VENDOR_ID]
 USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014]
 
+FTDI_ERROR_DEVICE_NOT_FOUND = -3
+
 
 class Driver(object):
     """
@@ -289,7 +291,9 @@ class Device(object):
                     #  - attempt to match device_id to description
                     open_args[-2], open_args[-1] = open_args[-1], open_args[-2]
                     res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
-            if res == 0:
+            if res != FTDI_ERROR_DEVICE_NOT_FOUND:
+                # if we succeed (0) or get a specific error, don't continue
+                # otherwise (-3) - look for another device
                 break
 
         if res != 0:
