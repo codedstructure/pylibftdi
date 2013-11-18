@@ -17,10 +17,10 @@ examples Package
     :undoc-members:
     :show-inheritance:
 
-.. :mod:`lcd` Module
-   -----------------
+:mod:`lcd` Module
+-----------------
 
-.. .. automodule:: pylibftdi.examples.lcd
+.. automodule:: pylibftdi.examples.lcd
     :members:
     :undoc-members:
     :show-inheritance:
@@ -41,18 +41,26 @@ examples Package
     :undoc-members:
     :show-inheritance:
 
-.. :mod:`magic_candle` Module
-   --------------------------
+:mod:`magic_candle` Module
+--------------------------
 
-.. .. automodule:: pylibftdi.examples.magic_candle
+.. automodule:: pylibftdi.examples.magic_candle
       :members:
       :undoc-members:
       :show-inheritance:
 
 :mod:`pin_read` Module
---------------------------
+----------------------
 
 .. automodule:: pylibftdi.examples.pin_read
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`serial_loopback` Module
+-----------------------------
+
+.. automodule:: pylibftdi.examples.serial_loopback
     :members:
     :undoc-members:
     :show-inheritance:
