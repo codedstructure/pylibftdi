@@ -5,6 +5,7 @@ syntax: glob
 .DS_Store
 build
 dist
-doc/_build
+docs/_build
 MANIFEST
+pylibftdi.egg-info
 .git

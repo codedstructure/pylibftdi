@@ -6,7 +6,7 @@ TODO:
  * ANSI colours / display differences in bold
 
 example - beep on pin 1 going high:
-    $ pylibftdi/examples/pin_read.py -n 0.01 -m 1 -k 1 && echo -e "\a"
+    $ pylibftdi/examples/pin_read.py -n 0.01 -m 1 -k 1 && beep
 
 Copyright (c) 2011-2013 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
