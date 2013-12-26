@@ -37,9 +37,9 @@ copyright = u'2010-2013, Ben Bass'
 # built documents.
 #
 # The short X.Y version.
-version = '0.13'
+version = '0.14pre'
 # The full version, including alpha/beta/rc tags.
-release = '0.13'
+release = '0.14pre'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

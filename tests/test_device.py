@@ -11,7 +11,8 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from tests.test_common import (LoopDevice, Device, CallCheckMixin, unittest)
+from tests.test_common import (LoopDevice, CallCheckMixin, unittest)
+from pylibftdi.device import Device
 from pylibftdi import FtdiError
 
 # and now some test cases...
@@ -25,6 +26,7 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
                 pass
         self.assertCallsExact(_,
                 ['ftdi_init', 'ftdi_usb_open', 'ftdi_set_bitmode',
+                 'ftdi_setflowctrl', 'ftdi_set_baudrate',
                  'ftdi_usb_close', 'ftdi_deinit'])
 
     def testOpen(self):

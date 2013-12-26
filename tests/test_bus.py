@@ -52,3 +52,7 @@ class TestBus(unittest.TestCase):
         assert test_bus.a == 2
         assert test_bus.b == 0
         assert test_bus.c == 21
+
+
+if __name__ == "__main__":
+    unittest.main()

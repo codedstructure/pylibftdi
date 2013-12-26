@@ -1,6 +1,16 @@
 pylibftdi changes
 =================
 
+0.14
+~~~~
+
+* refactor - split the `Device` class from the driver.py module into its
+  own 'device.py' module
+* refactor - fix tests so they work both standalone and when run via e.g.
+  python -m unittest discover
+* change - now resets the flow control and baudrate during device
+  initialisation
+
 0.13
 ~~~~
 

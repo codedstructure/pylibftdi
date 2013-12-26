@@ -31,7 +31,8 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
                 pass
         self.assertCallsExact(_,
                 ['ftdi_init', 'ftdi_usb_open',
-                 'ftdi_set_bitmode', 'ftdi_set_bitmode',
+                 'ftdi_set_bitmode', 'ftdi_setflowctrl',
+                 'ftdi_set_baudrate', 'ftdi_set_bitmode',
                  'ftdi_usb_close', 'ftdi_deinit'])
 
     def testOpen(self):

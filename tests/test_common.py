@@ -13,6 +13,8 @@ to be attached.
 import logging
 
 import sys
+from tests.call_log import CallLog
+
 if sys.version_info < (2, 7):
     try:
         import unittest2 as unittest
@@ -21,7 +23,6 @@ if sys.version_info < (2, 7):
                 "Python 2.7+ unless unittest2 is installed")
 else:
     import unittest  # NOQA
-
 
 class SimpleMock(object):
     """
@@ -39,23 +40,6 @@ class SimpleMock(object):
         CallLog.append(self.__name)
         logging.debug("%s(*%s, **%s)" % (self.__name, o, k))
         return 0
-
-
-class CallLog(object):
-
-    fn_log = []
-
-    @classmethod
-    def reset(cls):
-        del cls.fn_log[:]
-
-    @classmethod
-    def append(cls, value):
-        cls.fn_log.append(value)
-
-    @classmethod
-    def get(cls):
-        return cls.fn_log[:]
 
 
 class CallCheckMixin(object):
@@ -91,8 +75,11 @@ class MockDriver(object):
 
 
 import pylibftdi.driver
-from pylibftdi.driver import Device
+# importing this _does_ things...
+pylibftdi.driver.Driver = MockDriver
+pylibftdi.device.Driver = MockDriver
 
+from pylibftdi.device import Device
 
 class LoopDevice(Device):
     """
@@ -113,9 +100,6 @@ class LoopDevice(Device):
         super(LoopDevice, self)._write(data)  # discard result
         self.__buffer.extend(bytearray(data))
         return len(data)
-
-# importing this _does_ things...
-pylibftdi.driver.Driver = MockDriver
 
 verbose = set(['-v', '--verbose']) & set(sys.argv)
 logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)

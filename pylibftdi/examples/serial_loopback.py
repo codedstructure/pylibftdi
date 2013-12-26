@@ -13,6 +13,11 @@ import time
 from pylibftdi import Device
 
 
+# TODO:
+# make this threaded - a writer stream, which sends known data with
+# occasional sync blocks, and a reader which reads and waits for a sync-block
+# then signals the writer if it gets stuck.
+
 def test_string(length):
     return os.urandom(length)
 
@@ -26,7 +31,8 @@ class LoopbackTester(object):
         time.sleep(0.1)
         for l in lengths:
             test_str = test_string(l)
-            self.device.write(test_str)
+            if self.device.write(test_str) != len(test_str):
+                sys.stdout.write('*')
             time.sleep(0.1)
             result = ''
             for _ in range(3):
@@ -39,10 +45,10 @@ class LoopbackTester(object):
             yield result == test_str
 
     def main(self):
-        for bd in [9600, 115200, 1152000]:
+        for bd in [9600, 31250, 115200, 1152000]:
             self.device.baudrate = bd
 
-            for result in self.test_loopback(range(1, 50) +
+            for result in self.test_loopback(range(1, 50) + range(100, 500, 100) +
                                              range(1000, 5000, 1000)):
                 if result:
                     sys.stdout.write('+')
