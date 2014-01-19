@@ -34,6 +34,8 @@ Contents
    quickstart
    installation
    basic_usage
+   bitbang
+   serial
    advanced_usage
    how_to
    troubleshooting
