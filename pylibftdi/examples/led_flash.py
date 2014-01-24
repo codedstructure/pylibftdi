@@ -3,7 +3,7 @@ Flash an LED connected via a FTDI UM232R/245R module using pylibftdi
 
 Optionally supply a flash rate (in Hz, default 1) as an argument
 
-Copyright (c) 2010-2013 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 

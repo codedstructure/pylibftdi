@@ -17,7 +17,7 @@ these devices, the following would be used:
     >>> dev = Device(device_id="FTE4FFVQ")
     >>>
 
-Copyright (c) 2011-2013 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2011-2014 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
