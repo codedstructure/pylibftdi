@@ -14,9 +14,31 @@ This indicates a conflict with FTDI's own drivers, and is (as far as I know)
 mainly a problem on Mac OS X, where they can be disabled (until reboot) by
 unloading the appropriate kernel module.
 
+TODO:   investigate ways of unloading the driver in the background e.g. as
+a part of some pylibftdi application startup itself?.  The need to do this
+action as root may make things trickier.
+
+OS X Mavericks
+~~~~~~~~~~~~~~
+
+OS X Mavericks includes kernel drivers which will reserve the FTDI device by
+default. This needs unloading before `libftdi` will be able to communicate
+with the device::
+
+    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
+
+Similarly to reload it::
+
+    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
+
 OS X Mountain Lion and earlier
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Unload the kernel driver::
+Whereas Mavericks includes an FTDI driver directly, earlier versions of OS X
+did not, and if this issue occurred it would typically as a result of
+installing some other program - for example the Arduino IDE.
+
+As a result, the kernel module may have different names, but `FTDIUSBSerialDriver.kext`
+is the usual culprit. Unload the kernel driver as follows::
 
     sudo kextunload /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
@@ -24,23 +46,11 @@ To reload the kernel driver, do the following::
 
     sudo kextload /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
-To permanently remove the driver, just delete it::
+If you aren't using whatever program might have installed it, the driver
+could be permanently removed (to prevent the need to continually unload it),
+but this is dangerous::
 
     sudo rm /System/Library/Extensions/FTDIUSBSerialDriver.kext
-
-OS X Mavericks
-~~~~~~~~~~~~~~
-
-Whereas earlier versions of OS X didn't include an FTDI driver directly -
-it would typically be installed as part of some other program - Mavericks
-includes this in the operating system itself. For this reason, it's probably
-a bad idea to delete it, but it can be unloaded as follows::
-
-    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
-
-Similarly to reload it::
-
-    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
 
 
 Diagnosis
