@@ -16,6 +16,8 @@ setup(
     author_email="benbass@codedstructure.net",
     url="http://bitbucket.org/codedstructure/pylibftdi",
     packages=["pylibftdi", "pylibftdi.examples"],
+    scripts=["scripts/ftdi_osx_driver_reload",
+             "scripts/ftdi_osx_driver_unload"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
