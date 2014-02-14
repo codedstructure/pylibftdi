@@ -6,9 +6,8 @@ See LICENSE file for details and (absence of) warranty
 
 pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
+libftdi can be found at: http://www.intra2net.com/en/developer/libftdi/
 
-libftdi can be found at:
- http://www.intra2net.com/en/developer/libftdi/
 Neither libftdi nor Intra2net are associated with this project;
 if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.

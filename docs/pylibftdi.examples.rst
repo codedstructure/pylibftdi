@@ -45,9 +45,17 @@ examples Package
 --------------------------
 
 .. automodule:: pylibftdi.examples.magic_candle
-      :members:
-      :undoc-members:
-      :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`midi_output` Module
+-------------------------
+
+.. automodule:: pylibftdi.examples.midi_output
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 :mod:`pin_read` Module
 ----------------------

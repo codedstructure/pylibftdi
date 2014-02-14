@@ -25,6 +25,14 @@ pylibftdi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`device` Module
+--------------------
+
+.. automodule:: pylibftdi.device
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`driver` Module
 --------------------
 

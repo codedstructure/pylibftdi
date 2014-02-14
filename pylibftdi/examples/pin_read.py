@@ -43,11 +43,12 @@ def display_loop(interval=1, count=0, match=None, mask=0xFF):
     """
     display and compare the value
 
-    @param interval - polling interval in seconds
-    @param count - number of polls to do, or infinite if 0
-    @param match - value to look for to exit early
-    @param mask - mask of read value before comparing to match
-    @return bool - 'ok'. either a match was made or none was requested
+    :param interval: polling interval in seconds
+    :param count: number of polls to do, or infinite if 0
+    :param match: value to look for to exit early
+    :param mask: mask of read value before comparing to match
+    :return: 'ok'. either a match was made or none was requested
+    :rtype: bool
     """
     if not count:
         count_iter = itertools.count()
@@ -82,12 +83,12 @@ def main(args=None):
                       default=1, type=float,
                       help="refresh interval, default 1 second")
     parser.add_option("-c", "--count", dest="count",
-        default=0, type=int,
-        help="number of cycles to run for (0 = no limit - the default)")
+                      default=0, type=int,
+                      help="number of cycles to run for (0 = no limit - the default)")
     parser.add_option("-m", "--match", dest="match",
-        help="value to match against (e.g. 0x1F, 7, etc)")
+                      help="value to match against (e.g. 0x1F, 7, etc)")
     parser.add_option("-k", "--mask", dest="mask",
-        help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF")
+                      help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF")
     opts, args = parser.parse_args(args)
 
     if opts.interval < 0.001:

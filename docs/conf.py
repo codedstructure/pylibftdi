@@ -22,6 +22,18 @@ sys.path.insert(0, os.path.abspath('..'))
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 
+# Sort members by type
+autodoc_member_order = 'groupwise'
+
+# Ensure that the __init__ method gets documented.
+def skip(app, what, name, obj, skip, options):
+    if name == "__init__":
+        return False
+    return skip
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)
+
 # The suffix of source filenames.
 source_suffix = '.rst'
 

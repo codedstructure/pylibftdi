@@ -8,10 +8,6 @@ from ctypes import byref, create_string_buffer, c_char_p
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import Driver, USB_VID_LIST, USB_PID_LIST, FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET, FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT
 
-import pylibftdi.driver
-
-import sys
-
 
 class Device(object):
     """
@@ -29,26 +25,26 @@ class Device(object):
         Supports a basic file-like interface (open/close/read/write, context
         manager support).
 
-        device_id - an optional serial number of the device to open.
+        :param device_id: an optional serial number of the device to open.
             if omitted, this refers to the first device found, which is
             convenient if only one device is attached, but otherwise
             fairly useless.
 
-        mode - either 'b' (binary) or 't' (text). This primarily affects
+        :param mode: either 'b' (binary) or 't' (text). This primarily affects
             Python 3 calls to read() and write(), which will accept/return
             unicode strings which will be encoded/decoded according to the given...
 
-        encoding - the codec name to be used for text operations.
+        :param encoding: the codec name to be used for text operations.
 
-        lazy_open - if True, then the device will not be opened immediately -
+        :param lazy_open: if True, then the device will not be opened immediately -
             the user must perform an explicit open() call prior to other
             operations.
 
-        chunk_size - if non-zero, split read and write operations into chunks
+        :param chunk_size: if non-zero, split read and write operations into chunks
             of this size. With large or slow accesses, interruptions (i.e.
             KeyboardInterrupt) may not happen in a timely fashion.
 
-        interface_select - select interface to use on multi-interface devices
+        :param interface_select: select interface to use on multi-interface devices
         """
         self._opened = False
         self.driver = Driver(**kwargs)
@@ -112,7 +108,33 @@ class Device(object):
         # Try to open the device.  If this fails, reset things to how
         # they were, but we can't use self.close as that assumes things
         # have already been setup.
+        res = self._open_device()
+
+        if res != 0:
+            msg = "%s (%d)" % (self.get_error_string(), res)
+            # free the context
+            self.fdll.ftdi_deinit(byref(self.ctx))
+            del self.ctx
+            raise FtdiError(msg)
+
+        # explicitly reset the device to serial mode with standard settings
+        # - no flow control, 9600 baud - in case it had previously been used
+        # in bitbang mode (some later driver versions might do bits of this
+        # automatically)
+        self.fdll.ftdi_set_bitmode(byref(self.ctx), 0, BITMODE_RESET)
+        self.fdll.ftdi_setflowctrl(byref(self.ctx), 0)
+        self.baudrate = 9600
+        self._opened = True
+
+    def _open_device(self):
+        """
+        Actually open the target device
+
+        :return: status of the open command (0 = success)
+        :rtype: int
+        """
         # FTDI vendor/product ids required here.
+        res = None
         for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
             open_args = [byref(self.ctx), usb_vid, usb_pid]
             if self.device_id is None:
@@ -131,21 +153,7 @@ class Device(object):
                 # otherwise (-3) - look for another device
                 break
 
-        if res != 0:
-            msg = "%s (%d)" % (self.get_error_string(), res)
-            # free the context
-            self.fdll.ftdi_deinit(byref(self.ctx))
-            del self.ctx
-            raise FtdiError(msg)
-
-        # explicitly reset the device to serial mode with standard settings
-        # - no flow control, 9600 baud - in case it had previously been used
-        # in bitbang mode (some later driver versions might do bits of this
-        # automatically)
-        self.fdll.ftdi_set_bitmode(byref(self.ctx), 0, BITMODE_RESET)
-        self.fdll.ftdi_setflowctrl(byref(self.ctx), 0)
-        self.baudrate = 9600
-        self._opened = True
+        return res
 
     def close(self):
         "close our connection, free resources"
@@ -173,7 +181,8 @@ class Device(object):
         """
         actually do the low level reading
 
-        returns a 'bytes' object
+        :return: bytes read from the device
+        :rtype: bytes
         """
         buf = create_string_buffer(length)
         rlen = self.fdll.ftdi_read_data(byref(self.ctx), byref(buf), length)
@@ -220,6 +229,7 @@ class Device(object):
     def _write(self, byte_data):
         """
         actually do the low level writing
+
         :param byte_data: data to be written
         :type byte_data: bytes
         :return: number of bytes written
@@ -276,9 +286,11 @@ class Device(object):
         By default both the input and output buffers will be
         flushed, but the caller can selectively chose to only
         flush the input or output buffers using `flush_what`:
-          FLUSH_BOTH - (default)
-          FLUSH_INPUT - (just the rx buffer)
-          FLUSH_OUTPUT - (just the tx buffer)
+
+        :param flush_what: select what to flush:
+            `FLUSH_BOTH` (default);
+            `FLUSH_INPUT` (just the rx buffer);
+            `FLUSH_OUTPUT` (just the tx buffer)
         """
         if flush_what == FLUSH_BOTH:
             fn = self.fdll.ftdi_usb_purge_buffers
@@ -406,6 +418,8 @@ class Device(object):
     def writelines(self, lines):
         """
         writelines for file-like compatibility.
+
+        :param lines: sequence of lines to write
         """
         for line in lines:
             self.write(line)

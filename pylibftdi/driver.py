@@ -69,6 +69,10 @@ class Driver(object):
     _dll_list = ('ftdi1', 'libftdi1', 'ftdi', 'libftdi')
 
     def __init__(self, libftdi_search=None):
+        """
+        :param libftdi_search: force a particular version of libftdi to be used
+        :type libftdi_search: string or sequence of strings
+        """
         self._libftdi_path = self._find_libftdi(libftdi_search)
         self.fdll = CDLL(self._libftdi_path)
         # most args/return types are fine with the implicit
@@ -81,7 +85,8 @@ class Driver(object):
     def _find_libftdi(self, libftdi_search=None):
         """
         find the libftdi path, suitable for ctypes.CDLL()
-        @param libftdi_search: string or sequence of strings
+
+        :param libftdi_search: string or sequence of strings
             use to force a particular version of libftdi to be used
         """
         if libftdi_search is None:
@@ -102,7 +107,8 @@ class Driver(object):
 
     def libftdi_version(self):
         """
-        return the version of the underlying library being used
+        :return: the version of the underlying library being used
+        :rtype: tuple (major, minor, micro, version_string, snapshot_string)
         """
         if hasattr(self.fdll, 'ftdi_get_library_version'):
             version = ftdi_version_info()
@@ -116,10 +122,13 @@ class Driver(object):
 
     def list_devices(self):
         """
-        return a list of triples (manufacturer, description, serial#)
-        for each attached device, e.g.:
-        [('FTDI', 'UM232R USB <-> Serial', 'FTE4FFVQ'),
-         ('FTDI', 'UM245R', 'FTE00P4L')]
+        :return: (manufacturer, description, serial#) for each attached
+            device, e.g.:
+
+            [('FTDI', 'UM232R USB <-> Serial', 'FTE4FFVQ'),
+            ('FTDI', 'UM245R', 'FTE00P4L')]
+
+        :rtype: a list of string triples
 
         the serial number can be used to open specific devices
         """
@@ -174,5 +183,3 @@ class Driver(object):
         finally:
             self.fdll.ftdi_deinit(byref(ctx))
         return devices
-
-
