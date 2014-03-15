@@ -17,14 +17,6 @@ pylibftdi Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`bitbang` Module
----------------------
-
-.. automodule:: pylibftdi.bitbang
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`device` Module
 --------------------
 
@@ -37,6 +29,23 @@ pylibftdi Package
 --------------------
 
 .. automodule:: pylibftdi.driver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+:mod:`bitbang` Module
+---------------------
+
+.. automodule:: pylibftdi.bitbang
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`serial_device` Module
+---------------------
+
+.. automodule:: pylibftdi.serial_device
     :members:
     :undoc-members:
     :show-inheritance:

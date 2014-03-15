@@ -10,6 +10,8 @@ pylibftdi changes
   python -m unittest discover
 * change - now resets the flow control and baudrate during device
   initialisation
+* new - SerialDevice class - supports properties for various serial lines
+  (CTS, DTS, RI as inputs; DTR, DSR as outputs)
 
 0.13
 ~~~~

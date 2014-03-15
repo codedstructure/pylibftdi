@@ -21,7 +21,7 @@ __ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
            'USB_VID_LIST', 'USB_PID_LIST']
 
-from pylibftdi import _base, driver, device, util, bitbang
+from pylibftdi import _base, driver, device, util, bitbang, serial_device
 
 # Bring them in to package scope so we can treat pylibftdi
 # as a module if we want.
@@ -29,6 +29,7 @@ FtdiError = _base.FtdiError
 Bus = util.Bus
 Driver = driver.Driver
 Device = device.Device
+SerialDevice = serial_device.SerialDevice
 BitBangDevice = bitbang.BitBangDevice
 USB_VID_LIST = driver.USB_VID_LIST
 USB_PID_LIST = driver.USB_PID_LIST
