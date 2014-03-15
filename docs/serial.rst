@@ -13,7 +13,24 @@ Setting line parameters
 
 Changing line parameters other than the baudrate is supported via use of the underlying FTDI function calls.
 
+The SerialDevice class
+----------------------
 
+While the standard ``Device`` class supports standard ``read`` and ``write`` methods, as well as a ``baudrate`` property, further functionality is provided by the ``SerialDevice`` class, available either as a top-level import from ``pylibftdi`` or through the ``serial_device`` module. This subclasses ``Device`` and adds additional properties to access various control and handshake lines.
+
+The following properties are available:
+
+    ======== ==================== =========
+    property meaning              direction
+    -------- -------------------- ---------
+    ``cts``  Clear To Send        Input
+    ``rts``  Ready To Send        Output
+    ``dsr``  Data Set Ready       Input
+    ``dtr``  Data Transmit Ready  Output
+    ``ri``   Ring Indicator       Input
+    ======== ==================== =========
+
+Note that these lines are normally active-low, and ``pylibftdi`` makes no attempt to hide this from the user. It is impractical to try to 'undo' this inversion in any case, since it can be disabled in the EEPROM settings of the device. Just be aware if using these lines as GPIO that the electrical sense will be the opposite of the value read. The lines are intended to support handshaking rather than GPIO, so this is not normally an issue; if CTS is connected to RTS, then values written to RTS will be reflected in the value read from CTS.
 
 Subclassing `Device` - A MIDI device
 ------------------------------------

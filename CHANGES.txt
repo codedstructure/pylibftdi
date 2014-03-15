@@ -12,6 +12,9 @@ pylibftdi changes
   initialisation
 * new - SerialDevice class - supports properties for various serial lines
   (CTS, DTS, RI as inputs; DTR, DSR as outputs)
+* new - ftdi_osx_driver_{re,un}load scripts to disable / re-enable the
+  built-in drivers supplied on Mac OS X
+* new - midi_output example - using pylibftdi to output MIDI data
 
 0.13
 ~~~~
