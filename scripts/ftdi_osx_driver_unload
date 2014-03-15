@@ -6,15 +6,24 @@ if sys.platform != 'darwin':
 from subprocess import check_output, CalledProcessError
 
 if check_output(['sw_vers', '-productVersion']).strip() >= '10.9.0':
-    command = ['kextunload', '-bundle-id', 'com.apple.driver.AppleUSBFTDI']
+    modules = ['com.apple.driver.AppleUSBFTDI',
+               'com.FTDI.driver.FTDIUSBSerialDriver']
+    unload_cmd = 'kextunload -bundle-id'
 else:
-    command = ['kextunload', '/System/Library/Extensions/FTDIUSBSerialDriver.kext']
+    modules = ['/System/Library/Extensions/FTDIUSBSerialDriver.kext']
+    unload_cmd = 'kextunload'
 
 print("Unloading the OS FTDI driver. This may require the sudo password")
-try:
-    check_output(['sudo'] + command)
-except CalledProcessError as e:
-    print(e)
-    raise SystemExit("Command failed; likely the module is already unloaded")
-else:
-    print("Complete.")
+errors = False
+for module in modules:
+    try:
+        check_output(['sudo'] + unload_cmd.split() + [module])
+    except CalledProcessError as e:
+        errors = True
+        print("Failed to unload {}:".format(module))
+        print(e)
+    else:
+        print("Unloaded {}".format(module))
+
+if errors:
+    raise SystemExit("Command failed")
