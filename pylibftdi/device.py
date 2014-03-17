@@ -1,3 +1,12 @@
+"""
+pylibftdi.device - access to individual FTDI devices
+
+Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
+See LICENSE file for details and (absence of) warranty
+
+pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+
+"""
 
 import functools
 import itertools
@@ -6,7 +15,10 @@ import os
 from ctypes import byref, create_string_buffer, c_char_p
 
 from pylibftdi._base import FtdiError
-from pylibftdi.driver import Driver, USB_VID_LIST, USB_PID_LIST, FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET, FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT
+from pylibftdi.driver import (
+        Driver, USB_VID_LIST, USB_PID_LIST,
+        FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
+        FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
 
 
 class Device(object):

@@ -32,9 +32,9 @@ def get_ftdi_device_list():
     dev_list = []
     for device in Driver().list_devices():
         # list_devices returns bytes rather than strings
-        device = map(lambda x: x.decode('latin1'), device)
+        dev_info = map(lambda x: x.decode('latin1'), device)
         # device must always be this triple
-        vendor, product, serial = device
+        vendor, product, serial = dev_info
         dev_list.append("%s:%s:%s" % (vendor, product, serial))
     return dev_list
 

@@ -113,13 +113,13 @@ class BitBangDevice(Device):
         return self._direction
 
     @direction.setter
-    def direction(self, dir):
-        if not (0 <= dir <= 255):
+    def direction(self, new_dir):
+        if not (0 <= new_dir <= 255):
             raise FtdiError("invalid direction bitmask")
-        self._direction = dir
+        self._direction = new_dir
         if not self.closed:
-            self.ftdi_fn.ftdi_set_bitmode(dir, self.bitbang_mode)
-            self._last_set_dir = dir
+            self.ftdi_fn.ftdi_set_bitmode(new_dir, self.bitbang_mode)
+            self._last_set_dir = new_dir
 
     # port property - 8 bit read/write value
     @property

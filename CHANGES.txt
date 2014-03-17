@@ -1,6 +1,11 @@
 pylibftdi changes
 =================
 
+0.14.1
+~~~~~~
+* install - only install the ftdi_osx_driver_* scripts if we're installing
+  to an OS X machine
+
 0.14
 ~~~~
 
