@@ -1,5 +1,5 @@
 """
-pylibftdi - python wrapper for libftdi
+pylibftdi.driver - interface to the libftdi library
 
 Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
@@ -157,7 +157,8 @@ class Driver(object):
                                                   usb_vid,
                                                   usb_pid)
                 if res < 0:
-                    msg = "%s (%d)" % (self.get_error_string(), res)
+                    err_msg = self.fdll.ftdi_get_error_string(byref(ctx))
+                    msg = "%s (%d)" % (err_msg, res)
                     raise FtdiError(msg)
                 elif res > 0:
                     # take a copy of the dev_list for subsequent list_free
@@ -172,7 +173,8 @@ class Driver(object):
                             # don't error on failure to get all the data
                             # error codes: -7: manuf, -8: desc, -9: serial
                             if res < 0 and res not in (-7, -8, -9):
-                                msg = "%s (%d)" % (self.get_error_string(), res)
+                                err_msg = self.fdll.ftdi_get_error_string(byref(ctx))
+                                msg = "%s (%d)" % (err_msg, res)
                                 raise FtdiError(msg)
                             devices.append((manuf.value, desc.value, serial.value))
                             # step to next in linked-list
