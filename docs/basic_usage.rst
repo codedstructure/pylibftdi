@@ -27,6 +27,11 @@ Device() and BitBangDevice() constructors. Alternatively the device 'description
 can be given, and an attempt will be made to match this if matching by serial
 number fails.
 
+In the event that multiple devices (perhaps of identical type) have the same
+description and serial number, the ``device_index`` parameter may be given to
+open matching devices by numerical index; this defaults to zero, meaning the
+first matching device.
+
 Examples
 ~~~~~~~~
 
