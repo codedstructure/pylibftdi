@@ -1,6 +1,12 @@
 pylibftdi changes
 =================
 
+0.14.2
+~~~~~~
+* new - optional device_index parameter to `Device()` constructor, select
+  devices by index rather than (just) serial number / description as per
+  device_id
+
 0.14.1
 ~~~~~~
 * install - only install the ftdi_osx_driver_* scripts if we're installing
