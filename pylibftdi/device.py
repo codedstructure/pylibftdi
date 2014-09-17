@@ -29,7 +29,7 @@ class Device(object):
     def __init__(self, device_id=None, mode="b",
                  encoding="latin1", lazy_open=False,
                  chunk_size=0, interface_select=None,
-                 **kwargs):
+                 device_index=0, **kwargs):
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
 
@@ -57,6 +57,10 @@ class Device(object):
             KeyboardInterrupt) may not happen in a timely fashion.
 
         :param interface_select: select interface to use on multi-interface devices
+
+        :param device_index: optional index of the device to open, in the
+            event of multiple matches for other parameters (PID, VID,
+            device_id). Defaults to zero (the first device found).
         """
         self._opened = False
         self.driver = Driver(**kwargs)
@@ -85,6 +89,8 @@ class Device(object):
         # interface can be set for devices which have multiple interface
         # ports (e.g. FT4232, FT2232)
         self.interface_select = interface_select
+        # device_index is an optional integer index of device to choose
+        self.device_index = device_index
         # lazy_open tells us not to open immediately.
         if not lazy_open:
             self.open()
@@ -148,18 +154,19 @@ class Device(object):
         # FTDI vendor/product ids required here.
         res = None
         for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
-            open_args = [byref(self.ctx), usb_vid, usb_pid]
+            open_args = [byref(self.ctx), usb_vid, usb_pid,
+                         0, 0, self.device_index]
             if self.device_id is None:
-                res = self.fdll.ftdi_usb_open(*tuple(open_args))
+                res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
             else:
                 # attempt to match device_id to serial number
-                open_args.extend([0, c_char_p(self.device_id.encode('latin1'))])
-                res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+                open_args[-2] = c_char_p(self.device_id.encode('latin1'))
+                res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
                 if res != 0:
-                    # swap last two parameters and try again
+                    # swap (description, serial) parameters and try again
                     #  - attempt to match device_id to description
-                    open_args[-2], open_args[-1] = open_args[-1], open_args[-2]
-                    res = self.fdll.ftdi_usb_open_desc(*tuple(open_args))
+                    open_args[-3], open_args[-2] = open_args[-2], open_args[-3]
+                    res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
             if res != FTDI_ERROR_DEVICE_NOT_FOUND:
                 # if we succeed (0) or get a specific error, don't continue
                 # otherwise (-3) - look for another device

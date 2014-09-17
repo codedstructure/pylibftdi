@@ -30,7 +30,7 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
             with BitBangDevice():
                 pass
         self.assertCallsExact(_,
-                ['ftdi_init', 'ftdi_usb_open',
+                ['ftdi_init', 'ftdi_usb_open_desc_index',
                  'ftdi_set_bitmode', 'ftdi_setflowctrl',
                  'ftdi_set_baudrate', 'ftdi_set_bitmode',
                  'ftdi_usb_close', 'ftdi_deinit'])
@@ -43,11 +43,11 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
         # a lazy_open open() shouldn't do anything
         self.assertCallsExact(lambda: BitBangDevice(lazy_open=True), [])
         # a non-lazy_open open() should open the port...
-        self.assertCalls(lambda: BitBangDevice(), 'ftdi_usb_open')
+        self.assertCalls(lambda: BitBangDevice(), 'ftdi_usb_open_desc_index')
         # and set the bit mode
         self.assertCalls(lambda: BitBangDevice(), 'ftdi_set_bitmode')
         # and given a device_id, it should do a open_desc
-        self.assertCalls(lambda: BitBangDevice('bogus'), 'ftdi_usb_open_desc')
+        self.assertCalls(lambda: BitBangDevice('bogus'), 'ftdi_usb_open_desc_index')
 
     def testInitDirection(self):
         # check that a direction can be given on open and is honoured

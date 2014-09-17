@@ -25,7 +25,7 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
             with Device():
                 pass
         self.assertCallsExact(_,
-                ['ftdi_init', 'ftdi_usb_open', 'ftdi_set_bitmode',
+                ['ftdi_init', 'ftdi_usb_open_desc_index', 'ftdi_set_bitmode',
                  'ftdi_setflowctrl', 'ftdi_set_baudrate',
                  'ftdi_usb_close', 'ftdi_deinit'])
 
@@ -33,10 +33,12 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
         # a lazy_open open() shouldn't do anything
         self.assertCallsExact(lambda: Device(lazy_open=True), [])
         # a non-lazy_open open() should open the port...
-        self.assertCalls(lambda: Device(), 'ftdi_usb_open')
-        # and given a device_id, it should do a open_desc
-        self.assertCalls(lambda: Device('bogus'), 'ftdi_usb_open_desc')
-        # check that opening a specific interface does that
+        self.assertCalls(lambda: Device(), 'ftdi_usb_open_desc_index')
+        # should be the same with device_id...
+        self.assertCalls(lambda: Device('bogus'), 'ftdi_usb_open_desc_index')
+        # should be the same with device_id...
+        self.assertCalls(lambda: Device(device_index=2),
+                'ftdi_usb_open_desc_index')
 
     def testOpenInterface(self):
         self.assertCalls(lambda: Device(interface_select=1),
