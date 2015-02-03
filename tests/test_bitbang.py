@@ -12,7 +12,7 @@ to be attached.
 """
 
 from tests.test_common import (LoopDevice, CallCheckMixin, unittest)
-from pylibftdi.bitbang import BitBangDevice
+from pylibftdi.bitbang import BitBangDevice, ALL_OUTPUTS
 from pylibftdi import FtdiError
 
 
@@ -85,9 +85,50 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
             self.assertCalls(lambda: _(port_test), 'ftdi_write_data')
             self.assertEqual(dev._latch, port_test)
             self.assertEqual(dev.port, port_test)
-        # TODO: this is incomplete.
-        # could check for various directions and how that impacts
-        # port read / write, as well as r/m/w operations.
+
+    def testBitAccess(self):
+        dev = BitBangDevice(direction=0xF0)
+        dev.latch  # absorb the first ftdi_read_pins
+        self.assertCallsExact(lambda: dev.port | 2, ['ftdi_read_pins'])
+        self.assertCallsExact(lambda: dev.port & 2, ['ftdi_read_pins'])
+
+    def testLatchReadModifyWrite(self):
+        dev = BitBangDevice(direction=0x55)
+        self.assertCallsExact(lambda: dev.latch, ['ftdi_read_pins'])
+        self.assertCallsExact(lambda: dev.latch, [])
+        def x():
+            dev.latch += 1
+            dev.latch += 1
+            dev.latch += 1
+
+        self.assertCallsExact(x,
+                ['ftdi_usb_purge_tx_buffer', 'ftdi_write_data',
+                 'ftdi_usb_purge_tx_buffer', 'ftdi_write_data',
+                 'ftdi_usb_purge_tx_buffer', 'ftdi_write_data'])
+
+    def testAsyncLatchReadModifyWrite(self):
+        dev = BitBangDevice(direction=0x55, sync=False)
+        self.assertCallsExact(lambda: dev.latch, ['ftdi_read_pins'])
+        self.assertCallsExact(lambda: dev.latch, [])
+        def x():
+            dev.latch += 1
+            dev.latch += 1
+            dev.latch += 1
+
+        self.assertCallsExact(x,
+                ['ftdi_write_data',
+                 'ftdi_write_data',
+                 'ftdi_write_data'])
+
+    def testAugmentedAccess(self):
+        dev = BitBangDevice(direction=0xAA)
+        dev.latch  # absorb the first ftdi_read_pins
+        def _1():
+            dev.port &= 2
+        def _2():
+            dev.port |= 2
+        self.assertCallsExact(_1, ['ftdi_read_pins', 'ftdi_usb_purge_tx_buffer', 'ftdi_write_data'])
+        self.assertCallsExact(_2, ['ftdi_read_pins', 'ftdi_usb_purge_tx_buffer', 'ftdi_write_data'])
 
 if __name__ == "__main__":
     unittest.main()
