@@ -9,13 +9,26 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 import itertools
+from collections import namedtuple
 
 # be disciplined so pyflakes can check us...
-from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, cast,
+from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, c_uint16, cast,
                     create_string_buffer, Structure, pointer, POINTER)
 from ctypes.util import find_library
 
-from pylibftdi._base import FtdiError
+from pylibftdi._base import FtdiError, LibraryMissingError
+
+
+class libusb_version_struct(Structure):
+    _fields_ = [('major', c_uint16),
+                ('minor', c_uint16),
+                ('micro', c_uint16),
+                ('nano', c_uint16),
+                ('rc', c_char_p),
+                ('describe', c_char_p)]
+
+libusb_version = namedtuple('libusb_version',
+                            'major minor micro nano rc describe')
 
 
 class ftdi_device_list(Structure):
@@ -29,6 +42,9 @@ class ftdi_version_info(Structure):
                 ('micro', c_int),
                 ('version_str', c_char_p),
                 ('snapshot_str', c_char_p)]
+
+libftdi_version = namedtuple('libftdi_version',
+                             'major minor micro version_str snapshot_str')
 
 # Note I gave up on attempts to use ftdi_new/ftdi_free (just using
 # ctx instead of byref(ctx) in first param of most ftdi_* functions) as
@@ -62,48 +78,84 @@ class Driver(object):
     We load the libftdi library, and use it.
     """
 
-    _instance = None
-    _need_init = True
-
     # prefer libftdi1 if available. Windows uses 'lib' prefix.
-    _dll_list = ('ftdi1', 'libftdi1', 'ftdi', 'libftdi')
+    _lib_search = {
+        'libftdi': ('ftdi1', 'libftdi1', 'ftdi', 'libftdi'),
+        'libusb': ('usb-1.0', 'libusb-1.0')
+    }
 
     def __init__(self, libftdi_search=None):
         """
         :param libftdi_search: force a particular version of libftdi to be used
         :type libftdi_search: string or sequence of strings
         """
-        self._libftdi_path = self._find_libftdi(libftdi_search)
-        self.fdll = CDLL(self._libftdi_path)
-        # most args/return types are fine with the implicit
-        # int/void* which ctypes uses, but some need setting here
-        self.fdll.ftdi_get_error_string.restype = c_char_p
-        self.fdll.ftdi_usb_get_strings.argtypes = (
-            c_void_p, c_void_p,
-            c_char_p, c_int, c_char_p, c_int, c_char_p, c_int)
+        if libftdi_search is not None:
+            self.lib_search['libftdi'] = libftdi_search
 
-    def _find_libftdi(self, libftdi_search=None):
+    def _library_path(self, name, search_list=None):
         """
-        find the libftdi path, suitable for ctypes.CDLL()
+        find the requested library, return path suitable for CDLL
 
-        :param libftdi_search: string or sequence of strings
-            use to force a particular version of libftdi to be used
+        :param name: library name
+        :param search_list: sequence or string referring to library names
         """
-        if libftdi_search is None:
-            search_list = self._dll_list
-        elif isinstance(libftdi_search, (str, bytes)):
-            search_list = (libftdi_search,)
-        else:
-            search_list = libftdi_search
+        if search_list is None:
+            search_list = self._lib_search.get(name, ())
+        if isinstance(search_list, (str, bytes)):
+            search_list = (search_list,)
 
-        ftdi_lib = None
+        lib_path = None
         for dll in search_list:
-            ftdi_lib = find_library(dll)
-            if ftdi_lib is not None:
+            lib_path = find_library(dll)
+            if lib_path is not None:
                 break
-        if ftdi_lib is None:
-            raise FtdiError('libftdi library not found (search: {})'.format(search_list))
-        return ftdi_lib
+        if lib_path is None:
+            raise LibraryMissingError('{} library not found (search: {})'.format(
+                name, search_list))
+        return lib_path
+
+    @property
+    def _libusb(self):
+        """
+        ctypes DLL referencing the libusb library, if it exists
+
+        Note this is not normally used directly by pylibftdi, and is available
+        primarily for diagnostic purposes.
+        """
+        if self._libusb_dll is None:
+            path = self._library_path('libusb')
+            self._libusb_dll = CDLL(path)
+            self._libusb_dll.libusb_get_version.restype = POINTER(libusb_version_struct)
+
+        return self._libusb_dll
+    _libusb_dll = None
+
+    def libusb_version(self):
+        """
+        :return: namedtuple containing version info on libusb
+        """
+        ver = self._libusb.libusb_get_version().contents
+        return libusb_version(ver.major, ver.minor, ver.micro, ver.nano,
+                              ver.rc, ver.describe)
+
+    @property
+    def fdll(self):
+        """
+        ctypes DLL referencing the libftdi library
+
+        This is the main interface to FTDI functionality.
+        """
+        if self._fdll is None:
+            path = self._library_path('libftdi')
+            self._fdll = CDLL(path)
+            # most args/return types are fine with the implicit
+            # int/void* which ctypes uses, but some need setting here
+            self._fdll.ftdi_get_error_string.restype = c_char_p
+            self._fdll.ftdi_usb_get_strings.argtypes = (
+                c_void_p, c_void_p,
+                c_char_p, c_int, c_char_p, c_int, c_char_p, c_int)
+        return self._fdll
+    _fdll = None
 
     def libftdi_version(self):
         """
@@ -113,12 +165,13 @@ class Driver(object):
         if hasattr(self.fdll, 'ftdi_get_library_version'):
             version = ftdi_version_info()
             self.fdll.ftdi_get_library_version(byref(version))
-            return (version.major, version.minor, version.micro,
-                    version.version_str, version.snapshot_str)
+            return libftdi_version(version.major, version.minor, version.micro,
+                                   version.version_str, version.snapshot_str)
         else:
             # library versions <1.0 don't support this function...
-            return (0, 0, 0,
-                    'unknown - no ftdi_get_library_version()', 'unknown')
+            return libftdi_version(0, 0, 0,
+                                   '< 1.0 - no ftdi_get_library_version()',
+                                   'unknown')
 
     def list_devices(self):
         """

@@ -1,7 +1,7 @@
 """
 pylibftdi - python wrapper for libftdi
 
-Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2015 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
 pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
@@ -13,11 +13,12 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.14.2"
+__VERSION__ = "0.15.0pre"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus', 'FtdiError',
+__ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus',
+           'FtdiError', 'MissingLibraryError',
            'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
            'USB_VID_LIST', 'USB_PID_LIST']
 
@@ -26,6 +27,7 @@ from pylibftdi import _base, driver, device, util, bitbang, serial_device
 # Bring them in to package scope so we can treat pylibftdi
 # as a module if we want.
 FtdiError = _base.FtdiError
+LibraryMissingError = _base.LibraryMissingError
 Bus = util.Bus
 Driver = driver.Driver
 Device = device.Device

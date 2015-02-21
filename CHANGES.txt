@@ -1,6 +1,20 @@
 pylibftdi changes
 =================
 
+0.15pre
+~~~~~~~
+* new - additional `pylibftdi.Driver` methods: `libusb_version` to report
+  on the version of the libusb library
+* new - `info` example, which displays additional info about the enviroment
+  pylibftdi is running in; run with `python -m pylibftdi.examples.info` or
+  similar.
+* changed - libftdi is now opened on first use, not immediately when
+  creating a `Driver` instance.
+* changed - missing libraries now raise `pylibftdi.LibraryMissingError`.
+  This subclasses `FtdiError`, so should remain compatible with existing
+  usage, but allows this to be caught explicitly.
+* More test cases covering bitbang usage
+
 0.14.2
 ~~~~~~
 * new - optional device_index parameter to `Device()` constructor, select
