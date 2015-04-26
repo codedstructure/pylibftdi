@@ -4,11 +4,18 @@ Welcome to pylibftdi's documentation!
 pylibftdi is a simple library interacting with FTDI devices to provide
 serial and parallel IO from Python.
 
-Example Usage::
+Examples::
 
     >>> from pylibftdi import BitBangDevice
     >>> with BitBangDevice('FT0123') as dev:
-    ...     dev.port.bit[0] = 1
+    ...     dev.port |= 1
+
+::
+
+    >>> from pylibftdi import Device
+    >>> with Device() as dev:
+    ...     dev.baudrate = 31250
+    ...     dev.write('\x90\x64\x64')
 
 The two main use cases it serves are:
 
