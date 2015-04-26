@@ -8,11 +8,16 @@ pylibftdi changes
 * new - `info` example, which displays additional info about the enviroment
   pylibftdi is running in; run with `python -m pylibftdi.examples.info` or
   similar.
+* changed - `libftdi_search` argument to `Driver()` can now give a path name
+  referencing the libftdi library.
 * changed - libftdi is now opened on first use, not immediately when
   creating a `Driver` instance.
 * changed - missing libraries now raise `pylibftdi.LibraryMissingError`.
   This subclasses `FtdiError`, so should remain compatible with existing
   usage, but allows this to be caught explicitly.
+* fixed - finding the libftdi library on Windows has been improved/fixed;
+  find_library does not work consistently across Windows / Python
+  versions...
 * More test cases covering bitbang usage
 
 0.14.2

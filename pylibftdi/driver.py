@@ -12,7 +12,7 @@ import itertools
 from collections import namedtuple
 
 # be disciplined so pyflakes can check us...
-from ctypes import (CDLL, byref, c_int, c_char_p, c_void_p, c_uint16, cast,
+from ctypes import (cdll, byref, c_int, c_char_p, c_void_p, c_uint16, cast,
                     create_string_buffer, Structure, pointer, POINTER)
 from ctypes.util import find_library
 
@@ -87,32 +87,43 @@ class Driver(object):
     def __init__(self, libftdi_search=None):
         """
         :param libftdi_search: force a particular version of libftdi to be used
+            can specify either library name(s) or path(s)
         :type libftdi_search: string or sequence of strings
         """
         if libftdi_search is not None:
-            self.lib_search['libftdi'] = libftdi_search
+            self._lib_search['libftdi'] = libftdi_search
 
-    def _library_path(self, name, search_list=None):
+    def _load_library(self, name, search_list=None):
         """
-        find the requested library, return path suitable for CDLL
+        find and load the requested library
 
         :param name: library name
         :param search_list: sequence or string referring to library names
+            library names or paths can be given
+        :return: a CDLL object referring to the requested library
         """
         if search_list is None:
             search_list = self._lib_search.get(name, ())
         if isinstance(search_list, (str, bytes)):
             search_list = (search_list,)
 
-        lib_path = None
+        lib = None
         for dll in search_list:
-            lib_path = find_library(dll)
-            if lib_path is not None:
+            try:
+                # Windows in particular can have find_library
+                # not find things which work fine directly on
+                # cdll access.
+                lib = getattr(cdll, dll)
                 break
-        if lib_path is None:
+            except OSError:
+                lib_path = find_library(dll)
+                if lib_path is not None:
+                    lib = getattr(cdll, lib_path)
+                    break
+        if lib is None:
             raise LibraryMissingError('{} library not found (search: {})'.format(
                 name, search_list))
-        return lib_path
+        return lib
 
     @property
     def _libusb(self):
@@ -123,8 +134,7 @@ class Driver(object):
         primarily for diagnostic purposes.
         """
         if self._libusb_dll is None:
-            path = self._library_path('libusb')
-            self._libusb_dll = CDLL(path)
+            self._libusb_dll = self._load_library('libusb')
             self._libusb_dll.libusb_get_version.restype = POINTER(libusb_version_struct)
 
         return self._libusb_dll
@@ -146,8 +156,7 @@ class Driver(object):
         This is the main interface to FTDI functionality.
         """
         if self._fdll is None:
-            path = self._library_path('libftdi')
-            self._fdll = CDLL(path)
+            self._fdll = self._load_library('libftdi')
             # most args/return types are fine with the implicit
             # int/void* which ctypes uses, but some need setting here
             self._fdll.ftdi_get_error_string.restype = c_char_p

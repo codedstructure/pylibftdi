@@ -4,7 +4,7 @@ Report environment info relevant to pylibftdi
 example usage::
 
     $ python3 -m pylibftdi.examples.info
-    pylibftdi version     : 0.15.0pre
+    pylibftdi version     : 0.15.0
     libftdi version       : libftdi_version(major=1, minor=1, micro=0, version_str=b'1.1', snapshot_str=b'unknown')
     libftdi library path  : /usr/local/lib/libftdi1.dylib
     libusb version        : libusb_version(major=1, minor=0, micro=19, nano=10903, rc=b'', describe=b'http://libusb.info')
@@ -33,12 +33,12 @@ def ftdi_info():
     info['pylibftdi version'] = pylibftdi.__VERSION__
     try:
         info['libftdi version'] = d.libftdi_version()
-        info['libftdi library path'] = d._library_path('libftdi')
+        info['libftdi library name'] = d._load_library('libftdi')._name
     except pylibftdi.LibraryMissingError:
         info['libftdi library'] = "Missing"
     try:
         info['libusb version'] = d.libusb_version()
-        info['libusb library path'] = d._library_path('libusb')
+        info['libusb library name'] = d._load_library('libusb')._name
     except pylibftdi.LibraryMissingError:
         info['libusb library'] = "Missing"
     info['Python version'] = platform.python_version()
