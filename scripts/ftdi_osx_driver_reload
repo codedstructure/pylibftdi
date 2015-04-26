@@ -5,7 +5,9 @@ if sys.platform != 'darwin':
 
 from subprocess import check_output, CalledProcessError
 
-if check_output(['sw_vers', '-productVersion']).strip() >= '10.9.0':
+osx_vers = check_output(['sw_vers', '-productVersion']).strip()
+# Need a natural sort rather than lexical for version number...
+if map(int, osx_vers.split('.')) >= [10, 9, 0]:
     modules = ['com.apple.driver.AppleUSBFTDI',
                'com.FTDI.driver.FTDIUSBSerialDriver']
     load_cmd = 'kextload -bundle-id'

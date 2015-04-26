@@ -18,12 +18,12 @@ TODO:   investigate ways of unloading the driver in the background e.g. as
 a part of some pylibftdi application startup itself?.  The need to do this
 action as root may make things trickier.
 
-OS X Mavericks
-~~~~~~~~~~~~~~
+OS X Mavericks, Yosemite and later
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OS X Mavericks includes kernel drivers which will reserve the FTDI device by
-default. This needs unloading before `libftdi` will be able to communicate
-with the device::
+Starting with OS X Mavericks, OS X includes kernel drivers which will reserve
+the FTDI device by default. This needs unloading before `libftdi` will be able
+to communicate with the device::
 
     sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
 
@@ -52,6 +52,12 @@ but this is dangerous::
 
     sudo rm /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
+Scripts are installed to perform these actions which are installed with
+pylibftdi; run `ftdi_osx_driver_unload` to unload the kernel driver and
+`ftdi_osx_driver_reload` to reload it. These commands are useful when
+other programs require frequent access to FTDI devices; the Arduino IDE
+running with FTDI devices (note many newer Arduino models use native USB
+rather than FTDI interfaces).
 
 Diagnosis
 ---------
@@ -99,3 +105,16 @@ Use ``lsusb``. Example from my laptop::
     Bus 008 Device 011: ID 0a5c:217f Broadcom Corp. Bluetooth Controller
     Bus 002 Device 009: ID 17ef:481d Lenovo 
     Bus 002 Device 016: ID 0403:6014 Future Technology Devices International, Ltd FT232H Single HS USB-UART/FIFO IC
+
+
+Gathering information
+---------------------
+Starting with pylibftdi version 0.15, an example script to gather system
+information is included, which will help in any diagnosis required.
+
+Run the following::
+
+    python -m pylibftdi.examples.info
+
+this will output a range of information related to the versions of libftdi
+libusb in use, as well as the system platform and Python version.

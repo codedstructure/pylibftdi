@@ -15,8 +15,7 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 
 :Limitations:
 
- - The API might change prior to reaching a 1.0 release. It already has a
-   couple of times.
+ - The API might change prior to reaching a 1.0 release.
 
 Usage
 -----
@@ -70,19 +69,15 @@ This package is the result of various bits of work using FTDI's
 devices, primarily for controlling external devices.  Some of this
 is documented on the codedstructure blog, codedstructure.blogspot.com
 
-At least two other open-source Python FTDI wrappers exist, and each
-of these may be best for some projects.
-
- * ftd2xx_ - ctypes binding to FTDI's own D2XX driver
- * pyftdi_ - a C extension libftdi binding
+Several other open-source Python FTDI wrappers exist, and each may be
+best for some projects. Some aim at closely wrapping the libftdi interface,
+others use FTDI's own D2XX driver (ftd2xx_) or talk directly to USB via
+libusb or similar (such as pyftdi_).
 
 .. _ftd2xx: http://pypi.python.org/pypi/ftd2xx
-.. _pyftdi: http://git.marcansoft.com/?p=pyftdi.git
+.. _pyftdi: https://github.com/eblot/pyftdi
 
-pylibftdi exists in the gap between these two projects; ftd2xx uses
-the (closed-source) D2XX driver, but provides a high-level Python
-interface, while pyftdi works with libftdi but is very low-level.
-The aim for pylibftdi is to work with the libftdi, but to provide
+The aim for pylibftdi is to work with libftdi, but to provide
 a high-level Pythonic interface.  Various wrappers and utility
 functions are also part of the distribution; following Python's
 batteries included approach, there are various interesting devices
@@ -93,7 +88,6 @@ Plans
  * Add more examples: SPI devices, knight-rider effects, input devices, MIDI...
  * Perhaps add support for D2XX driver, though the name then becomes a
    slight liability ;)
-
 
 License
 -------

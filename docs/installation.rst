@@ -21,13 +21,19 @@ or prefix the command with ``sudo`` to gain root privileges.
 Windows
 -------
 
-I've not tested pylibftdi on Windows, but recent libftdi binaries seem to be
-available from the picusb_ project on google code.
+I perform only limited testing of pylibftdi on Windows, but it should work
+correctly provided the requirements of libftdi and libusb are correctly
+installed.
 
-.. _picusb: http://code.google.com/p/picusb
+Recent libftdi binaries for Windows seem to be available from the picusb_
+project on Sourceforge. Download libftdi1-1.1_devkit_x86_x64_21Feb2014.zip
+or later from that site, which includes the required
 
-Things:
- - installing it in the first place, e.g. via ez_setup.py etc.
+.. _picusb: http://sourceforge.net/projects/picusb/files/
+
+Installing libraries on Windows is easier with recent versions of Python
+(2.7.9, 3.4+) installing `pip` directly, so the standard approach of
+`pip install pylibftdi` will now easily work on Windows.
 
 Mac OS X
 --------

@@ -36,25 +36,48 @@ Device() and BitBangDevice() constructors. Alternatively the device 'description
 can be given, and an attempt will be made to match this if matching by serial
 number fails.
 
+Examples
+~~~~~~~~
+
+::
+
+    >>> from pylibftdi import Device
+    >>>
+    >>> with Device(mode='t') as dev:
+    ...     dev.baudrate = 115200
+    ...     dev.write('Hello World')
+
+The pylibftdi.BitBangDevice wrapper provides access to the parallel IO mode of
+operation through the ``port`` and ``direction`` properties.  These provide an
+8 bit IO port including all the relevant bit operations to make things simple.
+
+::
+
+    >>> from pylibftdi import BitBangDevice
+    >>>
+    >>> with BitBangDevice('FTE00P4L') as bb:
+    ...     bb.direction = 0x0F  # four LSB are output(1), four MSB are input(0)
+    ...     bb.port |= 2         # set bit 1
+    ...     bb.port &= 0xFE      # clear bit 0
+
+There is support for a number of external devices and protocols, including
+interfacing with HD44780 LCDs using the 4-bit interface.
+
 History & Motivation
 --------------------
 This package is the result of various bits of work using FTDI's
 devices, primarily for controlling external devices.  Some of this
 is documented on the codedstructure blog, codedstructure.blogspot.com
 
-At least two other open-source Python FTDI wrappers exist, and each
-of these may be best for some projects.
-
- * ftd2xx_ - ctypes binding to FTDI's own D2XX driver
- * pyftdi_ - a C extension libftdi binding
+Several other open-source Python FTDI wrappers exist, and each may be
+best for some projects. Some aim at closely wrapping the libftdi interface,
+others use FTDI's own D2XX driver (ftd2xx_) or talk directly to USB via
+libusb or similar (such as pyftdi_).
 
 .. _ftd2xx: http://pypi.python.org/pypi/ftd2xx
-.. _pyftdi: http://git.marcansoft.com/?p=pyftdi.git
+.. _pyftdi: https://github.com/eblot/pyftdi
 
-pylibftdi exists in the gap between these two projects; ftd2xx uses
-the (closed-source) D2XX driver, but provides a high-level Python
-interface, while pyftdi works with libftdi but is very low-level.
-The aim for pylibftdi is to work with the libftdi, but to provide
+The aim for pylibftdi is to work with libftdi, but to provide
 a high-level Pythonic interface.  Various wrappers and utility
 functions are also part of the distribution; following Python's
 batteries included approach, there are various interesting devices
@@ -69,7 +92,7 @@ Plans
 License
 -------
 
-Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2015 Ben Bass <benbass@codedstructure.net>
 
 pylibftdi is released under the MIT licence; see the file "LICENSE.txt"
 for information.

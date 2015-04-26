@@ -73,3 +73,10 @@ examples Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`info` Module
+-----------------------------
+
+.. automodule:: pylibftdi.examples.info
+    :members:
+    :undoc-members:
+    :show-inheritance:
