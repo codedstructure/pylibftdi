@@ -12,13 +12,13 @@ import functools
 import itertools
 import os
 
-from ctypes import byref, create_string_buffer, c_char_p
+from ctypes import byref, create_string_buffer, c_char_p, c_uint16
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
-        Driver, USB_VID_LIST, USB_PID_LIST,
-        FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
-        FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
+    Driver, USB_VID_LIST, USB_PID_LIST,
+    FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
+    FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
 
 
 class Device(object):
@@ -139,9 +139,11 @@ class Device(object):
         # - no flow control, 9600 baud - in case it had previously been used
         # in bitbang mode (some later driver versions might do bits of this
         # automatically)
-        self.fdll.ftdi_set_bitmode(byref(self.ctx), 0, BITMODE_RESET)
-        self.fdll.ftdi_setflowctrl(byref(self.ctx), 0)
+        self.ftdi_fn.ftdi_set_bitmode(0, BITMODE_RESET)
+        self.ftdi_fn.ftdi_setflowctrl(0)
         self.baudrate = 9600
+        # reset the latency timer to 16ms
+        self.ftdi_fn.ftdi_set_latency_timer(16)
         self._opened = True
 
     def _open_device(self):
@@ -195,6 +197,34 @@ class Device(object):
         result = self.fdll.ftdi_set_baudrate(byref(self.ctx), value)
         if result == 0:
             self._baudrate = value
+
+    @property
+    def modem_status(self):
+        """
+        Layout of the first byte:
+        B0..B3 - must be 0
+        B4 Clear to send (CTS) 0 = inactive 1 = active
+        B5 Data set ready (DTS) 0 = inactive 1 = active
+        B6 Ring indicator (RI) 0 = inactive 1 = active
+        B7 Receive line signal detect (RLSD) 0 = inactive 1 = active
+
+        Layout of the second byte:
+        B0 Data ready (DR)
+        B1 Overrun error (OE)
+        B2 Parity error (PE)
+        B3 Framing error (FE)
+        B4 Break interrupt (BI)
+        B5 Transmitter holding register (THRE)
+        B6 Transmitter empty (TEMT)
+        B7 Error in RCVR FIFO
+
+        '{:016b}'.format(d.modem_status)
+        '0110000000000001'
+        - b5,b6 set in MSB ('2nd byte'), b0 set in first byte
+        """
+        status = c_uint16()
+        self.ftdi_fn.ftdi_poll_modem_status(byref(status))
+        return status.value
 
     def _read(self, length):
         """
