@@ -25,8 +25,9 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
             with Device():
                 pass
         self.assertCallsExact(_,
-                ['ftdi_init', 'ftdi_usb_open_desc_index', 'ftdi_set_bitmode',
-                 'ftdi_setflowctrl', 'ftdi_set_baudrate',
+                ['ftdi_init', 'ftdi_usb_open_desc_index',
+                 'ftdi_set_bitmode', 'ftdi_setflowctrl',
+                 'ftdi_set_baudrate', 'ftdi_set_latency_timer',
                  'ftdi_usb_close', 'ftdi_deinit'])
 
     def testOpen(self):
