@@ -8,9 +8,11 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 
 """
 
+import os
+import time
+import codecs
 import functools
 import itertools
-import os
 
 from ctypes import byref, create_string_buffer, c_char_p, c_uint16
 
@@ -142,7 +144,8 @@ class Device(object):
         self.ftdi_fn.ftdi_set_bitmode(0, BITMODE_RESET)
         self.ftdi_fn.ftdi_setflowctrl(0)
         self.baudrate = 9600
-        # reset the latency timer to 16ms
+        # reset the latency timer to 16ms (device default, but kernel device
+        # drivers can set a different - e.g. 1ms - value)
         self.ftdi_fn.ftdi_set_latency_timer(16)
         self._opened = True
 
@@ -241,19 +244,10 @@ class Device(object):
 
         return byte_data
 
-    def read(self, length):
+    def _chunked_read(self, length):
         """
-        read(length) -> bytes/string of up to `length` bytes.
-
-        read upto `length` bytes from the FTDI device
-        :param length: maximum number of bytes to read
-        :return: value read from device
-        :rtype: bytes if self.mode is 'b', else decode with self.encoding
+        Read from device in appropriate-sized chunks
         """
-        if not self._opened:
-            raise FtdiError("read() on closed Device")
-
-        # read the data
         if self.chunk_size != 0:
             remaining = length
             byte_data_list = []
@@ -266,6 +260,33 @@ class Device(object):
             byte_data = b''.join(byte_data_list)
         else:
             byte_data = self._read(length)
+        return byte_data
+
+    def read(self, length, timeout=None):
+        """
+        read(length) -> bytes/string of up to `length` bytes.
+
+        read upto `length` bytes from the FTDI device
+        :param length: maximum number of bytes to read
+        :param timeout: time to wait for any response. 0 = non blocking;
+            None=indefinite (default).
+        :return: value read from device
+        :rtype: bytes if self.mode is 'b', else decode with self.encoding
+        """
+        if not self._opened:
+            raise FtdiError("read() on closed Device")
+
+        # read the data
+        if timeout not in (0, None):
+            # a timed operation
+            timeout_at = time.time() + timeout
+        while True:
+            byte_data = self._chunked_read(length)
+            if timeout == 0 or byte_data:
+                break
+            elif timeout is not None and time.time() > timeout_at:
+                break
+
         if self.mode == 'b':
             return byte_data
         else:

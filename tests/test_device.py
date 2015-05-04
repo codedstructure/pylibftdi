@@ -102,5 +102,28 @@ class LoopbackTest(unittest.TestCase):
         self.assertEqual(d.readline(), 'Bye')
 
 
+import threading
+
+
+class ReadTimeoutTest(unittest.TestCase):
+
+    def setUp(self):
+        self.d = LoopDevice()
+
+    def write(self):
+        self.d.write('Hello')
+
+    def testTimeout(self):
+
+        threading.Timer(2, self.write).start()
+        self.assertEqual(self.d.read(100, timeout=0), '')
+        self.assertEqual(self.d.read(100, timeout=0.2), '')
+        self.assertEqual(self.d.read(100, timeout=2.5), 'Hello')
+
+    def testBlocking(self):
+        threading.Timer(2, self.write).start()
+        self.assertEqual(self.d.read(100, timeout=None), 'Hello')
+
+
 if __name__ == "__main__":
     unittest.main()
