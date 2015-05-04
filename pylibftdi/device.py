@@ -73,12 +73,14 @@ class Device(object):
         # if set to text, the values returned from read() will
         # be decoded using encoding before being returned as
         # strings; for binary the raw bytes will be returned.
-        # This will only affect Python3.
         self.mode = mode
         # when giving a str to Device.write(), it is encoded.
         # default is latin1, because it provides
         # a one-to-one correspondence for code points 0-FF
         self.encoding = encoding
+        if mode == 't':
+            self.encoder = codecs.getincrementalencoder(self.encoding)()
+            self.decoder = codecs.getincrementaldecoder(self.encoding)()
         # ftdi_usb_open_dev initialises the device baudrate
         # to 9600, which certainly seems to be a de-facto
         # standard for serial devices.
@@ -290,11 +292,7 @@ class Device(object):
         if self.mode == 'b':
             return byte_data
         else:
-            # TODO: for some codecs, this may choke if we haven't read the
-            # full required data. If this is the case we should probably trim
-            # a byte at a time from the output until the decoding works, and
-            # buffer the remainder for next time.
-            return byte_data.decode(self.encoding)
+            return self.decoder.decode(byte_data)
 
     def _write(self, byte_data):
         """
@@ -328,7 +326,7 @@ class Device(object):
             byte_data = bytes(data)
         except TypeError:
             # this will happen if we are Python3 and data is a str.
-            byte_data = data.encode(self.encoding)
+            byte_data = self.encoder.encode(data)
 
         # actually write it
         if self.chunk_size != 0:
@@ -476,7 +474,7 @@ class Device(object):
         lines = []
         if sizehint is not None:
             string_blob = self.read(sizehint)
-            lines.extend(string_blob.split(os.linesep))
+            lines.extend(string_blob.splitlines())
 
         while True:
             line = self.readline()
