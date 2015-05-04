@@ -22,6 +22,7 @@ class SerialDevice(Device):
 
     cts, dsr, ri - input
     dtr, rts - output
+    modem_status - return a two byte bitfield of various values
 
     Note: These lines are all active-low by default, though this can be
     changed in the EEPROM settings. pylibftdi does not attempt to hide
@@ -52,7 +53,7 @@ class SerialDevice(Device):
     @property
     def rts(self):
         """
-        set (or get the previous set) state of the DTR line
+        set (or get the previous set) state of the RTS line
 
         :return: the state of the RTS line; None if not previously set
         """
@@ -66,7 +67,31 @@ class SerialDevice(Device):
 
         self._rts = value
 
-    def _modem_status(self):
+    @property
+    def modem_status(self):
+        """
+        Layout of the first byte:
+        B0..B3 - must be 0
+        B4 Clear to send (CTS) 0 = inactive 1 = active
+        B5 Data set ready (DTS) 0 = inactive 1 = active
+        B6 Ring indicator (RI) 0 = inactive 1 = active
+        B7 Receive line signal detect (RLSD) 0 = inactive 1 = active
+
+        Layout of the second byte:
+        B0 Data ready (DR)
+        B1 Overrun error (OE)
+        B2 Parity error (PE)
+        B3 Framing error (FE)
+        B4 Break interrupt (BI)
+        B5 Transmitter holding register (THRE)
+        B6 Transmitter empty (TEMT)
+        B7 Error in RCVR FIFO
+
+        '{:016b}'.format(d.modem_status)
+        '0110000000000001'
+        - b5,b6 set in MSB ('2nd byte'), b0 set in first byte
+        (despite the libftdi docs saying this shouldn't be set)
+        """
         status = c_uint16()
         self.ftdi_fn.ftdi_poll_modem_status(byref(status))
         return status.value
@@ -76,18 +101,18 @@ class SerialDevice(Device):
         """
         get the state of CTS (1 = 'active')
         """
-        return int(bool(self._modem_status() & CTS_MASK))
+        return int(bool(self.modem_status & CTS_MASK))
 
     @property
     def dsr(self):
         """
         get the state of DSR (1 = 'active')
         """
-        return int(bool(self._modem_status() & DSR_MASK))
+        return int(bool(self.modem_status & DSR_MASK))
 
     @property
     def ri(self):
         """
         get the state of RI (1 = 'active')
         """
-        return int(bool(self._modem_status() & RI_MASK))
+        return int(bool(self.modem_status & RI_MASK))
