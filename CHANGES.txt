@@ -1,8 +1,15 @@
 pylibftdi changes
 =================
 
-0.15pre
+0.16pre
 ~~~~~~~
+* new - by default, calls `libusb_set_auto_detach_kernel_driver()` on
+  newly opened devices, to restore kernel drivers after close.  Note 
+  this only seems to have an effect on Linux, as far as I can tell.
+  Disable with `Device(..., auto_detach=False)`
+
+0.15
+~~~~
 * new - additional `pylibftdi.Driver` methods: `libusb_version` to report
   on the version of the libusb library
 * new - `info` example, which displays additional info about the enviroment

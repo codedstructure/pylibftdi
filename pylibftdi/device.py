@@ -14,13 +14,21 @@ import codecs
 import functools
 import itertools
 
-from ctypes import byref, create_string_buffer, c_char_p, c_uint16
+from ctypes import (byref, create_string_buffer, c_char_p, c_uint16,
+                    c_void_p, Structure, cast, POINTER)
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
     Driver, USB_VID_LIST, USB_PID_LIST,
     FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
     FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
+
+
+# The only part of the ftdi context we need at this point is
+# libusb_device_handle, so we don't encode the entire structure.
+class ftdi_context_partial(Structure):
+    _fields_ = [('libusb_context', c_void_p),
+                ('libusb_device_handle', c_void_p)]
 
 
 class Device(object):
@@ -31,7 +39,7 @@ class Device(object):
     def __init__(self, device_id=None, mode="b",
                  encoding="latin1", lazy_open=False,
                  chunk_size=0, interface_select=None,
-                 device_index=0, **kwargs):
+                 device_index=0, auto_detach=True, **kwargs):
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
 
@@ -63,6 +71,9 @@ class Device(object):
         :param device_index: optional index of the device to open, in the
             event of multiple matches for other parameters (PID, VID,
             device_id). Defaults to zero (the first device found).
+
+        :param auto_detach: default True, whether to automatically re-attach
+            the kernel driver on device close.
         """
         self._opened = False
         self.driver = Driver(**kwargs)
@@ -95,6 +106,9 @@ class Device(object):
         self.interface_select = interface_select
         # device_index is an optional integer index of device to choose
         self.device_index = device_index
+        # auto_detach is a flag to call libusb_set_auto_detach_kernel_driver
+        # when we open the device
+        self.auto_detach = auto_detach
         # lazy_open tells us not to open immediately.
         if not lazy_open:
             self.open()
@@ -138,6 +152,12 @@ class Device(object):
             self.fdll.ftdi_deinit(byref(self.ctx))
             del self.ctx
             raise FtdiError(msg)
+
+        if self.auto_detach:
+            ctx_p = cast(byref(self.ctx), POINTER(ftdi_context_partial)).contents
+            dev = ctx_p.libusb_device_handle
+            if dev:
+                self.driver._libusb.libusb_set_auto_detach_kernel_driver(dev, 1)
 
         # explicitly reset the device to serial mode with standard settings
         # - no flow control, 9600 baud - in case it had previously been used
