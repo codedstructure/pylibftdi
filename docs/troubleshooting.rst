@@ -14,10 +14,6 @@ This indicates a conflict with FTDI's own drivers, and is (as far as I know)
 mainly a problem on Mac OS X, where they can be disabled (until reboot) by
 unloading the appropriate kernel module.
 
-TODO:   investigate ways of unloading the driver in the background e.g. as
-a part of some pylibftdi application startup itself?.  The need to do this
-action as root may make things trickier.
-
 OS X Mavericks, Yosemite and later
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -124,6 +120,15 @@ reappear would be to unplug and replug the USB device itself. Starting from
 behaviour can be controlled by the `auto_detach` argument (which is defaulted
 to `True`) to the `Device` class; setting it to `False` reverts to the old
 behaviour.
+
+Note that on recent OS X, libftdi doesn't 'steal' the device, but instead
+refuses to open it. The kernel devices can be seen as
+`/dev/tty.usbserial-xxxxxxxx`, where `xxxxxxxx` is the device serial number.
+FTDI's Application Note AN134_ details this further (see section 'Using
+Apple-provided VCP or D2XX with OS X 10.9 & 10.10'). See the section above
+under Installation for further details on resolving this.
+
+.. _AN134: http://www.ftdichip.com/Support/Documents/AppNotes/AN_134_FTDI_Drivers_Installation_Guide_for_MAC_OSX.pdf
 
 Gathering information
 ---------------------
