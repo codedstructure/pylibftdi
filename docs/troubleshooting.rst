@@ -107,6 +107,24 @@ Use ``lsusb``. Example from my laptop::
     Bus 002 Device 016: ID 0403:6014 Future Technology Devices International, Ltd FT232H Single HS USB-UART/FIFO IC
 
 
+Where did my ttyUSB devices go?
+-------------------------------
+When a `pylibftdi.Device()` is opened, any kernel device which was previously
+present will become unavailable. On Linux for example, a serial-capable FTDI
+device will (via the `ftdi_sio` driver) create a device node such as
+`/dev/ttyUSB0` (or ttyUSB1,2,3 etc). This device allows use of the FTDI device
+as a simple file in the Linux filesystem which can be read and written.
+Various programs such as the Arduino IDE (at least when communicating with
+some board variants) and libraries such as `PySerial` will use this device.
+Once libftdi opens a device, the corresponding entry in /dev/ will disappear.
+Prior to `pylibftdi` version 0.16, the simplest way to get the device node to
+reappear would be to unplug and replug the USB device itself. Starting from
+0.16, this should no longer be necessary as the kernel driver (which exports
+`/dev/ttyUSB...`) is reattached when the `pylibftdi` device is closed. This
+behaviour can be controlled by the `auto_detach` argument (which is defaulted
+to `True`) to the `Device` class; setting it to `False` reverts to the old
+behaviour.
+
 Gathering information
 ---------------------
 Starting with pylibftdi version 0.15, an example script to gather system
@@ -117,4 +135,12 @@ Run the following::
     python -m pylibftdi.examples.info
 
 this will output a range of information related to the versions of libftdi
-libusb in use, as well as the system platform and Python version.
+libusb in use, as well as the system platform and Python version, for example::
+
+    pylibftdi version     : 0.16.0pre
+    libftdi version       : libftdi_version(major=1, minor=1, micro=0, version_str='1.1', snapshot_str='v1.1-12-g2ecba57')
+    libftdi library name  : libftdi1.so.2
+    libusb version        : libusb_version(major=1, minor=0, micro=17, nano=10830, rc='', describe='http://libusbx.org')
+    libusb library name   : libusb-1.0.so.0
+    Python version        : 2.7.6
+    OS platform           : Linux-3.13.0-55-generic-x86_64-with-Ubuntu-14.04-trusty
