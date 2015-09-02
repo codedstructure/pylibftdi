@@ -31,6 +31,7 @@ LibraryMissingError = _base.LibraryMissingError
 Bus = util.Bus
 Driver = driver.Driver
 Device = device.Device
+ReadTimeout = device.ReadTimeout
 SerialDevice = serial_device.SerialDevice
 BitBangDevice = bitbang.BitBangDevice
 USB_VID_LIST = driver.USB_VID_LIST

@@ -31,6 +31,10 @@ class ftdi_context_partial(Structure):
                 ('libusb_device_handle', c_void_p)]
 
 
+class ReadTimeout(IOError):
+    pass
+
+
 class Device(object):
     """
     Represents a connection to a single FTDI device
@@ -307,7 +311,7 @@ class Device(object):
             if timeout == 0 or byte_data:
                 break
             elif timeout is not None and time.time() > timeout_at:
-                break
+                raise ReadTimeout()
 
         if self.mode == 'b':
             return byte_data
