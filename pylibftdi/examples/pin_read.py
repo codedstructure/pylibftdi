@@ -77,40 +77,40 @@ def display_loop(interval=1, count=0, match=None, mask=0xFF):
 
 
 def main(args=None):
-    import optparse
-    parser = optparse.OptionParser()
-    parser.add_option("-n", "--interval", dest="interval",
-                      default=1, type=float,
-                      help="refresh interval, default 1 second")
-    parser.add_option("-c", "--count", dest="count",
-                      default=0, type=int,
-                      help="number of cycles to run for (0 = no limit - the default)")
-    parser.add_option("-m", "--match", dest="match",
-                      help="value to match against (e.g. 0x1F, 7, etc)")
-    parser.add_option("-k", "--mask", dest="mask",
-                      help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF")
-    opts, args = parser.parse_args(args)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--interval", dest="interval",
+                        default=1, type=float,
+                        help="refresh interval, default 1 second")
+    parser.add_argument("-c", "--count", dest="count",
+                        default=0, type=int,
+                        help="number of cycles to run for (0 = no limit - the default)")
+    parser.add_argument("-m", "--match", dest="match",
+                        help="value to match against (e.g. 0x1F, 7, etc)")
+    parser.add_argument("-k", "--mask", dest="mask",
+                        help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF")
+    args = parser.parse_args(args)
 
-    if opts.interval < 0.001:
+    if args.interval < 0.001:
         parser.error("interval must be >= 0.001")
-    if opts.count < 0:
+    if args.count < 0:
         parser.error("count must be >= 0")
     mask = match = None
-    if opts.mask:
-        if not opts.match:
+    if args.mask:
+        if not args.match:
             parser.error("Must specify --match with mask")
         try:
-            mask = int(opts.mask, 0)
+            mask = int(args.mask, 0)
         except ValueError:
             parser.error("Could not interpret given mask")
     else:
         mask = 0xFF
-    if opts.match:
+    if args.match:
         try:
-            match = int(opts.match, 0)
+            match = int(args.match, 0)
         except ValueError:
             parser.error("Could not interpret given mask")
-    ok = display_loop(opts.interval, opts.count, match, mask)
+    ok = display_loop(args.interval, args.count, match, mask)
     sys.exit(0 if ok else 1)
 
 

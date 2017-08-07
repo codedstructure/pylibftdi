@@ -9,12 +9,11 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 import os
-import time
 import codecs
 import functools
 import itertools
 
-from ctypes import (byref, create_string_buffer, c_char_p, c_uint16,
+from ctypes import (byref, create_string_buffer, c_char_p,
                     c_void_p, Structure, cast, POINTER)
 
 from pylibftdi._base import FtdiError

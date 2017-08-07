@@ -13,7 +13,7 @@ from pylibftdi import BitBangDevice
 
 
 def flash_forever(rate):
-    "toggle bit zero at rate Hz"
+    """toggle bit zero at rate Hz"""
     # put an LED with 1Kohm or similar series resistor
     # on D0 pin
     with BitBangDevice() as bb:

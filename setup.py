@@ -11,7 +11,7 @@ except ImportError:
 
 setup_args = dict(
     name="pylibftdi",
-    version="0.16.0pre",
+    version="0.16.0",
     description="Pythonic interface to FTDI devices using libftdi",
     long_description=open('README.rst').read(),
     author="Ben Bass",
@@ -26,12 +26,13 @@ setup_args = dict(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Embedded Systems",
         "Topic :: System :: Hardware"

@@ -17,6 +17,7 @@ START_NOTE = 48
 def volume(beat):
     return 100 if beat % 2 else 127
 
+
 def scale():
     midi = MidiDevice()
 
@@ -36,6 +37,7 @@ def scale():
         time.sleep(0.35)
         midi.write('\x90%c\x00' % chr(note))
         time.sleep(0.125)
+
 
 if __name__ == '__main__':
     scale()

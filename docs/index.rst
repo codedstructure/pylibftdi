@@ -12,6 +12,7 @@ Examples::
 
 ::
 
+    >>> # Send a MIDI 'note on' message
     >>> from pylibftdi import Device
     >>> with Device() as dev:
     ...     dev.baudrate = 31250

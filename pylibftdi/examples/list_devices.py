@@ -38,6 +38,11 @@ def get_ftdi_device_list():
         dev_list.append("%s:%s:%s" % (vendor, product, serial))
     return dev_list
 
-if __name__ == '__main__':
+
+def main():
     for device in get_ftdi_device_list():
         print(device)
+
+
+if __name__ == '__main__':
+    main()

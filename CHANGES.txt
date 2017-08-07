@@ -1,12 +1,21 @@
 pylibftdi changes
 =================
 
-0.16pre
-~~~~~~~
-* new - by default, calls `libusb_set_auto_detach_kernel_driver()` on
-  newly opened devices, to restore kernel drivers after close.  Note 
-  this only seems to have an effect on Linux, as far as I can tell.
+0.16.0
+~~~~~~
+* new/changed - Automatic driver detach. By default, calls
+  `libusb_set_auto_detach_kernel_driver()` on  newly opened devices, to
+  restore kernel drivers after close.  Note this only seems to have an
+  effect on Linux, as far as I can tell.
   Disable with `Device(..., auto_detach=False)`
+* new - serial_transfer example which checks that pseudo-random data send
+  over a serial connection is correctly transferred.
+* new - `modem_status` property on SerialDevice() object, 16-bit value where
+  each bit represents a different value such as 'Overrun Error'. See docstring
+  or documentation for ftdi_poll_modem_status function in libftdi.
+* fixed - reset FTDI latency timer to default (16ms) on device instantiation
+* changed - Python2.6 is no longer supported.
+* changed - now uses incremental codecs when doing text-based transfer.
 
 0.15
 ~~~~

@@ -6,9 +6,26 @@ This module assumes two devices (e.g. FT232R based) are connected to the
 host computer, with RX and TX of the two devices wired to each other so
 they can communicate. It launches threads to send and receive traffic and
 check that a random stream sent from one device is correctly received at
-the other.
+the other:
 
-Copyright (c) 2015 Ben Bass <benbass@codedstructure.net>
+Testing 9600 baud
+Half duplex d1->d2...
+  Bytes TX: 10000  RX: 10000
+  Checksum TX: ad7e985fdddfbc04e398daa781a9fad0  RX: ad7e985fdddfbc04e398daa781a9fad0
+ SUCCESS
+Half duplex d2->d1...
+  Bytes TX: 10000  RX: 10000
+  Checksum TX: 61338c11fe18642a07f196094646295f  RX: 61338c11fe18642a07f196094646295f
+ SUCCESS
+Full duplex d1<=>d2...
+  Bytes TX: 10000  RX: 10000
+  Checksum TX: 7dcc7ed3b89e46592c777ec42c330fd8  RX: 7dcc7ed3b89e46592c777ec42c330fd8
+ SUCCESS
+  Bytes TX: 10000  RX: 10000
+  Checksum TX: 1a957192b8219aa02ad374dd518e37fd  RX: 1a957192b8219aa02ad374dd518e37fd
+ SUCCESS
+
+Copyright (c) 2015-2017 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
@@ -32,10 +49,9 @@ class RandomStream(object):
         # Note: `reset()` sets the initial attributes
         self.reset()
 
-    def _rand_gen(self, size):
+    @staticmethod
+    def _rand_gen(size):
         """Return a `bytes` instance of `size` random byte"""
-        # Note - on OS X, os.urandom is faster on Py3, but getrandbits on Py2...
-        #return os.urandom(size)
         return bytes(bytearray(random.getrandbits(8) for _ in range(size)))
 
     def reset(self):
@@ -69,12 +85,12 @@ class RandomStream(object):
 def test_rs():
     r = RandomStream()
     prev_checksum = 0
-    zzA = []
+    stream_bytes = []
     for i in range(30):
-        zzA.append(b''.join(islice(r, 500)))
+        stream_bytes.append(b''.join(islice(r, 500)))
         assert r.checksum() != prev_checksum
     assert r.checksum() == r.checksum()
-    assert hashlib.md5(b''.join(zzA)).hexdigest() == r.checksum()
+    assert hashlib.md5(b''.join(stream_bytes)).hexdigest() == r.checksum()
 
 
 class HalfDuplexTransfer(object):
@@ -99,6 +115,9 @@ class HalfDuplexTransfer(object):
 
         self.block_size = block_size
         self.test_duration = 10
+
+        self.t1 = None
+        self.t2 = None
 
         self.done = False
 
