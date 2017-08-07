@@ -31,10 +31,6 @@ class ftdi_context_partial(Structure):
                 ('libusb_device_handle', c_void_p)]
 
 
-class ReadTimeout(IOError):
-    pass
-
-
 class Device(object):
     """
     Represents a connection to a single FTDI device
@@ -93,9 +89,8 @@ class Device(object):
         # default is latin1, because it provides
         # a one-to-one correspondence for code points 0-FF
         self.encoding = encoding
-        if mode == 't':
-            self.encoder = codecs.getincrementalencoder(self.encoding)()
-            self.decoder = codecs.getincrementaldecoder(self.encoding)()
+        self.encoder = codecs.getincrementalencoder(self.encoding)()
+        self.decoder = codecs.getincrementaldecoder(self.encoding)()
         # ftdi_usb_open_dev initialises the device baudrate
         # to 9600, which certainly seems to be a de-facto
         # standard for serial devices.
@@ -227,34 +222,6 @@ class Device(object):
         if result == 0:
             self._baudrate = value
 
-    @property
-    def modem_status(self):
-        """
-        Layout of the first byte:
-        B0..B3 - must be 0
-        B4 Clear to send (CTS) 0 = inactive 1 = active
-        B5 Data set ready (DTS) 0 = inactive 1 = active
-        B6 Ring indicator (RI) 0 = inactive 1 = active
-        B7 Receive line signal detect (RLSD) 0 = inactive 1 = active
-
-        Layout of the second byte:
-        B0 Data ready (DR)
-        B1 Overrun error (OE)
-        B2 Parity error (PE)
-        B3 Framing error (FE)
-        B4 Break interrupt (BI)
-        B5 Transmitter holding register (THRE)
-        B6 Transmitter empty (TEMT)
-        B7 Error in RCVR FIFO
-
-        '{:016b}'.format(d.modem_status)
-        '0110000000000001'
-        - b5,b6 set in MSB ('2nd byte'), b0 set in first byte
-        """
-        status = c_uint16()
-        self.ftdi_fn.ftdi_poll_modem_status(byref(status))
-        return status.value
-
     def _read(self, length):
         """
         actually do the low level reading
@@ -270,10 +237,19 @@ class Device(object):
 
         return byte_data
 
-    def _chunked_read(self, length):
+    def read(self, length):
         """
-        Read from device in appropriate-sized chunks
+        read(length) -> bytes/string of up to `length` bytes.
+
+        read upto `length` bytes from the FTDI device
+        :param length: maximum number of bytes to read
+        :return: value read from device
+        :rtype: bytes if self.mode is 'b', else decode with self.encoding
         """
+        if not self._opened:
+            raise FtdiError("read() on closed Device")
+
+        # read the data
         if self.chunk_size != 0:
             remaining = length
             byte_data_list = []
@@ -286,33 +262,6 @@ class Device(object):
             byte_data = b''.join(byte_data_list)
         else:
             byte_data = self._read(length)
-        return byte_data
-
-    def read(self, length, timeout=None):
-        """
-        read(length) -> bytes/string of up to `length` bytes.
-
-        read upto `length` bytes from the FTDI device
-        :param length: maximum number of bytes to read
-        :param timeout: time to wait for any response. 0 = non blocking;
-            None=indefinite (default).
-        :return: value read from device
-        :rtype: bytes if self.mode is 'b', else decode with self.encoding
-        """
-        if not self._opened:
-            raise FtdiError("read() on closed Device")
-
-        # read the data
-        if timeout not in (0, None):
-            # a timed operation
-            timeout_at = time.time() + timeout
-        while True:
-            byte_data = self._chunked_read(length)
-            if timeout == 0 or byte_data:
-                break
-            elif timeout is not None and time.time() > timeout_at:
-                raise ReadTimeout()
-
         if self.mode == 'b':
             return byte_data
         else:

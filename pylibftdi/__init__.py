@@ -13,7 +13,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.16.0pre"
+__VERSION__ = "0.16.0"
 __AUTHOR__ = "Ben Bass"
 
 
@@ -31,7 +31,6 @@ LibraryMissingError = _base.LibraryMissingError
 Bus = util.Bus
 Driver = driver.Driver
 Device = device.Device
-ReadTimeout = device.ReadTimeout
 SerialDevice = serial_device.SerialDevice
 BitBangDevice = bitbang.BitBangDevice
 USB_VID_LIST = driver.USB_VID_LIST
