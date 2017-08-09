@@ -142,7 +142,7 @@ Run the following::
 this will output a range of information related to the versions of libftdi
 libusb in use, as well as the system platform and Python version, for example::
 
-	pylibftdi version     : 0.16.0
+	pylibftdi version     : 0.16.1
 	libftdi version       : libftdi_version(major=1, minor=3, micro=0, version_str=b'1.3', snapshot_str=b'unknown')
 	libftdi library name  : /usr/local/lib/libftdi1.dylib
 	libusb version        : libusb_version(major=1, minor=0, micro=21, nano=11156, rc=b'', describe=b'http://libusb.info')
