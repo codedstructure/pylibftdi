@@ -1,6 +1,11 @@
 pylibftdi changes
 =================
 
+0.16.1
+~~~~~~
+* fixed - segfault opening `Device` instances when `auto_detach` used and
+  running on early (pre 1.0) versions of `libftdi`.
+
 0.16.0
 ~~~~~~
 * new/changed - Automatic driver detach. By default, calls
