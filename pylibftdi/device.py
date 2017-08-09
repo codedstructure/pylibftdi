@@ -25,15 +25,13 @@ from pylibftdi.driver import (
 
 # The only part of the ftdi context we need at this point is
 # libusb_device_handle, so we don't encode the entire structure.
+# Note the structure for 0.x is different (no libusb_context
+# member), but we don't support auto_detach on 0.x which is
+# the only case this is used.
 class ftdi_context_partial(Structure):
     # This is for libftdi 1.0+
     _fields_ = [('libusb_context', c_void_p),
                 ('libusb_device_handle', c_void_p)]
-
-
-class ftdi_context_partial_v0(Structure):
-    # This is for libftdi 0.x
-    _fields_ = [('libusb_device_handle', c_void_p)]
 
 
 class Device(object):
@@ -157,13 +155,9 @@ class Device(object):
             del self.ctx
             raise FtdiError(msg)
 
-        if self.auto_detach:
-            if self.driver.libftdi_version().major > 0:
-                context_struct = ftdi_context_partial
-            else:
-                context_struct = ftdi_context_partial_v0
-
-            ctx_p = cast(byref(self.ctx), POINTER(context_struct)).contents
+        if self.auto_detach and self.driver.libftdi_version().major > 0:
+            # This doesn't reliably work on libftdi 0.x, so we ignore it
+            ctx_p = cast(byref(self.ctx), POINTER(ftdi_context_partial)).contents
             dev = ctx_p.libusb_device_handle
             if dev:
                 self.driver._libusb.libusb_set_auto_detach_kernel_driver(dev, 1)

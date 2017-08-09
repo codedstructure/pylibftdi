@@ -1,6 +1,12 @@
 pylibftdi changes
 =================
 
+0.16.1.1
+~~~~~~~~
+* changed / fixed - still getting segfault in some situations with
+  combination of auto_detach=True and libftdi 0.x, so auto_detach
+  is now only supported in libftdi 1.0+ and ignored otherwise.
+
 0.16.1
 ~~~~~~
 * fixed - segfault opening `Device` instances when `auto_detach` used and
