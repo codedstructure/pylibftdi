@@ -160,7 +160,7 @@ class Device(object):
             ctx_p = cast(byref(self.ctx), POINTER(ftdi_context_partial)).contents
             dev = ctx_p.libusb_device_handle
             if dev:
-                self.driver._libusb.libusb_set_auto_detach_kernel_driver(dev, 1)
+                self.driver._libusb.libusb_set_auto_detach_kernel_driver(c_void_p(dev), 1)
 
         # explicitly reset the device to serial mode with standard settings
         # - no flow control, 9600 baud - in case it had previously been used
