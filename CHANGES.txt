@@ -1,6 +1,17 @@
 pylibftdi changes
 =================
 
+0.17.0
+~~~~~~
+* new - added 0x6015 USB PID to the default PID list, supporting FT230 devices
+* fixed - updated ftdi_osx_driver_re/unload scripts to support Python3
+* fixed - auto_detach bug on some systems (Bitbucket issue #27)
+* *API CHANGE* - Moved `auto_detach`, `chunk_size` and `lazy_open` to class
+  attributes which can be easily overridden in subclasses, or in kwargs.
+  This means that any program using these as *positional* arguments needs
+  to change to use them as keyword parameters. Note: all but `device_id` and
+  `mode` may become keyword-only arguments in the future.
+
 0.16.1.2
 * rebuilt to fix install issue on macOS
 

@@ -13,7 +13,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.16.1.2"
+__VERSION__ = "0.17.0"
 __AUTHOR__ = "Ben Bass"
 
 
