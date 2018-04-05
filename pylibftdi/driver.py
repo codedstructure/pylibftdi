@@ -67,7 +67,7 @@ BITMODE_BITBANG = 0x01
 # by default. These can be extended directly after import if required.
 FTDI_VENDOR_ID = 0x0403
 USB_VID_LIST = [FTDI_VENDOR_ID]
-USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014]
+USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014, 0x6015]
 
 FTDI_ERROR_DEVICE_NOT_FOUND = -3
 
