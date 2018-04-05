@@ -1,7 +1,7 @@
 """
 pylibftdi.device - access to individual FTDI devices
 
-Copyright (c) 2010-2017 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2018 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
 pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
@@ -39,10 +39,23 @@ class Device(object):
     Represents a connection to a single FTDI device
     """
 
+    # If false, don't open the device as part of instantiation
+    lazy_open = False
+
+    # chunk_size (if not 0) chunks the reads and writes
+    # to allow interruption
+    chunk_size = 0
+
+    # auto_detach is a flag to call libusb_set_auto_detach_kernel_driver
+    # when we open the device
+    auto_detach = True
+
+    # defining softspace allows us to 'print' to this device
+    softspace = 0
+
     def __init__(self, device_id=None, mode="b",
-                 encoding="latin1", lazy_open=False,
-                 chunk_size=0, interface_select=None,
-                 device_index=0, auto_detach=True, **kwargs):
+                 encoding="latin1", interface_select=None,
+                 device_index=0, **kwargs):
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
 
@@ -61,6 +74,15 @@ class Device(object):
 
         :param encoding: the codec name to be used for text operations.
 
+        :param interface_select: select interface to use on multi-interface devices
+
+        :param device_index: optional index of the device to open, in the
+            event of multiple matches for other parameters (PID, VID,
+            device_id). Defaults to zero (the first device found).
+
+        The following parameters are only available as keyword parameters
+        and override class attributes, so may be specified in subclasses.
+
         :param lazy_open: if True, then the device will not be opened immediately -
             the user must perform an explicit open() call prior to other
             operations.
@@ -69,16 +91,18 @@ class Device(object):
             of this size. With large or slow accesses, interruptions (i.e.
             KeyboardInterrupt) may not happen in a timely fashion.
 
-        :param interface_select: select interface to use on multi-interface devices
-
-        :param device_index: optional index of the device to open, in the
-            event of multiple matches for other parameters (PID, VID,
-            device_id). Defaults to zero (the first device found).
-
         :param auto_detach: default True, whether to automatically re-attach
             the kernel driver on device close.
         """
         self._opened = False
+
+        # Some behavioural attributes are extracted from kwargs and override
+        # existing attribute defaults. This allows subclassing to easily
+        # change these.
+        for param in ['auto_detach', 'lazy_open', 'chunk_size']:
+            if param in kwargs:
+                setattr(self, param, kwargs.pop(param))
+
         self.driver = Driver(**kwargs)
         self.fdll = self.driver.fdll
         # device_id is an optional serial number of the requested device.
@@ -98,21 +122,14 @@ class Device(object):
         # to 9600, which certainly seems to be a de-facto
         # standard for serial devices.
         self._baudrate = 9600
-        # defining softspace allows us to 'print' to this device
-        self.softspace = 0
-        # chunk_size (if not 0) chunks the reads and writes
-        # to allow interruption
-        self.chunk_size = chunk_size
         # interface can be set for devices which have multiple interface
         # ports (e.g. FT4232, FT2232)
         self.interface_select = interface_select
         # device_index is an optional integer index of device to choose
         self.device_index = device_index
-        # auto_detach is a flag to call libusb_set_auto_detach_kernel_driver
-        # when we open the device
-        self.auto_detach = auto_detach
+
         # lazy_open tells us not to open immediately.
-        if not lazy_open:
+        if not self.lazy_open:
             self.open()
 
     def __del__(self):
