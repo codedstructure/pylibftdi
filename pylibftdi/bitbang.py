@@ -27,9 +27,11 @@ class BitBangDevice(Device):
     reading and writing - if set, the FIFOs are ignored (read) or
     cleared (write) so operations will appear synchronous
 
-    Adds two read/write properties to the base class:
+    Adds three read/write properties to the base class:
      direction: 8 bit input(0)/output(1) direction control.
      port: 8 bit IO port, as defined by direction.
+     latch: 8 bit output value, allowing e.g. `bb.latch += 1` to make sense
+            when there is a mix of input and output lines
     """
     def __init__(self,
                  device_id=None,

@@ -20,9 +20,10 @@ if sys.version_info < (2, 7):
         import unittest2 as unittest
     except ImportError:
         raise SystemExit("The test functionality is only supported in"
-                "Python 2.7+ unless unittest2 is installed")
+                         "Python 2.7+ unless unittest2 is installed")
 else:
     import unittest  # NOQA
+
 
 class SimpleMock(object):
     """
@@ -68,18 +69,24 @@ class CallCheckMixin(object):
         self.assertEqual(call_list, CallLog.get())
 
 
+import pylibftdi.driver
+
+
 # monkey patch the Driver class to be the mock thing above.
 class MockDriver(object):
     def __init__(self, *o, **k):
         self.fdll = SimpleMock()
 
+    def libftdi_version(self):
+        return pylibftdi.driver.libftdi_version(1, 2, 3, 0, 0)
 
-import pylibftdi.driver
+
 # importing this _does_ things...
 pylibftdi.driver.Driver = MockDriver
 pylibftdi.device.Driver = MockDriver
 
 from pylibftdi.device import Device
+
 
 class LoopDevice(Device):
     """
