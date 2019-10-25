@@ -1,6 +1,13 @@
 pylibftdi changes
 =================
 
+0.18.0
+~~~~~~
+* fixed - memory leak in list_devices() (Bitbucket issue #34)
+* changed - examples now assume / require Python3 (Bitbucket issue #35)
+* new - more helpful platform-dependent error messages
+* added - __main__.py module to support `python -im pylibftdi`
+
 0.17.0
 ~~~~~~
 * new - added 0x6015 USB PID to the default PID list, supporting FT230 devices

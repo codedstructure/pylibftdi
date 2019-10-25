@@ -9,6 +9,7 @@ pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
 """
 
 import os
+import sys
 import codecs
 import functools
 import itertools
@@ -22,6 +23,33 @@ from pylibftdi.driver import (
     FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
     FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
 
+
+ERR_HELP_NOT_FOUND_FAIL = """
+No device matching the given specification could be found.
+Try running `python -m pylibftdi.examples.list_devices` to
+see if the device is listed.
+"""
+
+ERR_HELP_LINUX_OPEN_FAIL = """
+Could not access the FTDI device - this could be a permissions
+issue accessing the device.
+
+If the program works when run with root privileges (i.e. sudo)
+this is likely to be the issue. Running as a normal user should
+be possible by setting appropriate udev rules on the device.
+"""
+
+ERR_HELP_LINUX_CLAIM_FAIL = """
+Could not claim the FTDI USB device - either the device is
+already open, or another driver (e.g. `ftdi_sio`) is preventing
+libftdi from claiming the device.
+
+The Linux `ftdi_sio` driver is often the culprit here, and may be
+unloaded with `sudo rmmod ftdi_sio`. However in recent libftdi
+versions this should not be necessary, as a driver option to
+switch out the driver temporarily is applied (unless
+`auto_detach=False` is given in `Device` instantiation).
+"""
 
 # The only part of the ftdi context we need at this point is
 # libusb_device_handle, so we don't encode the entire structure.
@@ -166,7 +194,7 @@ class Device(object):
         res = self._open_device()
 
         if res != 0:
-            msg = "%s (%d)" % (self.get_error_string(), res)
+            msg = self.handle_open_error(res)
             # free the context
             self.fdll.ftdi_deinit(byref(self.ctx))
             del self.ctx
@@ -190,6 +218,20 @@ class Device(object):
         # drivers can set a different - e.g. 1ms - value)
         self.ftdi_fn.ftdi_set_latency_timer(16)
         self._opened = True
+
+    def handle_open_error(self, errcode):
+        """
+        return a (hopefully helpful) error message on a failed open()
+        """
+        help = ''
+        if errcode == -3:
+            help = ERR_HELP_NOT_FOUND_FAIL
+        elif errcode == -4 and sys.platform == 'linux':
+            help = ERR_HELP_LINUX_OPEN_FAIL
+        elif errcode == -5 and sys.platform == 'linux':
+            help = ERR_HELP_LINUX_CLAIM_FAIL
+        msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, help)
+        return msg
 
     def _open_device(self):
         """

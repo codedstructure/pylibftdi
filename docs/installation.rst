@@ -87,16 +87,26 @@ needing root permissions:
      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP="dialout", MODE="0660"
 
 Some FTDI devices may use other USB PIDs. You could try removing the match on
-`idProduct` altogether, just matching on the FTDI vendor ID. Or Use `lsusb` or
-similar to determine the exact values to use (or try checking `dmesg` output on
-device insertion / removal). ``udevadm monitor --environment`` is also helpful,
-but note that the environment 'keys' it gives are different to the attributes
-(filenames within /sys/devices/...) which the ATTRS will match.  Perhaps ENV{}
-matches work just as well, though I've only tried matching on ATTRS.
+`idProduct` altogether, just matching on the FTDI vendor ID as follows::
+
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", GROUP="dialout", MODE="0660"
+
+Or use `lsusb` or similar to determine the exact values to use (or try checking
+`dmesg` output on device insertion / removal).
+``udevadm monitor --environment`` is also helpful, but note that the environment
+'keys' it gives are different to the attributes (filenames within /sys/devices/...)
+which the ATTRS will match.  Perhaps ENV{} matches work just as well, though I've
+only tried matching on ATTRS.
 
 Note that changed udev rules files will be picked up automatically by the udev
 daemon, but will only be acted upon on device actions, so unplug/plug in the
 device to check whether you're latest rules iteration actually works :-)
+
+Also note that the udev rules above assume that your user is in the 'dialout'
+group - if not, add it to your user with the following, though note that this
+will not apply immediately, not a full reboot may be needed on some systems::
+
+   sudo usermod -aG dialout $USER
 
 See http://wiki.debian.org/udev for more on writing udev rules.
 
@@ -135,6 +145,6 @@ with Ctrl-C. Likely errors at this point are either permissions problems
 (e.g. udev rules not working), or not finding the device at all - although
 the earlier stage is likely to have failed if this were the case.
 
-Feel free to contact me (@codedstructure) if you have any issues with
+Feel free to contact me (@codedstructure on Twitter) if you have any issues with
 installation, though be aware I don't have much in the way of Windows systems
 to test.
