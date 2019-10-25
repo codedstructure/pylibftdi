@@ -26,8 +26,11 @@ from pylibftdi.driver import (
 
 ERR_HELP_NOT_FOUND_FAIL = """
 No device matching the given specification could be found.
-Try running `python -m pylibftdi.examples.list_devices` to
-see if the device is listed.
+Is the device connected?
+
+Try running the following command to see if the device is listed:
+
+    python -m pylibftdi.examples.list_devices
 """
 
 ERR_HELP_LINUX_OPEN_FAIL = """
@@ -39,17 +42,35 @@ this is likely to be the issue. Running as a normal user should
 be possible by setting appropriate udev rules on the device.
 """
 
-ERR_HELP_LINUX_CLAIM_FAIL = """
+ERR_HELP_CLAIM_FAIL = """
 Could not claim the FTDI USB device - either the device is
-already open, or another driver (e.g. `ftdi_sio`) is preventing
-libftdi from claiming the device.
+already open, or another driver is preventing libftdi from
+claiming the device.
+"""
 
+ERR_HELP_LINUX_CLAIM_FAIL = ERR_HELP_CLAIM_FAIL + """
 The Linux `ftdi_sio` driver is often the culprit here, and may be
 unloaded with `sudo rmmod ftdi_sio`. However in recent libftdi
 versions this should not be necessary, as a driver option to
 switch out the driver temporarily is applied (unless
 `auto_detach=False` is given in `Device` instantiation).
 """
+
+ERR_HELP_MACOS_CLAIM_FAIL = ERR_HELP_CLAIM_FAIL + """
+The following commands may be attempted in the terminal to unload
+the builtin drivers:
+
+    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
+    sudo kextunload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
+
+Reload these with the command 'kextload' replacing 'kextunload' above.
+
+Note the second of these will only be present if the FTDI-provided
+driver has been installed from their website:
+
+    https://www.ftdichip.com/Drivers/VCP.htm
+"""
+
 
 # The only part of the ftdi context we need at this point is
 # libusb_device_handle, so we don't encode the entire structure.
@@ -228,8 +249,13 @@ class Device(object):
             help = ERR_HELP_NOT_FOUND_FAIL
         elif errcode == -4 and sys.platform == 'linux':
             help = ERR_HELP_LINUX_OPEN_FAIL
-        elif errcode == -5 and sys.platform == 'linux':
-            help = ERR_HELP_LINUX_CLAIM_FAIL
+        elif errcode == -5:
+            if sys.platform == 'linux':
+                help = ERR_HELP_LINUX_CLAIM_FAIL
+            elif sys.platform == 'darwin':
+                help = ERR_HELP_MACOS_CLAIM_FAIL
+            else:
+                help = ERR_HELP_CLAIM_FAIL
         msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, help)
         return msg
 
