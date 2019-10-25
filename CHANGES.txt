@@ -4,9 +4,13 @@ pylibftdi changes
 0.18.0
 ~~~~~~
 * fixed - memory leak in list_devices() (Bitbucket issue #34)
-* changed - examples now assume / require Python3 (Bitbucket issue #35)
+* changed - examples now written for (and require) Python3 (Bitbucket issue #35)
 * new - more helpful platform-dependent error messages
 * added - __main__.py module to support `python -im pylibftdi`
+* added - `index` parameter to Device() constructor to allow indexing
+  into the list returned from Driver.list_devices(). Useful to access
+  e.g. the second device where PID differs between the first two devices
+  and device_index would reset to zero for each PID/VID combination.
 
 0.17.0
 ~~~~~~

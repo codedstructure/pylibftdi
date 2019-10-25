@@ -142,6 +142,11 @@ class Device(object):
 
         :param auto_detach: default True, whether to automatically re-attach
             the kernel driver on device close.
+
+        :param index: optional index into list_devices() to open.
+            Useful in the event that multiple devices of differing VID/PID
+            are attached, where `device_index` is insufficient to select
+            as device indexing restarts at 0 for each VID/PID combination.
         """
         self._opened = False
 
@@ -176,6 +181,9 @@ class Device(object):
         self.interface_select = interface_select
         # device_index is an optional integer index of device to choose
         self.device_index = device_index
+        # list_index (from parameter `index`) is an optional integer index
+        # into list_devices() entries.
+        self.list_index = kwargs.pop('index', None)
 
         # lazy_open tells us not to open immediately.
         if not self.lazy_open:
@@ -193,7 +201,24 @@ class Device(object):
         if self._opened:
             return
 
+        if not self.device_id and self.list_index is not None:
+            # Use serial number from list_index
+            dev_list = self.driver.list_devices()
+            try:
+                # The third (index 2) field is serial number.
+                self.device_id = dev_list[self.list_index][2]
+            except IndexError:
+                raise FtdiError("index provided not in range of list_devices() entries")
+
         # create context for this device
+        # Note I gave up on attempts to use ftdi_new/ftdi_free (just using
+        # ctx instead of byref(ctx) in first param of most ftdi_* functions) as
+        # (at least for 64-bit) they only worked if argtypes was declared
+        # (c_void_p for ctx), and that's too much like hard work to maintain.
+        # So I've reverted to using create_string_buffer for memory management,
+        # byref(ctx) to pass in the context instance, and ftdi_init() /
+        # ftdi_deinit() pair to manage the driver resources. It's very nice
+        # how layered the libftdi code is, with access to each layer.
         self.ctx = create_string_buffer(1024)
         res = self.fdll.ftdi_init(byref(self.ctx))
         if res != 0:
@@ -244,19 +269,19 @@ class Device(object):
         """
         return a (hopefully helpful) error message on a failed open()
         """
-        help = ''
+        err_help = ''
         if errcode == -3:
-            help = ERR_HELP_NOT_FOUND_FAIL
+            err_help = ERR_HELP_NOT_FOUND_FAIL
         elif errcode == -4 and sys.platform == 'linux':
-            help = ERR_HELP_LINUX_OPEN_FAIL
+            err_help = ERR_HELP_LINUX_OPEN_FAIL
         elif errcode == -5:
             if sys.platform == 'linux':
-                help = ERR_HELP_LINUX_CLAIM_FAIL
+                err_help = ERR_HELP_LINUX_CLAIM_FAIL
             elif sys.platform == 'darwin':
-                help = ERR_HELP_MACOS_CLAIM_FAIL
+                err_help = ERR_HELP_MACOS_CLAIM_FAIL
             else:
-                help = ERR_HELP_CLAIM_FAIL
-        msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, help)
+                err_help = ERR_HELP_CLAIM_FAIL
+        msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, err_help)
         return msg
 
     def _open_device(self):

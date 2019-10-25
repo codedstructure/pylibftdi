@@ -43,17 +43,10 @@ class ftdi_version_info(Structure):
                 ('version_str', c_char_p),
                 ('snapshot_str', c_char_p)]
 
+
 libftdi_version = namedtuple('libftdi_version',
                              'major minor micro version_str snapshot_str')
 
-# Note I gave up on attempts to use ftdi_new/ftdi_free (just using
-# ctx instead of byref(ctx) in first param of most ftdi_* functions) as
-# (at least for 64-bit) they only worked if argtypes was declared
-# (c_void_p for ctx), and that's too much like hard work to maintain.
-# So I've reverted to using create_string_buffer for memory management,
-# byref(ctx) to pass in the context instance, and ftdi_init() /
-# ftdi_deinit() pair to manage the driver resources. It's very nice
-# how layered the libftdi code is, with access to each layer.
 
 # These constants determine what type of flush operation to perform
 FLUSH_BOTH = 1
@@ -84,7 +77,7 @@ class Driver(object):
         'libusb': ('usb-1.0', 'libusb-1.0')
     }
 
-    def __init__(self, libftdi_search=None):
+    def __init__(self, libftdi_search=None, **kwargs):
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
@@ -212,6 +205,10 @@ class Driver(object):
             msg = self.fdll.ftdi_get_error_string(byref(ctx))
             raise FtdiError(msg)
 
+        def _s(s):
+            "From c_char_p / str you shall be / in Python2 or 3"
+            return str(s.decode())
+
         try:
             for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
                 res = self.fdll.ftdi_usb_find_all(byref(ctx),
@@ -238,7 +235,9 @@ class Driver(object):
                                 err_msg = self.fdll.ftdi_get_error_string(byref(ctx))
                                 msg = "%s (%d)" % (err_msg, res)
                                 raise FtdiError(msg)
-                            devices.append((manuf.value, desc.value, serial.value))
+                            devices.append((_s(manuf.value),
+                                            _s(desc.value),
+                                            _s(serial.value)))
                             # step to next in linked-list
                             dev_list_ptr = cast(dev_list_ptr.contents.next,
                                                 devlistptrtype)
