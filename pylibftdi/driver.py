@@ -224,7 +224,7 @@ class Driver(object):
                     raise FtdiError(msg)
                 elif res > 0:
                     # take a copy of the dev_list for subsequent list_free
-                    dev_list_base = pointer(dev_list_ptr.contents)
+                    dev_list_base = byref(dev_list_ptr)
                     # traverse the linked list...
                     try:
                         while dev_list_ptr:
