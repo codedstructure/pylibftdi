@@ -12,9 +12,9 @@ import sys
 import threading
 import time
 import webbrowser
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from cStringIO import StringIO
-from SocketServer import ThreadingMixIn
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from io import BytesIO
+from socketserver import ThreadingMixIn
 from pylibftdi import BitBangDevice
 
 HTTP_PORT = 8008
@@ -64,9 +64,9 @@ class ReqHandler(BaseHTTPRequestHandler):
             f.close()
 
     def do_POST(self):
-        length = self.headers.getheader('content-length')
+        length = self.headers['content-length']
         nbytes = int(length)
-        query = self.rfile.read(nbytes)
+        query = self.rfile.read(nbytes).decode()
         # this is lazy and fragile - assumes only a single
         # query parameter XXX
         if query.startswith('bit'):
@@ -83,8 +83,8 @@ class ReqHandler(BaseHTTPRequestHandler):
             f.close()
 
     def send_head(self):
-        f = StringIO()
-        f.write(get_page())
+        f = BytesIO()
+        f.write(get_page().encode())
         length = f.tell()
         f.seek(0)
         self.send_response(200)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     try:
         HTTP_PORT = int(sys.argv[1])
-    except TypeError:
+    except (ValueError, TypeError):
         print("Usage: FtdiWebServer [portnumber]")
     except IndexError:
         pass
@@ -112,6 +112,7 @@ if __name__ == '__main__':
     t = threading.Thread(target=runserver, args=(HTTP_PORT,))
     t.setDaemon(True)
     t.start()
+    print("Webserver running on localhost port %d" % HTTP_PORT)
     time.sleep(0.5)
     retry = 10
     while retry:
@@ -126,6 +127,6 @@ if __name__ == '__main__':
     # wait for Ctrl-C
     try:
         while 1:
-            time.sleep(1)
+            time.sleep(100)
     except KeyboardInterrupt:
         pass

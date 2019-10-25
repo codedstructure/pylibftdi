@@ -13,7 +13,7 @@ from collections import namedtuple
 
 # be disciplined so pyflakes can check us...
 from ctypes import (cdll, byref, c_int, c_char_p, c_void_p, c_uint16, cast,
-                    create_string_buffer, Structure, pointer, POINTER)
+                    create_string_buffer, Structure, POINTER)
 from ctypes.util import find_library
 
 from pylibftdi._base import FtdiError, LibraryMissingError

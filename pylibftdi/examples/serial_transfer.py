@@ -35,7 +35,7 @@ import hashlib
 import threading
 from itertools import islice
 
-from pylibftdi import Device, ReadTimeout
+from pylibftdi import Device, FtdiError
 
 
 class RandomStream(object):
@@ -126,17 +126,17 @@ class HalfDuplexTransfer(object):
         self.wait_signal.set()
 
         # if we've just finished reading when self.done get's set by the
-        # writeri, we won't get the 'last' packet. But if we assume there's
+        # writer, we won't get the 'last' packet. But if we assume there's
         # always one more after done gets set, we'll get some ReadTimeouts....
         # Probably best to try one more time but catch & ignore ReadTimeout.
         while not self.done:
-            data = self.dest.read(1024, timeout=1)
+            data = self.dest.read(1024)
             self.target.append(data)
 
         try:
-            data = self.dest.read(1024, timeout=1)
+            data = self.dest.read(1024)
             self.target.append(data)
-        except ReadTimeout:
+        except FtdiError:
             pass
 
     def writer(self):
