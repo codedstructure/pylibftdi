@@ -28,7 +28,7 @@ class Bus(object):
         self.width = width
         self._mask = ((1 << width) - 1)
 
-    def __get__(self, obj, type):
+    def __get__(self, obj, type_):
         val = obj.device.port
         return (val >> self.offset) & self._mask
 

@@ -1,1 +1,1 @@
-"pylibftdi examples"
+"""pylibftdi examples"""

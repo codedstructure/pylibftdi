@@ -190,7 +190,7 @@ class Device(object):
             self.open()
 
     def __del__(self):
-        "free the ftdi_context resource"
+        """free the ftdi_context resource"""
         if self._opened:
             self.close()
 
@@ -315,7 +315,7 @@ class Device(object):
         return res
 
     def close(self):
-        "close our connection, free resources"
+        """close our connection, free resources"""
         if self._opened:
             self.fdll.ftdi_usb_close(byref(self.ctx))
             self.fdll.ftdi_deinit(byref(self.ctx))
@@ -518,7 +518,7 @@ class Device(object):
         return self
 
     def __exit__(self, exc_type, exc_val, tb):
-        "support for context manager"
+        """support for context manager"""
         self.close()
 
     #
@@ -546,7 +546,7 @@ class Device(object):
         line_buffer = []
         while True:
             next_char = self.read(1)
-            if next_char == '' or (size > 0 and len(line_buffer) > size):
+            if next_char == '' or (0 < size < len(line_buffer)):
                 break
             line_buffer.append(next_char)
             if (len(line_buffer) >= lsl and

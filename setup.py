@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import sys
-
 try:
     # this is primarily to support the 'develop' target
     # if setuptools/distribute are installed
@@ -28,8 +26,6 @@ setup_args = dict(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.2",
-        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
@@ -40,10 +36,5 @@ setup_args = dict(
         "Topic :: System :: Hardware"
     ]
 )
-
-if sys.platform == 'darwin':
-    # only install the OS X scripts if we're on a Mac
-    setup_args['scripts'] = ["scripts/ftdi_osx_driver_reload",
-                             "scripts/ftdi_osx_driver_unload"]
 
 setup(**setup_args)

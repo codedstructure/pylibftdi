@@ -1,22 +1,25 @@
 Installation
 ============
 
-Unsurprisingly, `pylibftdi` depends on `libftdi`, and installing this varies
+Unsurprisingly, ``pylibftdi`` depends on ``libftdi``, and installing this varies
 according to your operating system. Chances are that following one of the
 following instructions will install the required prerequisites. If not, be
-aware that libftdi in turn relies on `libusb`.
+aware that libftdi in turn relies on ``libusb``.
 
-Installing pylibftdi itself is straightforward - it is a pure Python package
-(using `ctypes` for bindings), and has no dependencies outside the Python
+Installing ``pylibftdi`` itself is straightforward - it is a pure Python package
+(using ``ctypes`` for bindings), and has no dependencies outside the Python
 standard library for installation. Don't expect it to work happily without
-`libftdi` installed though :-)
+``libftdi`` installed though :-)
 
 ::
 
     $ pip install pylibftdi
 
-Depending on your environment, you may want to use either the ``--user`` flag,
-or prefix the command with ``sudo`` to gain root privileges.
+Depending on your environment, you may want to set up a `virtual environment`_
+or use either the ``--user`` flag, or prefix the command with ``sudo`` to
+gain root privileges.
+
+.. _virtual environment: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
 Windows
 -------
@@ -70,10 +73,10 @@ Debian (Raspberry Pi) / Ubuntu etc
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On Debian like systems (including Ubuntu, Mint, Debian, etc), the package
-`libftdi-dev` should give you what you need as far as the libftdi library
+``libftdi1-dev`` should give you what you need as far as the libftdi library
 is concerned::
 
-    $ sudo apt-get install libftdi-dev
+    $ sudo apt-get install libftdi1-dev
 
 The following works for both a Raspberry Pi (Debian Wheezy) and Ubuntu 12.04,
 getting ordinary users (e.g. 'pi' on the RPi) access to the FTDI device without
@@ -84,15 +87,19 @@ needing root permissions:
 2. Put the following in the file::
 
      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="dialout", MODE="0660"
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", GROUP="dialout", MODE="0660"
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", GROUP="dialout", MODE="0660"
      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP="dialout", MODE="0660"
+     SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", GROUP="dialout", MODE="0660"
 
-Some FTDI devices may use other USB PIDs. You could try removing the match on
-`idProduct` altogether, just matching on the FTDI vendor ID as follows::
+The list of USB product IDs above matches the default used by ``pylibftdi``, but
+some FTDI devices may use other USB PIDs. You could try removing the match on
+``idProduct`` altogether, just matching on the FTDI vendor ID as follows::
 
      SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", GROUP="dialout", MODE="0660"
 
-Or use `lsusb` or similar to determine the exact values to use (or try checking
-`dmesg` output on device insertion / removal).
+Or use ``lsusb`` or similar to determine the exact values to use (or try checking
+``dmesg`` output on device insertion / removal).
 ``udevadm monitor --environment`` is also helpful, but note that the environment
 'keys' it gives are different to the attributes (filenames within /sys/devices/...)
 which the ATTRS will match.  Perhaps ENV{} matches work just as well, though I've
@@ -113,7 +120,7 @@ See http://wiki.debian.org/udev for more on writing udev rules.
 Arch Linux
 ~~~~~~~~~~
 
-The `libftdi` package (sensibly enough) provides the `libftdi` library::
+The ``libftdi`` package (sensibly enough) provides the ``libftdi`` library::
 
     $ sudo pacman -S libftdi
 
@@ -122,23 +129,24 @@ Similar udev rules to those above for Debian should be included (again in
 should be changed to set the group to 'users'::
 
    SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="users", MODE="0660"
-   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", GROUP="users", MODE="0660"
+   SUBSYSTEMS=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", GROUP="users", MODE="0660"
+   (etc...)
 
 Testing installation
 --------------------
 
 Connect your device, and run the following (as a regular user)::
 
-    $ python -m pylibftdi.examples.list_devices
+    $ python3 -m pylibftdi.examples.list_devices
 
 If all goes well, the program should report information about each connected
 device. If no information is printed, but it is when run with ``sudo``, a
 possibility is permissions problems - see the section under Linux above
-regarding udev rules.
+regarding ``udev`` rules.
 
 If the above works correctly, then try the following::
 
-    $ python -m pylibftdi.examples.led_flash
+    $ python3 -m pylibftdi.examples.led_flash
 
 Even without any LED connected, this should 'work' without any error - quit
 with Ctrl-C. Likely errors at this point are either permissions problems

@@ -11,6 +11,9 @@ pylibftdi changes
   into the list returned from Driver.list_devices(). Useful to access
   e.g. the second device where PID differs between the first two devices
   and device_index would reset to zero for each PID/VID combination.
+* Removed the ftdi_osx_driver_reload/unload scripts. These complicated cross-
+  platform packaging and error messages / docs have been updated to include
+  appropriate instructions.
 
 0.17.0
 ~~~~~~

@@ -14,18 +14,41 @@ This indicates a conflict with FTDI's own drivers, and is (as far as I know)
 mainly a problem on Mac OS X, where they can be disabled (until reboot) by
 unloading the appropriate kernel module.
 
-OS X Mavericks, Yosemite and later
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MacOS (Mavericks and later)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Starting with OS X Mavericks, OS X includes kernel drivers which will reserve
-the FTDI device by default. This needs unloading before `libftdi` will be able
+the FTDI device by default. In addition, the FTDI-provided VCP driver will
+claim the device by default. These need unloading before `libftdi` will be able`
 to communicate with the device::
 
     sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
+    sudo kextunload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
 
-Similarly to reload it::
+Similarly to reload them::
 
     sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
+    sudo kextload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
+
+Earlier versions of ``pylibftdi`` (prior to 0.18.0) included scripts for
+MacOS which unloaded / reloaded these drivers, but these complicated cross-platform
+packaging so have been removed. If you are on using MacOS with programs which
+need these drivers on a frequent basis (such as the Arduino IDE when using
+older FTDI-based Arduino boards), consider implementing these yourself, along the
+lines of the following (which assumes ~/bin is in your path)::
+
+    cat << EOF > /usr/local/bin/ftdi_osx_driver_unload
+    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
+    sudo kextunload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
+    EOF
+
+    cat << EOF > /usr/local/bin/ftdi_osx_driver_reload
+    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
+    sudo kextload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
+    EOF
+
+    chmod +x /usr/local/bin/ftdi_osx_driver_*
+
 
 OS X Mountain Lion and earlier
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,13 +70,6 @@ could be permanently removed (to prevent the need to continually unload it),
 but this is dangerous::
 
     sudo rm /System/Library/Extensions/FTDIUSBSerialDriver.kext
-
-Scripts are installed to perform these actions which are installed with
-pylibftdi; run `ftdi_osx_driver_unload` to unload the kernel driver and
-`ftdi_osx_driver_reload` to reload it. These commands are useful when
-other programs require frequent access to FTDI devices; the Arduino IDE
-running with FTDI devices (note many newer Arduino models use native USB
-rather than FTDI interfaces).
 
 Diagnosis
 ---------
@@ -137,15 +153,16 @@ information is included, which will help in any diagnosis required.
 
 Run the following::
 
-    python -m pylibftdi.examples.info
+    python3 -m pylibftdi.examples.info
 
 this will output a range of information related to the versions of libftdi
 libusb in use, as well as the system platform and Python version, for example::
 
-	pylibftdi version     : 0.16.1
-	libftdi version       : libftdi_version(major=1, minor=3, micro=0, version_str=b'1.3', snapshot_str=b'unknown')
-	libftdi library name  : /usr/local/lib/libftdi1.dylib
-	libusb version        : libusb_version(major=1, minor=0, micro=21, nano=11156, rc=b'', describe=b'http://libusb.info')
-	libusb library name   : /usr/local/lib/libusb-1.0.dylib
-	Python version        : 3.6.2
-	OS platform           : Darwin-16.7.0-x86_64-i386-64bit
+    pylibftdi version     : 0.18.0
+    libftdi version       : libftdi_version(major=1, minor=4, micro=0, version_str=b'1.4', snapshot_str=b'unknown')
+    libftdi library name  : libftdi1.so.2
+    libusb version        : libusb_version(major=1, minor=0, micro=22, nano=11312, rc=b'', describe=b'http://libusb.info')
+    libusb library name   : libusb-1.0.so.0
+    Python version        : 3.7.3
+    OS platform           : Linux-5.0.0-32-generic-x86_64-with-Ubuntu-19.04-disco
+

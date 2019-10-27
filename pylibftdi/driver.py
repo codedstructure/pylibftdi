@@ -206,7 +206,7 @@ class Driver(object):
             raise FtdiError(msg)
 
         def _s(s):
-            "From c_char_p / str you shall be / in Python2 or 3"
+            """From c_char_p / str you shall be / in Python2 or 3"""
             return str(s.decode())
 
         try:

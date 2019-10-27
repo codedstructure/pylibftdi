@@ -108,5 +108,5 @@ class LoopDevice(Device):
         self.__buffer.extend(bytearray(data))
         return len(data)
 
-verbose = set(['-v', '--verbose']) & set(sys.argv)
+verbose = {'-v', '--verbose'} & set(sys.argv)
 logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)

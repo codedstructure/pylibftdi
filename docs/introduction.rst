@@ -92,7 +92,7 @@ Plans
 License
 -------
 
-Copyright (c) 2010-2015 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2019 Ben Bass <benbass@codedstructure.net>
 
 pylibftdi is released under the MIT licence; see the file "LICENSE.txt"
 for information.

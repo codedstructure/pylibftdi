@@ -12,7 +12,7 @@ to be attached.
 """
 
 from tests.test_common import (LoopDevice, CallCheckMixin, unittest)
-from pylibftdi.bitbang import BitBangDevice, ALL_OUTPUTS
+from pylibftdi.bitbang import BitBangDevice
 from pylibftdi import FtdiError
 
 

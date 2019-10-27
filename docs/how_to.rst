@@ -17,10 +17,10 @@ USB Vendor and Product IDs which pylibftdi checks for.
 To see the vendor / product IDs which are supported, run the following::
 
     >>> from pylibftdi import USB_VID_LIST, USB_PID_LIST
-    >>> print(map(hex, USB_VID_LIST))
-    ['0x403']
-    >>> print(map(hex, USB_PID_LIST))
-    ['0x6001', '0x6010', '0x6011', '0x6014']
+    >>> print(', '.join(hex(pid) for pid in USB_VID_LIST))
+    0x403
+    >>> print(', '.join(hex(pid) for pid in USB_PID_LIST))
+    0x6001, 0x6010, 0x6011, 0x6014, 0x6015
 
 If a FTDI device with a VID / PID not matching the above is required, then
 the device's values should be appended to the appropriate list after import::
@@ -251,13 +251,16 @@ To use / develop on that version, it must first be cloned locally, after
 which it can be 'installed'. Clone the repository to a local directory and
 install (with the 'develop' target ideally) as follows::
 
-    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
+    $ hg clone https://bitbucket.org/codedstructure/pylibftdi
     $ cd pylibftdi
-    $ python setup.py develop
+    $ python3 -m venv env
+    $ source env/bin/activate
+    (env) $ python3 setup.py develop
 
-If permission-related issues occur, then consider using the ``--user`` flag to
-setup.py to install for only the local user, or try prefixing the above command
-with ``sudo``.
+Note this also creates a virtual environment within the project directory;
+see here_
+
+.. _here: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
 Note for now there is only the master branch, so need to worry about which
 branch is required.
@@ -266,25 +269,24 @@ How do I run the tests?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Tests aren't included in the distutils distribution, so clone the
-repository and run from there. pylibftdi supports Python 2.6/2.7 as well
-as Python 3.2+, so these tests can be run for each Python version::
+repository and run from there. pylibftdi supports Python 2.7 as well
+as Python 3.4+, so these tests can be run for each Python version::
 
-    $ hg clone http://bitbucket.org/codedstructure/pylibftdi
+    $ hg clone https://bitbucket.org/codedstructure/pylibftdi
     <various output stuff>
     $ cd pylibftdi
     $ python2.7 -m unittest discover
-    ................
+    ..........................
     ----------------------------------------------------------------------
-    Ran 17 tests in 0.011s
+    Ran 26 tests in 0.006s
 
     OK
-    $ python3.3 -m unittest discover
-    ................
+    $ python3.7 -m unittest discover
+    ..........................
     ----------------------------------------------------------------------
-    Ran 17 tests in 0.015s
+    Ran 26 tests in 0.007s
 
     OK
-    $
 
 How can I determine and select the underlying libftdi library?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

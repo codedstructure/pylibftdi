@@ -13,7 +13,6 @@ to be attached.
 
 from tests.test_common import (LoopDevice, CallCheckMixin, unittest)
 from pylibftdi.serial_device import SerialDevice
-from pylibftdi import FtdiError
 
 
 class TestSerialDevice(SerialDevice, LoopDevice):

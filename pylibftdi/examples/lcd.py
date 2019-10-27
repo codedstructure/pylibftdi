@@ -33,7 +33,7 @@ class LCD(object):
         self.device = device
 
     def _trigger(self):
-        "generate a falling edge"
+        """generate a falling edge"""
         self.e = 1
         self.e = 0
 

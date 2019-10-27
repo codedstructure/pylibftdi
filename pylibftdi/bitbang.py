@@ -62,7 +62,7 @@ class BitBangDevice(Device):
             self.open()
 
     def open(self):
-        "open connection to a FTDI device"
+        """open connection to a FTDI device"""
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
         super(BitBangDevice, self).open()

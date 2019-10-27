@@ -58,3 +58,4 @@ As an example, consider an HD44780 LCD display. These have a data channel of eit
         data = Bus(0, 4)
         rs = Bus(6)
         e = Bus(7)
+
