@@ -25,7 +25,7 @@ Full duplex d1<=>d2...
   Checksum TX: 1a957192b8219aa02ad374dd518e37fd  RX: 1a957192b8219aa02ad374dd518e37fd
  SUCCESS
 
-Copyright (c) 2015-2017 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2015-2019 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
