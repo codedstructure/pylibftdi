@@ -9,4 +9,5 @@ docs/_build
 MANIFEST
 pylibftdi.egg-info
 .coverage
+htmlcov
 .git

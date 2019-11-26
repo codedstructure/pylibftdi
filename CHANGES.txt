@@ -27,6 +27,7 @@ pylibftdi changes
   `mode` may become keyword-only arguments in the future.
 
 0.16.1.2
+~~~~~~~~
 * rebuilt to fix install issue on macOS
 
 0.16.1.1
