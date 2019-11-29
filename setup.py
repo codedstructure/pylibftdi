@@ -9,7 +9,7 @@ except ImportError:
 
 setup_args = dict(
     name="pylibftdi",
-    version="0.18.0",
+    version="0.18.1",
     description="Pythonic interface to FTDI devices using libftdi",
     long_description=open('README.rst').read(),
     author="Ben Bass",

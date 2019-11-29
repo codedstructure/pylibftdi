@@ -1,6 +1,10 @@
 pylibftdi changes
 =================
 
+0.18.1
+~~~~~~
+* fixed - list_devices example was broken for Python3 following 0.18.0
+
 0.18.0
 ~~~~~~
 * fixed - memory leak in list_devices() (Bitbucket issue #34)
