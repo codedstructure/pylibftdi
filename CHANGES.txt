@@ -1,6 +1,12 @@
 pylibftdi changes
 =================
 
+0.19.0
+* Moved to GitHub (and git, obviously!) following deprecation of Mercurial
+  on bitbucket.org. No other changes beyond URL updates, docs pointing to
+  GitHub etc. Note that references to old bitbucket issues will stop being
+  helpful very soon, but there's not much I can do about this.
+
 0.18.1
 ~~~~~~
 * fixed - list_devices example was broken for Python3 following 0.18.0

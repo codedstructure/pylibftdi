@@ -2,7 +2,7 @@
 """
 test serial loopback; assumes Rx and Tx are connected
 
-Copyright (c) 2010-2019 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2020 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 

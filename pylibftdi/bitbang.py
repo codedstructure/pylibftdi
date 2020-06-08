@@ -4,7 +4,7 @@ pylibftdi - python wrapper for libftdi
 Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
-pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
 from pylibftdi.device import Device

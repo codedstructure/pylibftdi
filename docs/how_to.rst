@@ -246,12 +246,15 @@ Developing pylibftdi
 How do I checkout and use the latest development version?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-pylibftdi is currently developed with a Mercurial repository on bitbucket.
-To use / develop on that version, it must first be cloned locally, after
+`pylibftdi` is currently developed on GitHub, though started out as a Mercurial
+repository on bitbucket.org. There may still be references to old bitbucket issues
+in the docs.
+
+To use / develop on the latest version, it must first be cloned locally, after
 which it can be 'installed'. Clone the repository to a local directory and
 install (with the 'develop' target ideally) as follows::
 
-    $ hg clone https://bitbucket.org/codedstructure/pylibftdi
+    $ git clone https://github.com/codedstructure/pylibftdi
     $ cd pylibftdi
     $ python3 -m venv env
     $ source env/bin/activate
@@ -272,7 +275,7 @@ Tests aren't included in the distutils distribution, so clone the
 repository and run from there. pylibftdi supports Python 2.7 as well
 as Python 3.4+, so these tests can be run for each Python version::
 
-    $ hg clone https://bitbucket.org/codedstructure/pylibftdi
+    $ git clone https://github.com/codedstructure/pylibftdi
     <various output stuff>
     $ cd pylibftdi
     $ python2.7 -m unittest discover

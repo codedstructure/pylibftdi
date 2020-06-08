@@ -9,12 +9,12 @@ except ImportError:
 
 setup_args = dict(
     name="pylibftdi",
-    version="0.18.1",
+    version="0.19.0",
     description="Pythonic interface to FTDI devices using libftdi",
     long_description=open('README.rst').read(),
     author="Ben Bass",
     author_email="benbass@codedstructure.net",
-    url="http://bitbucket.org/codedstructure/pylibftdi",
+    url="https://github.com/codedstructure/pylibftdi",
     packages=["pylibftdi", "pylibftdi.examples"],
     classifiers=[
         "Development Status :: 4 - Beta",

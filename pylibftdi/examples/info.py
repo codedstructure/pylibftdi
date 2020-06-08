@@ -12,7 +12,7 @@ example usage::
     Python version        : 3.4.0
     OS platform           : Darwin-14.1.0-x86_64-i386-64bit
 
-Copyright (c) 2015-2019 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2015-2020 Ben Bass <benbass@codedstructure.net>
 """
 
 

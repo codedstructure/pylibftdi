@@ -1,10 +1,10 @@
 """
 pylibftdi.device - access to individual FTDI devices
 
-Copyright (c) 2010-2019 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2020 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
-pylibftdi: http://bitbucket.org/codedstructure/pylibftdi
+pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
 
