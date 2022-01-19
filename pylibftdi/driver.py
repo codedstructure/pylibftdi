@@ -156,6 +156,10 @@ class Driver(object):
             self._fdll.ftdi_usb_get_strings.argtypes = (
                 c_void_p, c_void_p,
                 c_char_p, c_int, c_char_p, c_int, c_char_p, c_int)
+            # library versions <1.0 don't provide ftdi_get_library_version, so
+            # we need to check for it before setting the restype.
+            if hasattr(self._fdll, 'ftdi_get_library_version'):
+                self._fdll.ftdi_get_library_version.restype = ftdi_version_info
         return self._fdll
     _fdll = None
 
@@ -165,8 +169,7 @@ class Driver(object):
         :rtype: tuple (major, minor, micro, version_string, snapshot_string)
         """
         if hasattr(self.fdll, 'ftdi_get_library_version'):
-            version = ftdi_version_info()
-            self.fdll.ftdi_get_library_version(byref(version))
+            version = self.fdll.ftdi_get_library_version()
             return libftdi_version(version.major, version.minor, version.micro,
                                    version.version_str, version.snapshot_str)
         else:
