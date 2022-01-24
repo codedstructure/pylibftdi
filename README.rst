@@ -7,7 +7,7 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 
 :Features:
 
- - Supports Python 2 and Python 3
+ - No dependencies beyond standard library and a `libftdi` install.
  - Supports parallel and serial devices
  - Support for multiple devices
  - File-like interface wherever appropriate
@@ -92,7 +92,7 @@ Plans
 License
 -------
 
-Copyright (c) 2010-2020 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2022 Ben Bass <benbass@codedstructure.net>
 
 pylibftdi is released under the MIT licence; see the file "LICENSE.txt"
 for information.

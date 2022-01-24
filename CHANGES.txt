@@ -1,7 +1,16 @@
 pylibftdi changes
 =================
 
+0.20.0
+------
+* Removed claims of Python2 support, added warnings that Python2 support
+  will be removed in future releases.
+  NOTE: Future releases will require Python 3.6 or later.
+* Fix to `ftdi_get_library_version`, broken on M1 Macs. See Github issue #2.
+  Thanks to @wrigby for diagnosing and fixing this.
+
 0.19.0
+------
 * Moved to GitHub (and git, obviously!) following deprecation of Mercurial
   on bitbucket.org. No other changes beyond URL updates, docs pointing to
   GitHub etc. Note that references to old bitbucket issues will stop being

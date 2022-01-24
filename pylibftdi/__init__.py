@@ -13,7 +13,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.18.0"
+__VERSION__ = "0.20.0"
 __AUTHOR__ = "Ben Bass"
 
 
@@ -23,6 +23,17 @@ __ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus',
            'USB_VID_LIST', 'USB_PID_LIST']
 
 from pylibftdi import _base, driver, device, util, bitbang, serial_device
+
+import sys
+if sys.version_info < (3, 6, 0):
+    import warnings
+
+    if sys.version_info.major < 3:
+        warnings.warn("""Python 2 has been end-of-life since 2020,
+and future releases of pylibftdi will require at least Python 3.6""")
+    else:
+        warnings.warn("Python version < 3.6.0: untested; expect issues.")
+
 
 # Bring them in to package scope so we can treat pylibftdi
 # as a module if we want.

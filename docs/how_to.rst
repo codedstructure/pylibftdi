@@ -272,19 +272,12 @@ How do I run the tests?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Tests aren't included in the distutils distribution, so clone the
-repository and run from there. pylibftdi supports Python 2.7 as well
-as Python 3.4+, so these tests can be run for each Python version::
+repository and run from there. pylibftdi supports Python 3.6+::
 
     $ git clone https://github.com/codedstructure/pylibftdi
     <various output stuff>
     $ cd pylibftdi
-    $ python2.7 -m unittest discover
-    ..........................
-    ----------------------------------------------------------------------
-    Ran 26 tests in 0.006s
-
-    OK
-    $ python3.7 -m unittest discover
+    $ python3.6 -m unittest discover
     ..........................
     ----------------------------------------------------------------------
     Ran 26 tests in 0.007s

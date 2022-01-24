@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/env python3 -u
 """
 test serial loopback; assumes Rx and Tx are connected
 
