@@ -559,13 +559,15 @@ class Device(object):
                 break
         return ''.join(line_buffer)
 
-    def readlines(self, sizehint: Optional[int]=None) -> list[str|bytes]:
+    def readlines(self, sizehint: Optional[int]=None) -> list[str]:
         """
         readlines() for file-like compatibility.
         """
-        lines: list[str|bytes] = []
+        lines: list[str] = []
         if sizehint is not None:
             string_blob = self.read(sizehint)
+            if isinstance(string_blob, bytes):
+                string_blob = self.decoder.decode(string_blob)
             lines.extend(string_blob.splitlines())
 
         while True:
