@@ -77,7 +77,7 @@ class Driver(object):
         'libusb': ('usb-1.0', 'libusb-1.0')
     }
 
-    def __init__(self, libftdi_search=None, **kwargs):
+    def __init__(self, libftdi_search=None, **kwargs) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
@@ -163,7 +163,7 @@ class Driver(object):
         return self._fdll
     _fdll = None
 
-    def libftdi_version(self):
+    def libftdi_version(self) -> libftdi_version:
         """
         :return: the version of the underlying library being used
         :rtype: tuple (major, minor, micro, version_string, snapshot_string)
@@ -178,7 +178,7 @@ class Driver(object):
                                    '< 1.0 - no ftdi_get_library_version()',
                                    'unknown')
 
-    def list_devices(self):
+    def list_devices(self) -> list[tuple]:
         """
         :return: (manufacturer, description, serial#) for each attached
             device, e.g.:
