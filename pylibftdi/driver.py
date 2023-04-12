@@ -10,6 +10,7 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 
 import itertools
 from collections import namedtuple
+from typing import Any, Optional
 
 # be disciplined so pyflakes can check us...
 from ctypes import (cdll, byref, c_int, c_char_p, c_void_p, c_uint16, cast,
@@ -72,36 +73,43 @@ class Driver(object):
     """
 
     # prefer libftdi1 if available. Windows uses 'lib' prefix.
-    _lib_search = {
-        'libftdi': ('ftdi1', 'libftdi1', 'ftdi', 'libftdi'),
-        'libusb': ('usb-1.0', 'libusb-1.0')
+    _lib_search: dict[str, list[str]] = {
+        'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
+        'libusb': ['usb-1.0', 'libusb-1.0']
     }
 
-    def __init__(self, libftdi_search=None, **kwargs) -> None:
+    def __init__(self, libftdi_search: Optional[str]=None, **kwargs: dict[str, Any]) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
         :type libftdi_search: string or sequence of strings
         """
         if libftdi_search is not None:
-            self._lib_search['libftdi'] = libftdi_search
+            self._lib_search['libftdi'] = list(libftdi_search)
 
-    def _load_library(self, name, search_list=None):
+        # Library handles.
+        self._fdll: Any = None
+        self._libusb_dll: Any = None
+
+    def _load_library(self, name: str, search_list: Optional[str]=None) -> Any:
         """
         find and load the requested library
 
         :param name: library name
-        :param search_list: sequence or string referring to library names
+        :param search_list: string referring to library names
             library names or paths can be given
         :return: a CDLL object referring to the requested library
         """
+        # If no search list is given, use the default.
+        if not isinstance(search_list, str):
+            raise TypeError(f'library search list must be a string, not {type(search_list)}')
         if search_list is None:
-            search_list = self._lib_search.get(name, ())
-        if isinstance(search_list, (str, bytes)):
-            search_list = (search_list,)
+            libraries = self._lib_search.get(name, "")
+        else:
+            libraries = [search_list]
 
         lib = None
-        for dll in search_list:
+        for dll in libraries:
             try:
                 # Windows in particular can have find_library
                 # not find things which work fine directly on
@@ -114,12 +122,11 @@ class Driver(object):
                     lib = getattr(cdll, lib_path)
                     break
         if lib is None:
-            raise LibraryMissingError('{} library not found (search: {})'.format(
-                name, search_list))
+            raise LibraryMissingError(f'{name} library not found (search: {str(search_list)})')
         return lib
 
     @property
-    def _libusb(self):
+    def _libusb(self): #type: ignore
         """
         ctypes DLL referencing the libusb library, if it exists
 
@@ -131,9 +138,9 @@ class Driver(object):
             self._libusb_dll.libusb_get_version.restype = POINTER(libusb_version_struct)
 
         return self._libusb_dll
-    _libusb_dll = None
 
-    def libusb_version(self):
+
+    def libusb_version(self) -> libusb_version:
         """
         :return: namedtuple containing version info on libusb
         """
@@ -142,7 +149,7 @@ class Driver(object):
                               ver.rc, ver.describe)
 
     @property
-    def fdll(self):
+    def fdll(self) -> Any:
         """
         ctypes DLL referencing the libftdi library
 
@@ -161,7 +168,7 @@ class Driver(object):
             if hasattr(self._fdll, 'ftdi_get_library_version'):
                 self._fdll.ftdi_get_library_version.restype = ftdi_version_info
         return self._fdll
-    _fdll = None
+    
 
     def libftdi_version(self) -> libftdi_version:
         """
@@ -178,7 +185,7 @@ class Driver(object):
                                    '< 1.0 - no ftdi_get_library_version()',
                                    'unknown')
 
-    def list_devices(self) -> list[tuple]:
+    def list_devices(self) -> list[tuple[str, str, str]]:
         """
         :return: (manufacturer, description, serial#) for each attached
             device, e.g.:
@@ -208,7 +215,7 @@ class Driver(object):
             msg = self.fdll.ftdi_get_error_string(byref(ctx))
             raise FtdiError(msg)
 
-        def _s(s):
+        def _s(s: bytes) -> str:
             """From c_char_p / str you shall be / in Python2 or 3"""
             return str(s.decode())
 
