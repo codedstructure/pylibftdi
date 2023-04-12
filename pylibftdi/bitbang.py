@@ -7,9 +7,10 @@ See LICENSE file for details and (absence of) warranty
 pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
-from pylibftdi.device import Device
 
-from pylibftdi.driver import FtdiError, BITMODE_BITBANG
+from pylibftdi._base import FtdiError
+from pylibftdi.device import Device
+from pylibftdi.driver import BITMODE_BITBANG
 from ctypes import c_ubyte, byref
 
 ALL_OUTPUTS = 0xFF
