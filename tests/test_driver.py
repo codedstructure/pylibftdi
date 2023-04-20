@@ -9,13 +9,24 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 This module contains some basic tests for Driver class.
 """
 
-import unittest
+from tests.test_common import unittest
 from pylibftdi.driver import Driver
 
 class DriverTest(unittest.TestCase):
     """
     Test to ensure the Driver class accepts the correct arguments. 
     """
+
+    def setUp(self):
+        """The default library names are stored in the Driver class as a
+        class variable. This method will run before each unit test to reset
+        the default library names. If other class variables are added to the
+        Driver class, they should also be added here.
+        """
+        Driver._lib_search = {
+            'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
+            'libusb': ['usb-1.0', 'libusb-1.0']
+        }
 
     def testNoneLibrary(self):
         """
