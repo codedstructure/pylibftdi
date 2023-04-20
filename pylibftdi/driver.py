@@ -110,9 +110,7 @@ class Driver(object):
         # If no search list is given, use the default library names stored in self._lib_search.
         if search_list is None:
             search_list = self._lib_search.get(name, [])
-        elif isinstance(search_list, list):
-            search_list = search_list
-        else:
+        elif not isinstance(search_list, list):
             raise TypeError(f'search_list type should be list[str], not {type(search_list)}')
 
         lib = None
