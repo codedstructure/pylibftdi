@@ -78,14 +78,19 @@ class Driver(object):
         'libusb': ['usb-1.0', 'libusb-1.0']
     }
 
-    def __init__(self, libftdi_search: Optional[str]=None, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, libftdi_search: Optional[str|list[str]]=None, **kwargs: dict[str, Any]) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
-        :type libftdi_search: string or sequence of strings
+        :type libftdi_search: string or a list of strings
         """
-        if libftdi_search is not None:
-            self._lib_search['libftdi'] = list(libftdi_search)
+        if isinstance(libftdi_search, str):
+            self._lib_search['libftdi'] = [libftdi_search]
+        elif isinstance(libftdi_search, list):
+            self._lib_search['libftdi'] = libftdi_search
+        elif libftdi_search is not None:
+            raise TypeError(f'libftdi_search type should be ' \
+                            f'Optional[str|list[str]], not {type(libftdi_search)}')
 
         # Library handles.
         self._fdll: Any = None
