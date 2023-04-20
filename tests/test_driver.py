@@ -17,25 +17,14 @@ class DriverTest(unittest.TestCase):
     Test to ensure the Driver class accepts the correct arguments. 
     """
 
-    def setUp(self):
-        """The default library names are stored in the Driver class as a
-        class variable. This method will run before each unit test to reset
-        the default library names. If other class variables are added to the
-        Driver class, they should also be added here.
-        """
-        Driver._lib_search = {
-            'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
-            'libusb': ['usb-1.0', 'libusb-1.0']
-        }
-
     def testNoneLibrary(self):
         """
         The Driver class can accept no library names passed in to
         the constructor. This uses the default libraries specified in the
         Driver class. This is the default and most typical behavior.
         """
-        driver1 = Driver(libftdi_search=None)
-        self.assertListEqual(driver1._lib_search['libftdi'], \
+        driver = Driver(libftdi_search=None)
+        self.assertListEqual(driver._lib_search['libftdi'], \
                         ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'])
 
     def testNoExplicitParameters(self):

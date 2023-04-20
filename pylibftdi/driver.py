@@ -72,18 +72,19 @@ class Driver(object):
     We load the libftdi library, and use it.
     """
 
-    # prefer libftdi1 if available. Windows uses 'lib' prefix.
-    _lib_search: dict[str, list[str]] = {
-        'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
-        'libusb': ['usb-1.0', 'libusb-1.0']
-    }
-
     def __init__(self, libftdi_search: Optional[str|list[str]]=None, **kwargs: dict[str, Any]) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
         :type libftdi_search: string or a list of strings
         """
+        # The default libraries if None is specified.
+        # Prefer libftdi1 if available. Windows uses 'lib' prefix.
+        self._lib_search = {
+            'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
+            'libusb': ['usb-1.0', 'libusb-1.0']
+        }
+
         if isinstance(libftdi_search, str):
             self._lib_search['libftdi'] = [libftdi_search]
         elif isinstance(libftdi_search, list):
