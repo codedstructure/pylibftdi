@@ -9,6 +9,7 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 This module contains some basic tests for Driver class.
 """
 
+from pylibftdi import LibraryMissingError
 from tests.test_common import unittest
 from pylibftdi.driver import Driver
 
@@ -65,6 +66,42 @@ class DriverTest(unittest.TestCase):
         driver = Driver(libftdi_search=['ftdi1', 'libftdi1'])
         self.assertListEqual(driver._lib_search['libftdi'], ['ftdi1', 'libftdi1'])
 
+    def testLoadLibrarySearchListEmpty(self):
+        """
+        If a Driver object calls _load_library where search_list is an empty
+        list, LibraryMissingError will be raised.
+        """
+        # Use the default library names.
+        driver = Driver(libftdi_search=None)
+        # Try and find the library names for libftdi.
+        with self.assertRaises(expected_exception=LibraryMissingError):
+            driver._load_library(name='libftdi', search_list=[])
+    
+    def testLoadLibraryMissingLibraryName(self):
+        """
+        If a Driver object calls _load_library with with a name not in the
+        default library names (Driver._lib_search), LibraryMissingError will
+        be raised.
+        """
+        driver = Driver(libftdi_search=None)
+        with self.assertRaises(expected_exception=LibraryMissingError):
+            driver._load_library(name='non-existent-library', search_list=None)
+
+    def testLoadLibrarySearchListNone(self):
+        """
+        If a Driver object calls _load_library with with a valid name (the key
+        exists in Driver._lib_search) and search_list is None, the proper
+        library will be returned.
+        """
+        driver = Driver(libftdi_search=None)
+        try:
+            # Assert that Driver can find both of the defaults.
+            libftdi = driver._load_library(name='libftdi', search_list=None)
+            libusb = driver._load_library(name='libusb', search_list=None)
+            self.assertIsNotNone(obj=libftdi, msg='libftdi library not found')
+            self.assertIsNotNone(obj=libusb, msg='libusb library not found')
+        except LibraryMissingError:
+            self.fail('LibraryMissingError raised for default library names.')
 
 if __name__ == "__main__":
     unittest.main()

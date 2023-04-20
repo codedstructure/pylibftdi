@@ -98,25 +98,25 @@ class Driver(object):
         self._fdll: Any = None
         self._libusb_dll: Any = None
 
-    def _load_library(self, name: str, search_list: Optional[str]=None) -> Any:
+    def _load_library(self, name: str, search_list: Optional[list[str]]=None) -> Any:
         """
         find and load the requested library
 
         :param name: library name
-        :param search_list: string referring to library names
+        :param search_list: an optional list of strings referring to library names
             library names or paths can be given
         :return: a CDLL object referring to the requested library
         """
-        # If no search list is given, use the default.
-        if not isinstance(search_list, str):
-            raise TypeError(f'library search list must be a string, not {type(search_list)}')
+        # If no search list is given, use the default library names stored in self._lib_search.
         if search_list is None:
-            libraries = self._lib_search.get(name, "")
+            search_list = self._lib_search.get(name, [])
+        elif isinstance(search_list, list):
+            search_list = search_list
         else:
-            libraries = [search_list]
+            raise TypeError(f'search_list type should be list[str], not {type(search_list)}')
 
         lib = None
-        for dll in libraries:
+        for dll in search_list:
             try:
                 # Windows in particular can have find_library
                 # not find things which work fine directly on
