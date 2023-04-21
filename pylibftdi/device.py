@@ -549,10 +549,10 @@ class Device(object):
         line_buffer: list[str] = []
         while True:
             next_char = self.read(1)
+            if not isinstance(next_char, str):
+                raise TypeError(".readline() only works for mode='t'")
             if next_char == '' or (0 < size < len(line_buffer)):
                 break
-            if isinstance(next_char, bytes):
-                next_char = self.decoder.decode(next_char)
             line_buffer.append(next_char)
             if (len(line_buffer) >= lsl and
                     line_buffer[-lsl:] == list(os.linesep)):
@@ -566,8 +566,8 @@ class Device(object):
         lines: list[str] = []
         if sizehint is not None:
             string_blob = self.read(sizehint)
-            if isinstance(string_blob, bytes):
-                string_blob = self.decoder.decode(string_blob)
+            if not isinstance(string_blob, str):
+                raise TypeError(".readlines() only works for mode='t'")
             lines.extend(string_blob.splitlines())
 
         while True:
