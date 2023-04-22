@@ -18,11 +18,11 @@ from pylibftdi.bitbang import BitBangDevice
 from tests.test_common import CallCheckMixin, LoopDevice
 
 
-class TestBitBangDevice(BitBangDevice, LoopDevice):
+class LoopBitBangDevice(BitBangDevice, LoopDevice):
     pass
 
 
-BitBangDevice = TestBitBangDevice
+BitBangDevice = LoopBitBangDevice  # type: ignore
 
 
 # and now some test cases...

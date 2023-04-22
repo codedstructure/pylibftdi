@@ -74,7 +74,7 @@ class MockDriver:
 
 
 # importing this _does_ things...
-pylibftdi.device.Driver = MockDriver
+pylibftdi.device.Driver = MockDriver  # type: ignore
 
 from pylibftdi.device import Device  # noqa
 

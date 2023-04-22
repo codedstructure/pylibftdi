@@ -2,11 +2,11 @@ __author__ = "ben"
 
 
 class CallLog:
-    fn_log = []
+    fn_log: list[str] = []
 
     @classmethod
     def reset(cls):
-        del cls.fn_log[:]
+        cls.fn_log.clear()
 
     @classmethod
     def append(cls, value):
@@ -14,4 +14,4 @@ class CallLog:
 
     @classmethod
     def get(cls):
-        return cls.fn_log[:]
+        return cls.fn_log.copy()

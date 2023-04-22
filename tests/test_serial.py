@@ -17,11 +17,11 @@ from pylibftdi.serial_device import SerialDevice
 from tests.test_common import CallCheckMixin, LoopDevice
 
 
-class TestSerialDevice(SerialDevice, LoopDevice):
+class LoopSerialDevice(SerialDevice, LoopDevice):
     pass
 
 
-SerialDevice = TestSerialDevice
+SerialDevice = LoopSerialDevice  # type: ignore
 
 
 # and now some test cases...
