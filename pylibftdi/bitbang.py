@@ -146,10 +146,7 @@ class BitBangDevice(Device):
             if self.sync:
                 result = self.read_pins()
             else:
-                # the coercion to bytearray here is to make this work
-                # transparently between Python2 and Python3 - equivalent
-                # of ord() for Python2, a time-wasting do-nothing on Python3
-                result = bytearray(super(BitBangDevice, self).read(1))[0]
+                result = self.read(1)[0]
 
             # replace the 'output' bits with current value of self.latch -
             # the last written value. This makes read-modify-write

@@ -35,16 +35,10 @@ import sys
 
 from pylibftdi import _base, bitbang, device, driver, serial_device, util
 
-if sys.version_info < (3, 6, 0):
+if sys.version_info < (3, 7, 0):
     import warnings
 
-    if sys.version_info.major < 3:
-        warnings.warn(
-            """Python 2 has been end-of-life since 2020,
-and future releases of pylibftdi will require at least Python 3.6"""
-        )
-    else:
-        warnings.warn("Python version < 3.6.0: untested; expect issues.")
+    warnings.warn("Python version < 3.7.0: untested; expect issues.")
 
 
 # Bring them in to package scope so we can treat pylibftdi

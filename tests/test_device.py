@@ -11,9 +11,11 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
+import unittest
+
 from pylibftdi import FtdiError
 from pylibftdi.device import Device
-from tests.test_common import CallCheckMixin, LoopDevice, unittest
+from tests.test_common import CallCheckMixin, LoopDevice
 
 # and now some test cases...
 
@@ -75,7 +77,7 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
 
 class LoopbackTest(unittest.TestCase):
     """
-    these all require mode='t' to pass in Python3
+    these all require mode='t'
     """
 
     def testPrint(self):

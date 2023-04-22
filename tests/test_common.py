@@ -15,17 +15,6 @@ import sys
 
 from tests.call_log import CallLog
 
-if sys.version_info < (2, 7):
-    try:
-        import unittest2 as unittest
-    except ImportError:
-        raise SystemExit(
-            "The test functionality is only supported in"
-            "Python 2.7+ unless unittest2 is installed"
-        )
-else:
-    import unittest  # noqa
-
 
 class SimpleMock(object):
     """

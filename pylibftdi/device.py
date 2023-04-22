@@ -43,7 +43,7 @@ Is the device connected?
 
 Try running the following command to see if the device is listed:
 
-    python -m pylibftdi.examples.list_devices
+    python3 -m pylibftdi.examples.list_devices
 """
 
 ERR_HELP_LINUX_OPEN_FAIL = """

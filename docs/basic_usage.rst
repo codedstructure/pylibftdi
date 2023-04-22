@@ -17,9 +17,8 @@ file-like interface (read, write).  Baudrate is controlled with the ``baudrate``
 property.
 
 If a Device instance is created with ``mode='t'`` (text mode) then read() and
-write() can use the given ``encoding`` (defaulting to latin-1). This doesn't
-make a lot of difference on Python 2 (and can be omitted), but allows easier
-integration with passing unicode strings between devices in Python 3.
+write() can use the given ``encoding`` (defaulting to latin-1). This allows
+easier integration with passing unicode strings between devices.
 
 Multiple devices are supported by passing the desired device serial number (as
 a string) in the ``device_id`` parameter - this is the first parameter in both

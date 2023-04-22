@@ -9,9 +9,10 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 This module contains some basic tests for Driver class.
 """
 
+import unittest
+
 from pylibftdi import LibraryMissingError
 from pylibftdi.driver import Driver
-from tests.test_common import unittest
 
 
 class DriverTest(unittest.TestCase):

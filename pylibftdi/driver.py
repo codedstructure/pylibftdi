@@ -255,8 +255,8 @@ class Driver(object):
             raise FtdiError(msg)
 
         def _s(s: bytes) -> str:
-            """From c_char_p / str you shall be / in Python2 or 3"""
-            return str(s.decode())
+            """c_char_p -> str helper"""
+            return s.decode()
 
         try:
             for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):

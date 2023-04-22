@@ -11,8 +11,10 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
+import unittest
+
 from pylibftdi.serial_device import SerialDevice
-from tests.test_common import CallCheckMixin, LoopDevice, unittest
+from tests.test_common import CallCheckMixin, LoopDevice
 
 
 class TestSerialDevice(SerialDevice, LoopDevice):
