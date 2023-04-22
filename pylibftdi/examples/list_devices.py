@@ -33,7 +33,7 @@ def get_ftdi_device_list():
     for device in Driver().list_devices():
         # device must always be this triple
         vendor, product, serial = device
-        dev_list.append("%s:%s:%s" % (vendor, product, serial))
+        dev_list.append(f"{vendor}:{product}:{serial}")
     return dev_list
 
 

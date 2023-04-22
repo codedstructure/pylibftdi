@@ -16,7 +16,7 @@ import sys
 from tests.call_log import CallLog
 
 
-class SimpleMock(object):
+class SimpleMock:
     """
     This is a simple mock plugin for fdll which logs any calls
     made through it to fn_log, which is currently rather ugly
@@ -31,11 +31,11 @@ class SimpleMock(object):
 
     def __call__(self, *o, **k):
         CallLog.append(self.__name)
-        logging.debug("%s(*%s, **%s)" % (self.__name, o, k))
+        logging.debug(f"{self.__name}(*{o}, **{k})")
         return 0
 
 
-class CallCheckMixin(object):
+class CallCheckMixin:
     """
     this should be used as a mixin for unittest.TestCase classes,
     where it allows the calls through the MockDriver to be checked
@@ -43,7 +43,7 @@ class CallCheckMixin(object):
     """
 
     def setUp(self):
-        super(CallCheckMixin, self).setUp()
+        super().setUp()
 
     def assertCalls(self, fn, methodname):
         CallLog.reset()
@@ -65,7 +65,7 @@ import pylibftdi.driver  # noqa
 
 
 # monkey patch the Driver class to be the mock thing above.
-class MockDriver(object):
+class MockDriver:
     def __init__(self, *o, **k):
         self.fdll = SimpleMock()
 
@@ -86,17 +86,17 @@ class LoopDevice(Device):
     """
 
     def __init__(self, *o, **k):
-        super(LoopDevice, self).__init__(*o, **k)
+        super().__init__(*o, **k)
         self.__buffer = []
 
     def _read(self, size):
-        super(LoopDevice, self)._read(size)  # discard result
+        super()._read(size)  # discard result
         result = bytes(bytearray(self.__buffer[:size]))
         self.__buffer = self.__buffer[size:]
         return result
 
     def _write(self, data):
-        super(LoopDevice, self)._write(data)  # discard result
+        super()._write(data)  # discard result
         self.__buffer.extend(bytearray(data))
         return len(data)
 

@@ -15,7 +15,7 @@ from pylibftdi import BitBangDevice
 from pylibftdi.util import Bus
 
 
-class Candle(object):
+class Candle:
     is_dark = Bus(0)  # D0
     be_light = Bus(1)  # D1
 

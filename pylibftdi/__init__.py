@@ -35,10 +35,10 @@ import sys
 
 from pylibftdi import _base, bitbang, device, driver, serial_device, util
 
-if sys.version_info < (3, 7, 0):
+if sys.version_info < (3, 7, 0):  # noqa
     import warnings
 
-    warnings.warn("Python version < 3.7.0: untested; expect issues.")
+    warnings.warn("Python version < 3.7.0: untested; expect issues.", stacklevel=0)
 
 
 # Bring them in to package scope so we can treat pylibftdi

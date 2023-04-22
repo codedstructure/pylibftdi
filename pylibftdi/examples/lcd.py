@@ -16,7 +16,7 @@ All rights reserved.
 from pylibftdi import BitBangDevice, Bus
 
 
-class LCD(object):
+class LCD:
     """
     The UM232R/245R is wired to the LCD as follows:
        DB0..3 to LCD D4..D7 (pin 11..pin 14)

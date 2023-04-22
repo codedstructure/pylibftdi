@@ -11,16 +11,17 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
+
 import unittest
 
 from pylibftdi.util import Bus
 
 
 class TestBus(unittest.TestCase):
-    class MockDevice(object):
+    class MockDevice:
         port = 0
 
-    class Bus1(object):
+    class Bus1:
         a = Bus(0, 2)
         b = Bus(2, 1)
         c = Bus(3, 5)

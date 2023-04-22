@@ -26,7 +26,7 @@ from ctypes import (
     create_string_buffer,
 )
 from ctypes.util import find_library
-from typing import Any, Optional
+from typing import Any
 
 from pylibftdi._base import FtdiError, LibraryMissingError
 
@@ -81,7 +81,7 @@ USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014, 0x6015]
 FTDI_ERROR_DEVICE_NOT_FOUND = -3
 
 
-class Driver(object):
+class Driver:
     """
     This is where it all happens...
     We load the libftdi library, and use it.
@@ -96,7 +96,7 @@ class Driver(object):
     }
 
     def __init__(
-        self, libftdi_search: Optional[str | list[str]] = None, **kwargs: dict[str, Any]
+        self, libftdi_search: str | list[str] | None = None, **kwargs: dict[str, Any]
     ) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
@@ -117,7 +117,7 @@ class Driver(object):
         self._fdll: Any = None
         self._libusb_dll: Any = None
 
-    def _load_library(self, name: str, search_list: Optional[list[str]] = None) -> Any:
+    def _load_library(self, name: str, search_list: list[str] | None = None) -> Any:
         """
         find and load the requested library
 

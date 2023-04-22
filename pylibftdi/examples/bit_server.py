@@ -132,7 +132,7 @@ if __name__ == "__main__":
     while retry:
         try:
             webbrowser.open("http://localhost:%d" % HTTP_PORT)
-        except EnvironmentError:
+        except OSError:
             time.sleep(1)
             retry -= 1
         else:

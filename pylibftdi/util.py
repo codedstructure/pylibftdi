@@ -16,7 +16,7 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 # writable.
 
 
-class Bus(object):
+class Bus:
     """
     This class is a descriptor for a bus of a given width starting
     at a given offset (0 = LSB).  The device which does the actual

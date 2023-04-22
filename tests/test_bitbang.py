@@ -76,10 +76,10 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
         # check that a direction can be given on open and is honoured
         for dir_test in (0, 1, 4, 12, 120, 255):
 
-            def _(dt):
-                dev.direction = dt
+            def assign_dir(dir_test=dir_test):
+                dev.direction = dir_test
 
-            self.assertCalls(lambda: _(dir_test), "ftdi_set_bitmode")
+            self.assertCalls(assign_dir, "ftdi_set_bitmode")
             self.assertEqual(dev.direction, dir_test)
             self.assertEqual(dev._direction, dir_test)
             self.assertEqual(dev._last_set_dir, dir_test)
@@ -95,16 +95,16 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
         # check that a direction can be given on open and is honoured
         for port_test in (0, 1, 4, 12, 120, 255):
 
-            def _(pt):
-                dev.port = pt
+            def assign_port(port_test=port_test):
+                dev.port = port_test
 
-            self.assertCalls(lambda: _(port_test), "ftdi_write_data")
+            self.assertCalls(assign_port, "ftdi_write_data")
             self.assertEqual(dev._latch, port_test)
             self.assertEqual(dev.port, port_test)
 
     def testBitAccess(self):
         dev = BitBangDevice(direction=0xF0)
-        dev.latch  # absorb the first ftdi_read_pins
+        _ = dev.latch  # absorb the first ftdi_read_pins
         self.assertCallsExact(lambda: dev.port | 2, ["ftdi_read_pins"])
         self.assertCallsExact(lambda: dev.port & 2, ["ftdi_read_pins"])
 
@@ -146,7 +146,7 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
 
     def testAugmentedAccess(self):
         dev = BitBangDevice(direction=0xAA)
-        dev.latch  # absorb the first ftdi_read_pins
+        _ = dev.latch  # absorb the first ftdi_read_pins
 
         def _1():
             dev.port &= 2

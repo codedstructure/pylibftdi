@@ -48,4 +48,4 @@ def ftdi_info():
 
 if __name__ == "__main__":
     for key, value in ftdi_info().items():
-        print("{:22}: {}".format(key, value))
+        print(f"{key:22}: {value}")

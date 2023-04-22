@@ -50,7 +50,7 @@ class BitBangDevice(Device):
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
         # of our own variables.
-        super(BitBangDevice, self).__init__(
+        super().__init__(
             device_id=device_id,
             mode="b",
             lazy_open=True,
@@ -72,7 +72,7 @@ class BitBangDevice(Device):
         """open connection to a FTDI device"""
         # in case someone sets the direction before we are open()ed,
         # we intercept this call...
-        super(BitBangDevice, self).open()
+        super().open()
         if self.direction != self._last_set_dir:
             self.direction = self._direction
         return self
@@ -161,4 +161,4 @@ class BitBangDevice(Device):
         self._latch = value
         if self.sync:
             self.flush_output()
-        return super(BitBangDevice, self).write(chr(value))
+        return super().write(chr(value))

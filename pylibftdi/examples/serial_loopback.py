@@ -17,7 +17,7 @@ def test_string(length):
     return os.urandom(length)
 
 
-class LoopbackTester(object):
+class LoopbackTester:
     def __init__(self):
         self.device = SerialDevice(chunk_size=16)
 
@@ -60,10 +60,10 @@ class LoopbackTester(object):
     def main(self):
         print("Determining largest non-streamed buffer size")
         for bd in [9600, 31250, 115200, 1152000]:
-            print("Baudrate: {}".format(bd))
+            print(f"Baudrate: {bd}")
             self.device.baudrate = bd
             result = self.bisect()
-            print("Buffer size: {}".format(result))
+            print(f"Buffer size: {result}")
 
 
 if __name__ == "__main__":

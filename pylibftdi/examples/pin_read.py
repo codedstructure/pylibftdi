@@ -25,7 +25,7 @@ def get_value():
     """
     if not getattr(get_value, "dev", None):
         get_value.dev = BitBangDevice(direction=ALL_INPUTS)
-    dev = getattr(get_value, "dev")
+    dev = get_value.dev
     return dev.port
 
 

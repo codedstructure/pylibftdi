@@ -38,7 +38,7 @@ from itertools import islice
 from pylibftdi import Device, FtdiError
 
 
-class RandomStream(object):
+class RandomStream:
     """
     Infinite iterator of random data which can be queried at any point
     for the checksum of the data already yielded
@@ -86,14 +86,14 @@ def test_rs():
     r = RandomStream()
     prev_checksum = 0
     stream_bytes = []
-    for i in range(30):
+    for _i in range(30):
         stream_bytes.append(b"".join(islice(r, 500)))
         assert r.checksum() != prev_checksum
     assert r.checksum() == r.checksum()
     assert hashlib.md5(b"".join(stream_bytes)).hexdigest() == r.checksum()
 
 
-class HalfDuplexTransfer(object):
+class HalfDuplexTransfer:
     """
     Test streaming bytes from one device to another
     """
@@ -175,9 +175,9 @@ class HalfDuplexTransfer(object):
 
     def results(self):
         result = b"".join(self.target)
-        print("  Bytes TX: {}  RX: {}".format(self.rs.bytecount, len(result)))
+        print(f"  Bytes TX: {self.rs.bytecount}  RX: {len(result)}")
         rx_chksum = hashlib.md5(b"".join(self.target)).hexdigest()
-        print("  Checksum TX: {}  RX: {}".format(self.rs.checksum(), rx_chksum))
+        print(f"  Checksum TX: {self.rs.checksum()}  RX: {rx_chksum}")
         if len(result) == self.rs.bytecount and self.rs.checksum() == rx_chksum:
             print(" SUCCESS")
         else:
@@ -214,7 +214,7 @@ def main():
     d2 = Device(device_index=1)
 
     for b in 9600, 38400, 115200:
-        print("Testing {} baud".format(b))
+        print(f"Testing {b} baud")
         d1.flush()
         d2.flush()
         print("Half duplex d1->d2...")

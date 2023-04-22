@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # pylibftdi documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct 31 22:36:38 2011.
 #

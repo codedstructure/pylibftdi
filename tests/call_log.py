@@ -1,7 +1,7 @@
 __author__ = "ben"
 
 
-class CallLog(object):
+class CallLog:
     fn_log = []
 
     @classmethod

@@ -23,7 +23,7 @@ from ctypes import (
     cast,
     create_string_buffer,
 )
-from typing import Any, Optional, no_type_check
+from typing import Any, no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
@@ -101,7 +101,7 @@ class ftdi_context_partial(Structure):
     _fields_ = [("libusb_context", c_void_p), ("libusb_device_handle", c_void_p)]
 
 
-class Device(object):
+class Device:
     """
     Represents a connection to a single FTDI device
     """
@@ -122,10 +122,10 @@ class Device(object):
 
     def __init__(
         self,
-        device_id: Optional[str] = None,
+        device_id: str | None = None,
         mode: str = "b",
         encoding: str = "latin1",
-        interface_select: Optional[int] = None,
+        interface_select: int | None = None,
         device_index: int = 0,
         **kwargs: Any,
     ) -> None:
@@ -232,7 +232,9 @@ class Device(object):
                 # The third (index 2) field is serial number.
                 self.device_id = dev_list[self.list_index][2]
             except IndexError:
-                raise FtdiError("index provided not in range of list_devices() entries")
+                raise FtdiError(
+                    "index provided not in range of list_devices() entries"
+                ) from None
 
         # create context for this device
         # Note I gave up on attempts to use ftdi_new/ftdi_free (just using
@@ -522,7 +524,7 @@ class Device(object):
         # note this class is constructed on each call, so this
         # won't be particularly quick.  It does ensure that the
         # fdll and ctx objects in the closure are up-to-date, though.
-        class FtdiForwarder(object):
+        class FtdiForwarder:
             @no_type_check
             def __getattr__(innerself, key: str):
                 return functools.partial(getattr(self.fdll, key), byref(self.ctx))
@@ -575,14 +577,14 @@ class Device(object):
             next_char = self.read(1)
             if not isinstance(next_char, str):
                 raise TypeError(".readline() only works for mode='t'")
-            if next_char == "" or (0 < size < len(line_buffer)):
+            if not next_char or (0 < size < len(line_buffer)):
                 break
             line_buffer.append(next_char)
             if len(line_buffer) >= lsl and line_buffer[-lsl:] == list(os.linesep):
                 break
         return "".join(line_buffer)
 
-    def readlines(self, sizehint: Optional[int] = None) -> list[str]:
+    def readlines(self, sizehint: int | None = None) -> list[str]:
         """
         readlines() for file-like compatibility.
         """

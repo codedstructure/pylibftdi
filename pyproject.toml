@@ -1,2 +1,6 @@
-[tool.isort]
-profile = "black"
+[tool.ruff]
+select = ["E", "W", "F", "B", "I", "UP", "PL"]
+ignore = [
+  "PLR2004",  # Magic value used in comparison
+  "PLR0913",  # Too many arguments to function call
+]
