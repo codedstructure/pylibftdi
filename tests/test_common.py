@@ -82,7 +82,6 @@ class MockDriver(object):
 
 
 # importing this _does_ things...
-pylibftdi.driver.Driver = MockDriver
 pylibftdi.device.Driver = MockDriver
 
 from pylibftdi.device import Device

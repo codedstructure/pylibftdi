@@ -80,11 +80,25 @@ class LoopbackTest(unittest.TestCase):
         self.assertEqual(d.readline(), 'Hello World\n')
         self.assertEqual(d.readline(), 'Bye')
 
+    def testPrintBytes(self):
+        d = LoopDevice(mode='t')
+        d.write(b'Hello')
+        d.write(b' World\n')
+        d.write(b'Bye')
+        self.assertEqual(d.readline(), 'Hello World\n')
+        self.assertEqual(d.readline(), 'Bye')
+
     def testLines(self):
         d = LoopDevice(mode='t')
         lines = ['Hello\n', 'World\n', 'And\n', 'Goodbye\n']
         d.writelines(lines)
         self.assertEqual(d.readlines(), lines)
+
+    def testLinesBytes(self):
+        d = LoopDevice(mode='t')
+        lines = [b'Hello\n', b'World\n', b'And\n', b'Goodbye\n']
+        d.writelines(lines)
+        self.assertEqual(d.readlines(), [str(l, 'ascii') for l in lines])
 
     def testIterate(self):
         d = LoopDevice(mode='t')
@@ -101,6 +115,25 @@ class LoopbackTest(unittest.TestCase):
         self.assertEqual(d.readline(), 'Hello World\n')
         self.assertEqual(d.readline(), 'Bye')
 
+    def testReadLineBytes(self):
+        """
+        Device.readline() when in byte mode should raise a TypeError.
+        This method should only be used in text mode.
+        """
+        d = LoopDevice(mode='b')
+        d.write(b'Hello\n')
+        with self.assertRaises(TypeError):
+            d.readline()
+
+    def testReadLinesBytes(self):
+        """
+        Device.readlines() when in byte mode should raise a TypeError.
+        This method should only be used in text mode.
+        """
+        d = LoopDevice(mode='b')
+        d.write(b'Hello\n')
+        with self.assertRaises(TypeError):
+            d.readlines()
 
 if __name__ == "__main__":
     unittest.main()

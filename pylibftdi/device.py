@@ -7,6 +7,7 @@ See LICENSE file for details and (absence of) warranty
 pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
+from __future__ import annotations
 
 import os
 import sys
@@ -16,6 +17,7 @@ import itertools
 
 from ctypes import (byref, create_string_buffer, c_char_p,
                     c_void_p, Structure, cast, POINTER)
+from typing import Any, Iterable, Optional, no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
@@ -102,9 +104,9 @@ class Device(object):
     # defining softspace allows us to 'print' to this device
     softspace = 0
 
-    def __init__(self, device_id=None, mode="b",
-                 encoding="latin1", interface_select=None,
-                 device_index=0, **kwargs):
+    def __init__(self, device_id: Optional[str]=None, mode: str="b",
+                 encoding: str="latin1", interface_select: Optional[int]=None,
+                 device_index: int=0, **kwargs: Any) -> None:
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
 
@@ -157,7 +159,7 @@ class Device(object):
             if param in kwargs:
                 setattr(self, param, kwargs.pop(param))
 
-        self.driver = Driver(**kwargs)
+        self.driver: Driver = Driver(**kwargs)
         self.fdll = self.driver.fdll
         # device_id is an optional serial number of the requested device.
         self.device_id = device_id
@@ -189,12 +191,12 @@ class Device(object):
         if not self.lazy_open:
             self.open()
 
-    def __del__(self):
+    def __del__(self) -> None:
         """free the ftdi_context resource"""
         if self._opened:
             self.close()
 
-    def open(self):
+    def open(self) -> None:
         """
         open connection to a FTDI device
         """
@@ -265,7 +267,7 @@ class Device(object):
         self.ftdi_fn.ftdi_set_latency_timer(16)
         self._opened = True
 
-    def handle_open_error(self, errcode):
+    def handle_open_error(self, errcode: int) -> str:
         """
         return a (hopefully helpful) error message on a failed open()
         """
@@ -284,7 +286,7 @@ class Device(object):
         msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, err_help)
         return msg
 
-    def _open_device(self):
+    def _open_device(self) -> int:
         """
         Actually open the target device
 
@@ -292,7 +294,7 @@ class Device(object):
         :rtype: int
         """
         # FTDI vendor/product ids required here.
-        res = None
+        res: int = -1
         for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
             open_args = [byref(self.ctx), usb_vid, usb_pid,
                          0, 0, self.device_index]
@@ -314,7 +316,7 @@ class Device(object):
 
         return res
 
-    def close(self):
+    def close(self) -> None:
         """close our connection, free resources"""
         if self._opened:
             self.fdll.ftdi_usb_close(byref(self.ctx))
@@ -323,7 +325,7 @@ class Device(object):
         self._opened = False
 
     @property
-    def baudrate(self):
+    def baudrate(self) -> int:
         """
         get or set the baudrate of the FTDI device. Re-read after setting
         to ensure baudrate was accepted by the driver.
@@ -331,12 +333,12 @@ class Device(object):
         return self._baudrate
 
     @baudrate.setter
-    def baudrate(self, value):
+    def baudrate(self, value: int) -> None:
         result = self.fdll.ftdi_set_baudrate(byref(self.ctx), value)
         if result == 0:
             self._baudrate = value
 
-    def _read(self, length):
+    def _read(self, length: int) -> bytes:
         """
         actually do the low level reading
 
@@ -351,7 +353,7 @@ class Device(object):
 
         return byte_data
 
-    def read(self, length):
+    def read(self, length: int) -> str|bytes:
         """
         read(length) -> bytes/string of up to `length` bytes.
 
@@ -381,7 +383,7 @@ class Device(object):
         else:
             return self.decoder.decode(byte_data)
 
-    def _write(self, byte_data):
+    def _write(self, byte_data: bytes) -> int:
         """
         actually do the low level writing
 
@@ -390,13 +392,13 @@ class Device(object):
         :return: number of bytes written
         """
         buf = create_string_buffer(byte_data)
-        written = self.fdll.ftdi_write_data(byref(self.ctx),
+        written: int = self.fdll.ftdi_write_data(byref(self.ctx),
                                             byref(buf), len(byte_data))
         if written < 0:
             raise FtdiError(self.get_error_string())
         return written
 
-    def write(self, data):
+    def write(self, data: str|bytes) -> int:
         """
         write(data) -> count of bytes actually written
 
@@ -409,20 +411,19 @@ class Device(object):
         if not self._opened:
             raise FtdiError("write() on closed Device")
 
-        try:
-            byte_data = bytes(data)
-        except TypeError:
-            # this will happen if we are Python3 and data is a str.
-            byte_data = self.encoder.encode(data)
+        if not isinstance(data, bytes):
+            data = self.encoder.encode(data)
+
+        assert isinstance(data, bytes)
 
         # actually write it
         if self.chunk_size != 0:
-            remaining = len(byte_data)
+            remaining = len(data)
             written = 0
             while remaining > 0:
                 start = written
                 length = min(remaining, self.chunk_size)
-                result = self._write(byte_data[start: start + length])
+                result = self._write(data[start: start + length])
                 if result == 0:
                     # don't continue to try writing forever if nothing
                     # is actually being written
@@ -431,10 +432,10 @@ class Device(object):
                     written += result
                     remaining -= result
         else:
-            written = self._write(byte_data)
+            written = self._write(data)
         return written
 
-    def flush(self, flush_what=FLUSH_BOTH):
+    def flush(self, flush_what: int=FLUSH_BOTH) -> None:
         """
         Instruct the FTDI device to flush its FIFO buffers
 
@@ -461,26 +462,26 @@ class Device(object):
             msg = "%s (%d)" % (self.get_error_string(), res)
             raise FtdiError(msg)
 
-    def flush_input(self):
+    def flush_input(self) -> None:
         """
         flush the device input buffer
         """
         self.flush(FLUSH_INPUT)
 
-    def flush_output(self):
+    def flush_output(self) -> None:
         """
         flush the device output buffer
         """
         self.flush(FLUSH_OUTPUT)
 
-    def get_error_string(self):
+    def get_error_string(self) -> str:
         """
         :return: error string from libftdi driver
         """
-        return self.fdll.ftdi_get_error_string(byref(self.ctx))
+        return str(self.fdll.ftdi_get_error_string(byref(self.ctx)))
 
     @property
-    def ftdi_fn(self):
+    def ftdi_fn(self): # type: ignore
         """
         this allows the vast majority of libftdi functions
         which are called with a pointer to a ftdi_context
@@ -498,12 +499,13 @@ class Device(object):
         # fdll and ctx objects in the closure are up-to-date, though.
         class FtdiForwarder(object):
 
-            def __getattr__(innerself, key):
+            @no_type_check
+            def __getattr__(innerself, key: str):
                 return functools.partial(getattr(self.fdll, key),
                                          byref(self.ctx))
         return FtdiForwarder()
 
-    def __enter__(self):
+    def __enter__(self) -> Device:
         """
         support for context manager.
 
@@ -517,7 +519,8 @@ class Device(object):
         self.open()
         return self
 
-    def __exit__(self, exc_type, exc_val, tb):
+    @no_type_check
+    def __exit__(self, exc_type, exc_val, tb) -> None:
         """support for context manager"""
         self.close()
 
@@ -527,13 +530,13 @@ class Device(object):
     #
 
     @property
-    def closed(self):
+    def closed(self) -> bool:
         """
         The Python file API defines a read-only 'closed' attribute
         """
         return not self._opened
 
-    def readline(self, size=0):
+    def readline(self, size: int=0) -> str:
         """
         readline() for file-like compatibility.
 
@@ -543,9 +546,11 @@ class Device(object):
         This only works for mode='t' on Python3
         """
         lsl = len(os.linesep)
-        line_buffer = []
+        line_buffer: list[str] = []
         while True:
             next_char = self.read(1)
+            if not isinstance(next_char, str):
+                raise TypeError(".readline() only works for mode='t'")
             if next_char == '' or (0 < size < len(line_buffer)):
                 break
             line_buffer.append(next_char)
@@ -554,13 +559,15 @@ class Device(object):
                 break
         return ''.join(line_buffer)
 
-    def readlines(self, sizehint=None):
+    def readlines(self, sizehint: Optional[int]=None) -> list[str]:
         """
         readlines() for file-like compatibility.
         """
-        lines = []
+        lines: list[str] = []
         if sizehint is not None:
             string_blob = self.read(sizehint)
+            if not isinstance(string_blob, str):
+                raise TypeError(".readlines() only works for mode='t'")
             lines.extend(string_blob.splitlines())
 
         while True:
@@ -570,7 +577,7 @@ class Device(object):
             lines.append(line)
         return lines
 
-    def writelines(self, lines):
+    def writelines(self, lines: list[str|bytes]) -> None:
         """
         writelines for file-like compatibility.
 
@@ -579,10 +586,10 @@ class Device(object):
         for line in lines:
             self.write(line)
 
-    def __iter__(self):
+    def __iter__(self) -> Device:
         return self
 
-    def __next__(self):
+    def __next__(self) -> str:
         while True:
             line = self.readline()
             if line:
