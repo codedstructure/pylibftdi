@@ -17,13 +17,12 @@ __VERSION__ = "0.20.0"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = [
+__all__ = [
     "Driver",
     "Device",
     "BitBangDevice",
     "Bus",
     "FtdiError",
-    "MissingLibraryError",
     "ALL_OUTPUTS",
     "ALL_INPUTS",
     "BB_OUTPUT",

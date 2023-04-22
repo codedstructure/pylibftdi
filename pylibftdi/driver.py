@@ -126,7 +126,7 @@ class Driver(object):
             library names or paths can be given
         :return: a CDLL object referring to the requested library
         """
-        # If no search list is given, use the default library names stored in self._lib_search.
+        # If no search list is given, use default library names from self._lib_search
         if search_list is None:
             search_list = self._lib_search.get(name, [])
         elif not isinstance(search_list, list):

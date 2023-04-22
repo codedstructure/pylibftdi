@@ -11,4 +11,17 @@ e.g.
     >>> d.write('Hello World')
 """
 
-from pylibftdi import *
+# This should be aligned with `__all__` in pylibftdi/__init__.py
+from pylibftdi import (  # noqa
+    Driver,
+    Device,
+    BitBangDevice,
+    Bus,
+    FtdiError,
+    ALL_OUTPUTS,
+    ALL_INPUTS,
+    BB_OUTPUT,
+    BB_INPUT,
+    USB_VID_LIST,
+    USB_PID_LIST,
+)

@@ -104,7 +104,7 @@ class LoopbackTest(unittest.TestCase):
         d = LoopDevice(mode="t")
         lines = [b"Hello\n", b"World\n", b"And\n", b"Goodbye\n"]
         d.writelines(lines)
-        self.assertEqual(d.readlines(), [str(l, "ascii") for l in lines])
+        self.assertEqual(d.readlines(), [str(line, "ascii") for line in lines])
 
     def testIterate(self):
         d = LoopDevice(mode="t")

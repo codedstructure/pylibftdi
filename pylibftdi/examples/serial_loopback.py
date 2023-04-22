@@ -21,14 +21,14 @@ class LoopbackTester(object):
     def __init__(self):
         self.device = SerialDevice(chunk_size=16)
 
-    def test_loopback(self, l):
-        test_str = test_string(l)
+    def test_loopback(self, length):
+        test_str = test_string(length)
         if self.device.write(test_str) != len(test_str):
             sys.stdout.write("*")
         time.sleep(0.1)
         result = ""
         for _ in range(5):
-            result = self.device.read(l)
+            result = self.device.read(length)
             time.sleep(0.1)
             if result:
                 break
@@ -40,8 +40,8 @@ class LoopbackTester(object):
     def test_iter(self, lengths):
         self.device.flush()
         time.sleep(0.1)
-        for l in lengths:
-            yield self.test_loopback(l)
+        for length in lengths:
+            yield self.test_loopback(length)
 
     def bisect(self):
         xmin, xmax = 1, 5000

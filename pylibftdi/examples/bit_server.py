@@ -49,7 +49,7 @@ def get_page():
 <input type="hidden" name="bit%d" />
 </form>
 </fieldset>
-""" % (
+""" % (  # noqa: E501
             color,
             bit,
             i,

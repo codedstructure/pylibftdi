@@ -83,7 +83,7 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
             self.assertEqual(dev._last_set_dir, dir_test)
         # check an invalid direction on open gives error
 
-        def _():  # NOQA
+        def _():  # noqa
             dev.direction = 300
 
         self.assertRaises(FtdiError, _)

@@ -13,7 +13,7 @@ example usage::
     OS platform           : Darwin-14.1.0-x86_64-i386-64bit
 
 Copyright (c) 2015-2020 Ben Bass <benbass@codedstructure.net>
-"""
+"""  # noqa: E501
 
 
 import platform

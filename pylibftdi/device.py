@@ -24,7 +24,7 @@ from ctypes import (
     cast,
     POINTER,
 )
-from typing import Any, Iterable, Optional, no_type_check
+from typing import Any, Optional, no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
