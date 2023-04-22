@@ -23,6 +23,7 @@ class LCD(object):
        DB6 to LCD 'RS' (pin 4)
        DB7 to LCD 'E' (pin 6)
     """
+
     data = Bus(0, 4)
     rs = Bus(6)
     e = Bus(7)
@@ -74,7 +75,6 @@ def display(string, device_id=None):
     an optional `device_id` can be given.
     """
     with BitBangDevice(device_id) as bb:
-
         # These LCDs are quite slow - and the actual baudrate
         # is 16x this in bitbang mode...
         bb.baudrate = 60
@@ -100,8 +100,9 @@ def display(string, device_id=None):
             lcd.write_data(ord(i))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     if len(sys.argv) == 2:
         display(sys.argv[1])
     else:

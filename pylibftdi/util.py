@@ -23,10 +23,11 @@ class Bus(object):
     reading and writing is assumed to be a BitBangDevice instance
     in the 'device' attribute of the object to which this is attached.
     """
+
     def __init__(self, offset, width=1):
         self.offset = offset
         self.width = width
-        self._mask = ((1 << width) - 1)
+        self._mask = (1 << width) - 1
 
     def __get__(self, obj, type_):
         val = obj.device.port

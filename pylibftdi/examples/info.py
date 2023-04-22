@@ -30,21 +30,22 @@ def ftdi_info():
     """
     info = OrderedDict()
     d = pylibftdi.Driver()
-    info['pylibftdi version'] = pylibftdi.__VERSION__
+    info["pylibftdi version"] = pylibftdi.__VERSION__
     try:
-        info['libftdi version'] = d.libftdi_version()
-        info['libftdi library name'] = d._load_library('libftdi')._name
+        info["libftdi version"] = d.libftdi_version()
+        info["libftdi library name"] = d._load_library("libftdi")._name
     except pylibftdi.LibraryMissingError:
-        info['libftdi library'] = "Missing"
+        info["libftdi library"] = "Missing"
     try:
-        info['libusb version'] = d.libusb_version()
-        info['libusb library name'] = d._load_library('libusb')._name
+        info["libusb version"] = d.libusb_version()
+        info["libusb library name"] = d._load_library("libusb")._name
     except pylibftdi.LibraryMissingError:
-        info['libusb library'] = "Missing"
-    info['Python version'] = platform.python_version()
-    info['OS platform'] = platform.platform()
+        info["libusb library"] = "Missing"
+    info["Python version"] = platform.python_version()
+    info["OS platform"] = platform.platform()
     return info
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     for key, value in ftdi_info().items():
         print("{:22}: {}".format(key, value))

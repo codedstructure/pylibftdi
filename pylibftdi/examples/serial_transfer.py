@@ -61,7 +61,7 @@ class RandomStream(object):
         self.bytecount = 0
 
     def _update_checksum(self):
-        self.stream_hash.update(self.rand_buf[self.chk_tail:self.chk_head])
+        self.stream_hash.update(self.rand_buf[self.chk_tail : self.chk_head])
         self.chk_tail = self.chk_head
 
     def checksum(self):
@@ -72,7 +72,7 @@ class RandomStream(object):
         while True:
             # Use slice rather than index to avoid bytes->int conversion
             # in Python3
-            data = self.rand_buf[self.chk_head:self.chk_head+1:]
+            data = self.rand_buf[self.chk_head : self.chk_head + 1 :]
             self.chk_head += 1
             self.bytecount += 1
             yield data
@@ -87,10 +87,10 @@ def test_rs():
     prev_checksum = 0
     stream_bytes = []
     for i in range(30):
-        stream_bytes.append(b''.join(islice(r, 500)))
+        stream_bytes.append(b"".join(islice(r, 500)))
         assert r.checksum() != prev_checksum
     assert r.checksum() == r.checksum()
-    assert hashlib.md5(b''.join(stream_bytes)).hexdigest() == r.checksum()
+    assert hashlib.md5(b"".join(stream_bytes)).hexdigest() == r.checksum()
 
 
 class HalfDuplexTransfer(object):
@@ -146,7 +146,7 @@ class HalfDuplexTransfer(object):
         end_time = time.time() + self.test_duration
 
         while time.time() < end_time:
-            x = b''.join(list(islice(self.rs, self.block_size)))
+            x = b"".join(list(islice(self.rs, self.block_size)))
             self.source.write(x)
 
         # Wait for the reader to catch up
@@ -174,9 +174,9 @@ class HalfDuplexTransfer(object):
         self.t2.join(timeout=1e6)
 
     def results(self):
-        result = b''.join(self.target)
+        result = b"".join(self.target)
         print("  Bytes TX: {}  RX: {}".format(self.rs.bytecount, len(result)))
-        rx_chksum = hashlib.md5(b''.join(self.target)).hexdigest()
+        rx_chksum = hashlib.md5(b"".join(self.target)).hexdigest()
         print("  Checksum TX: {}  RX: {}".format(self.rs.checksum(), rx_chksum))
         if len(result) == self.rs.bytecount and self.rs.checksum() == rx_chksum:
             print(" SUCCESS")
@@ -229,6 +229,6 @@ def main():
         test_full_duplex_transfer(d1, d2, baudrate=b)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_rs()
     main()

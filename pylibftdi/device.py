@@ -15,15 +15,28 @@ import codecs
 import functools
 import itertools
 
-from ctypes import (byref, create_string_buffer, c_char_p,
-                    c_void_p, Structure, cast, POINTER)
+from ctypes import (
+    byref,
+    create_string_buffer,
+    c_char_p,
+    c_void_p,
+    Structure,
+    cast,
+    POINTER,
+)
 from typing import Any, Iterable, Optional, no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
-    Driver, USB_VID_LIST, USB_PID_LIST,
-    FTDI_ERROR_DEVICE_NOT_FOUND, BITMODE_RESET,
-    FLUSH_BOTH, FLUSH_INPUT, FLUSH_OUTPUT)
+    Driver,
+    USB_VID_LIST,
+    USB_PID_LIST,
+    FTDI_ERROR_DEVICE_NOT_FOUND,
+    BITMODE_RESET,
+    FLUSH_BOTH,
+    FLUSH_INPUT,
+    FLUSH_OUTPUT,
+)
 
 
 ERR_HELP_NOT_FOUND_FAIL = """
@@ -50,15 +63,20 @@ already open, or another driver is preventing libftdi from
 claiming the device.
 """
 
-ERR_HELP_LINUX_CLAIM_FAIL = ERR_HELP_CLAIM_FAIL + """
+ERR_HELP_LINUX_CLAIM_FAIL = (
+    ERR_HELP_CLAIM_FAIL
+    + """
 The Linux `ftdi_sio` driver is often the culprit here, and may be
 unloaded with `sudo rmmod ftdi_sio`. However in recent libftdi
 versions this should not be necessary, as a driver option to
 switch out the driver temporarily is applied (unless
 `auto_detach=False` is given in `Device` instantiation).
 """
+)
 
-ERR_HELP_MACOS_CLAIM_FAIL = ERR_HELP_CLAIM_FAIL + """
+ERR_HELP_MACOS_CLAIM_FAIL = (
+    ERR_HELP_CLAIM_FAIL
+    + """
 The following commands may be attempted in the terminal to unload
 the builtin drivers:
 
@@ -72,6 +90,7 @@ driver has been installed from their website:
 
     https://www.ftdichip.com/Drivers/VCP.htm
 """
+)
 
 
 # The only part of the ftdi context we need at this point is
@@ -81,8 +100,7 @@ driver has been installed from their website:
 # the only case this is used.
 class ftdi_context_partial(Structure):
     # This is for libftdi 1.0+
-    _fields_ = [('libusb_context', c_void_p),
-                ('libusb_device_handle', c_void_p)]
+    _fields_ = [("libusb_context", c_void_p), ("libusb_device_handle", c_void_p)]
 
 
 class Device(object):
@@ -104,9 +122,15 @@ class Device(object):
     # defining softspace allows us to 'print' to this device
     softspace = 0
 
-    def __init__(self, device_id: Optional[str]=None, mode: str="b",
-                 encoding: str="latin1", interface_select: Optional[int]=None,
-                 device_index: int=0, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        device_id: Optional[str] = None,
+        mode: str = "b",
+        encoding: str = "latin1",
+        interface_select: Optional[int] = None,
+        device_index: int = 0,
+        **kwargs: Any,
+    ) -> None:
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
 
@@ -155,7 +179,7 @@ class Device(object):
         # Some behavioural attributes are extracted from kwargs and override
         # existing attribute defaults. This allows subclassing to easily
         # change these.
-        for param in ['auto_detach', 'lazy_open', 'chunk_size']:
+        for param in ["auto_detach", "lazy_open", "chunk_size"]:
             if param in kwargs:
                 setattr(self, param, kwargs.pop(param))
 
@@ -185,7 +209,7 @@ class Device(object):
         self.device_index = device_index
         # list_index (from parameter `index`) is an optional integer index
         # into list_devices() entries.
-        self.list_index = kwargs.pop('index', None)
+        self.list_index = kwargs.pop("index", None)
 
         # lazy_open tells us not to open immediately.
         if not self.lazy_open:
@@ -229,8 +253,7 @@ class Device(object):
             raise FtdiError(msg)
 
         if self.interface_select is not None:
-            res = self.fdll.ftdi_set_interface(byref(self.ctx),
-                                               self.interface_select)
+            res = self.fdll.ftdi_set_interface(byref(self.ctx), self.interface_select)
             if res != 0:
                 msg = "%s (%d)" % (self.get_error_string(), res)
                 del self.ctx
@@ -253,7 +276,9 @@ class Device(object):
             ctx_p = cast(byref(self.ctx), POINTER(ftdi_context_partial)).contents
             dev = ctx_p.libusb_device_handle
             if dev:
-                self.driver._libusb.libusb_set_auto_detach_kernel_driver(c_void_p(dev), 1)
+                self.driver._libusb.libusb_set_auto_detach_kernel_driver(
+                    c_void_p(dev), 1
+                )
 
         # explicitly reset the device to serial mode with standard settings
         # - no flow control, 9600 baud - in case it had previously been used
@@ -271,15 +296,15 @@ class Device(object):
         """
         return a (hopefully helpful) error message on a failed open()
         """
-        err_help = ''
+        err_help = ""
         if errcode == -3:
             err_help = ERR_HELP_NOT_FOUND_FAIL
-        elif errcode == -4 and sys.platform == 'linux':
+        elif errcode == -4 and sys.platform == "linux":
             err_help = ERR_HELP_LINUX_OPEN_FAIL
         elif errcode == -5:
-            if sys.platform == 'linux':
+            if sys.platform == "linux":
                 err_help = ERR_HELP_LINUX_CLAIM_FAIL
-            elif sys.platform == 'darwin':
+            elif sys.platform == "darwin":
                 err_help = ERR_HELP_MACOS_CLAIM_FAIL
             else:
                 err_help = ERR_HELP_CLAIM_FAIL
@@ -296,13 +321,12 @@ class Device(object):
         # FTDI vendor/product ids required here.
         res: int = -1
         for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
-            open_args = [byref(self.ctx), usb_vid, usb_pid,
-                         0, 0, self.device_index]
+            open_args = [byref(self.ctx), usb_vid, usb_pid, 0, 0, self.device_index]
             if self.device_id is None:
                 res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
             else:
                 # attempt to match device_id to serial number
-                open_args[-2] = c_char_p(self.device_id.encode('latin1'))
+                open_args[-2] = c_char_p(self.device_id.encode("latin1"))
                 res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
                 if res != 0:
                     # swap (description, serial) parameters and try again
@@ -353,7 +377,7 @@ class Device(object):
 
         return byte_data
 
-    def read(self, length: int) -> str|bytes:
+    def read(self, length: int) -> str | bytes:
         """
         read(length) -> bytes/string of up to `length` bytes.
 
@@ -375,10 +399,10 @@ class Device(object):
                     break
                 byte_data_list.append(rx_bytes)
                 remaining -= len(rx_bytes)
-            byte_data = b''.join(byte_data_list)
+            byte_data = b"".join(byte_data_list)
         else:
             byte_data = self._read(length)
-        if self.mode == 'b':
+        if self.mode == "b":
             return byte_data
         else:
             return self.decoder.decode(byte_data)
@@ -392,13 +416,14 @@ class Device(object):
         :return: number of bytes written
         """
         buf = create_string_buffer(byte_data)
-        written: int = self.fdll.ftdi_write_data(byref(self.ctx),
-                                            byref(buf), len(byte_data))
+        written: int = self.fdll.ftdi_write_data(
+            byref(self.ctx), byref(buf), len(byte_data)
+        )
         if written < 0:
             raise FtdiError(self.get_error_string())
         return written
 
-    def write(self, data: str|bytes) -> int:
+    def write(self, data: str | bytes) -> int:
         """
         write(data) -> count of bytes actually written
 
@@ -423,7 +448,7 @@ class Device(object):
             while remaining > 0:
                 start = written
                 length = min(remaining, self.chunk_size)
-                result = self._write(data[start: start + length])
+                result = self._write(data[start : start + length])
                 if result == 0:
                     # don't continue to try writing forever if nothing
                     # is actually being written
@@ -435,7 +460,7 @@ class Device(object):
             written = self._write(data)
         return written
 
-    def flush(self, flush_what: int=FLUSH_BOTH) -> None:
+    def flush(self, flush_what: int = FLUSH_BOTH) -> None:
         """
         Instruct the FTDI device to flush its FIFO buffers
 
@@ -455,8 +480,9 @@ class Device(object):
         elif flush_what == FLUSH_OUTPUT:
             fn = self.fdll.ftdi_usb_purge_tx_buffer
         else:
-            raise ValueError("Invalid value passed to %s.flush()" %
-                             self.__class__.__name__)
+            raise ValueError(
+                "Invalid value passed to %s.flush()" % self.__class__.__name__
+            )
         res = fn(byref(self.ctx))
         if res != 0:
             msg = "%s (%d)" % (self.get_error_string(), res)
@@ -481,7 +507,7 @@ class Device(object):
         return str(self.fdll.ftdi_get_error_string(byref(self.ctx)))
 
     @property
-    def ftdi_fn(self): # type: ignore
+    def ftdi_fn(self):  # type: ignore
         """
         this allows the vast majority of libftdi functions
         which are called with a pointer to a ftdi_context
@@ -494,15 +520,15 @@ class Device(object):
         ...     dev.ftdi_fn.ftdi_set_line_property(8, 2, 0)
         ...
         """
+
         # note this class is constructed on each call, so this
         # won't be particularly quick.  It does ensure that the
         # fdll and ctx objects in the closure are up-to-date, though.
         class FtdiForwarder(object):
-
             @no_type_check
             def __getattr__(innerself, key: str):
-                return functools.partial(getattr(self.fdll, key),
-                                         byref(self.ctx))
+                return functools.partial(getattr(self.fdll, key), byref(self.ctx))
+
         return FtdiForwarder()
 
     def __enter__(self) -> Device:
@@ -536,7 +562,7 @@ class Device(object):
         """
         return not self._opened
 
-    def readline(self, size: int=0) -> str:
+    def readline(self, size: int = 0) -> str:
         """
         readline() for file-like compatibility.
 
@@ -551,15 +577,14 @@ class Device(object):
             next_char = self.read(1)
             if not isinstance(next_char, str):
                 raise TypeError(".readline() only works for mode='t'")
-            if next_char == '' or (0 < size < len(line_buffer)):
+            if next_char == "" or (0 < size < len(line_buffer)):
                 break
             line_buffer.append(next_char)
-            if (len(line_buffer) >= lsl and
-                    line_buffer[-lsl:] == list(os.linesep)):
+            if len(line_buffer) >= lsl and line_buffer[-lsl:] == list(os.linesep):
                 break
-        return ''.join(line_buffer)
+        return "".join(line_buffer)
 
-    def readlines(self, sizehint: Optional[int]=None) -> list[str]:
+    def readlines(self, sizehint: Optional[int] = None) -> list[str]:
         """
         readlines() for file-like compatibility.
         """
@@ -577,7 +602,7 @@ class Device(object):
             lines.append(line)
         return lines
 
-    def writelines(self, lines: list[str|bytes]) -> None:
+    def writelines(self, lines: list[str | bytes]) -> None:
         """
         writelines for file-like compatibility.
 
@@ -596,4 +621,5 @@ class Device(object):
                 return line
             else:
                 raise StopIteration
+
     next = __next__

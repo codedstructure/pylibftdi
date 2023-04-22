@@ -16,7 +16,7 @@ from pylibftdi import BitBangDevice
 
 
 class Candle(object):
-    is_dark = Bus(0)   # D0
+    is_dark = Bus(0)  # D0
     be_light = Bus(1)  # D1
 
     def __init__(self):
@@ -31,6 +31,6 @@ class Candle(object):
             self.be_light = not self.is_dark
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     c = Candle()
     c.run()

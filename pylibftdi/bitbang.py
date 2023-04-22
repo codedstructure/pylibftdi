@@ -34,23 +34,28 @@ class BitBangDevice(Device):
      latch: 8 bit output value, allowing e.g. `bb.latch += 1` to make sense
             when there is a mix of input and output lines
     """
-    def __init__(self,
-                 device_id=None,
-                 direction=ALL_OUTPUTS,
-                 lazy_open=False,
-                 sync=True,
-                 bitbang_mode=BITMODE_BITBANG,
-                 interface_select=None,
-                 **kwargs):
+
+    def __init__(
+        self,
+        device_id=None,
+        direction=ALL_OUTPUTS,
+        lazy_open=False,
+        sync=True,
+        bitbang_mode=BITMODE_BITBANG,
+        interface_select=None,
+        **kwargs,
+    ):
         # initialise the super-class, but don't open yet. We really want
         # two-part initialisation here - set up all the instance variables
         # here in the super class, then open it after having set more
         # of our own variables.
-        super(BitBangDevice, self).__init__(device_id=device_id,
-                                            mode='b',
-                                            lazy_open=True,
-                                            interface_select=interface_select,
-                                            **kwargs)
+        super(BitBangDevice, self).__init__(
+            device_id=device_id,
+            mode="b",
+            lazy_open=True,
+            interface_select=interface_select,
+            **kwargs,
+        )
         self.direction = direction
         self.sync = sync
         self.bitbang_mode = bitbang_mode
@@ -148,8 +153,9 @@ class BitBangDevice(Device):
             # replace the 'output' bits with current value of self.latch -
             # the last written value. This makes read-modify-write
             # operations (e.g. 'drv.port |= 0x10') work as expected
-            result = ((result & ~self._direction) |    # read input
-                      (self.latch & self._direction))  # output latch
+            result = (result & ~self._direction) | (  # read input
+                self.latch & self._direction
+            )  # output latch
         return result
 
     @port.setter

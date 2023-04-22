@@ -19,8 +19,10 @@ if sys.version_info < (2, 7):
     try:
         import unittest2 as unittest
     except ImportError:
-        raise SystemExit("The test functionality is only supported in"
-                         "Python 2.7+ unless unittest2 is installed")
+        raise SystemExit(
+            "The test functionality is only supported in"
+            "Python 2.7+ unless unittest2 is installed"
+        )
 else:
     import unittest  # NOQA
 
@@ -31,6 +33,7 @@ class SimpleMock(object):
     made through it to fn_log, which is currently rather ugly
     global state.
     """
+
     def __init__(self, name="<base>"):
         self.__name = name
 
@@ -92,6 +95,7 @@ class LoopDevice(Device):
     a mock device object which overrides read and write
     to operate as an unbounded loopback pair
     """
+
     def __init__(self, *o, **k):
         super(LoopDevice, self).__init__(*o, **k)
         self.__buffer = []
@@ -107,5 +111,6 @@ class LoopDevice(Device):
         self.__buffer.extend(bytearray(data))
         return len(data)
 
-verbose = {'-v', '--verbose'} & set(sys.argv)
+
+verbose = {"-v", "--verbose"} & set(sys.argv)
 logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)

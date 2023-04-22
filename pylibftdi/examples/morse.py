@@ -36,7 +36,7 @@ def output(s, device, wpm=12):
                 # completely ignore unknown characters
                 continue
             for symbol in morse:
-                if symbol == '.':
+                if symbol == ".":
                     device.port = 1
                     sleep(delay)
                     device.port = 0
@@ -57,7 +57,7 @@ def main(wpm=12):
     """
     while True:
         try:
-            s = input('Morse:> ' if isatty(0) else '').lower().strip()
+            s = input("Morse:> " if isatty(0) else "").lower().strip()
         except EOFError:
             break
 
@@ -68,5 +68,5 @@ def main(wpm=12):
         print("Bye!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

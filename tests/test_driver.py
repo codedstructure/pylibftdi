@@ -13,9 +13,10 @@ from pylibftdi import LibraryMissingError
 from tests.test_common import unittest
 from pylibftdi.driver import Driver
 
+
 class DriverTest(unittest.TestCase):
     """
-    Test to ensure the Driver class accepts the correct arguments. 
+    Test to ensure the Driver class accepts the correct arguments.
     """
 
     def setUp(self):
@@ -25,8 +26,8 @@ class DriverTest(unittest.TestCase):
         Driver class, they should also be added here.
         """
         Driver._lib_search = {
-            'libftdi': ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'],
-            'libusb': ['usb-1.0', 'libusb-1.0']
+            "libftdi": ["ftdi1", "libftdi1", "ftdi", "libftdi"],
+            "libusb": ["usb-1.0", "libusb-1.0"],
         }
 
     def testNoneLibrary(self):
@@ -36,17 +37,19 @@ class DriverTest(unittest.TestCase):
         Driver class. This is the default and most typical behavior.
         """
         driver = Driver(libftdi_search=None)
-        self.assertListEqual(driver._lib_search['libftdi'], \
-                        ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'])
+        self.assertListEqual(
+            driver._lib_search["libftdi"], ["ftdi1", "libftdi1", "ftdi", "libftdi"]
+        )
 
     def testNoExplicitParameters(self):
         """
-        The Driver class can accept no explicit parameters. Ensures 
+        The Driver class can accept no explicit parameters. Ensures
         that libftdi_search is set to None by default.
         """
         driver = Driver()
-        self.assertListEqual(driver._lib_search['libftdi'], \
-                        ['ftdi1', 'libftdi1', 'ftdi', 'libftdi'])
+        self.assertListEqual(
+            driver._lib_search["libftdi"], ["ftdi1", "libftdi1", "ftdi", "libftdi"]
+        )
 
     def testStringLibrary(self):
         """
@@ -54,8 +57,8 @@ class DriverTest(unittest.TestCase):
         value in a list with a single element. You might use this when you
         know the exact name of the library (perhaps custom).
         """
-        driver = Driver(libftdi_search='libftdi')
-        self.assertListEqual(driver._lib_search['libftdi'], ['libftdi'])
+        driver = Driver(libftdi_search="libftdi")
+        self.assertListEqual(driver._lib_search["libftdi"], ["libftdi"])
 
     def testListLibrary(self):
         """
@@ -63,8 +66,8 @@ class DriverTest(unittest.TestCase):
         values in a list. You might use this to support a limited number of
         platforms with different library names.
         """
-        driver = Driver(libftdi_search=['ftdi1', 'libftdi1'])
-        self.assertListEqual(driver._lib_search['libftdi'], ['ftdi1', 'libftdi1'])
+        driver = Driver(libftdi_search=["ftdi1", "libftdi1"])
+        self.assertListEqual(driver._lib_search["libftdi"], ["ftdi1", "libftdi1"])
 
     def testLoadLibrarySearchListEmpty(self):
         """
@@ -75,8 +78,8 @@ class DriverTest(unittest.TestCase):
         driver = Driver(libftdi_search=None)
         # Try and find the library names for libftdi.
         with self.assertRaises(expected_exception=LibraryMissingError):
-            driver._load_library(name='libftdi', search_list=[])
-    
+            driver._load_library(name="libftdi", search_list=[])
+
     def testLoadLibraryMissingLibraryName(self):
         """
         If a Driver object calls _load_library with with a name not in the
@@ -85,7 +88,7 @@ class DriverTest(unittest.TestCase):
         """
         driver = Driver(libftdi_search=None)
         with self.assertRaises(expected_exception=LibraryMissingError):
-            driver._load_library(name='non-existent-library', search_list=None)
+            driver._load_library(name="non-existent-library", search_list=None)
 
     def testLoadLibrarySearchListNone(self):
         """
@@ -96,12 +99,13 @@ class DriverTest(unittest.TestCase):
         driver = Driver(libftdi_search=None)
         try:
             # Assert that Driver can find both of the defaults.
-            libftdi = driver._load_library(name='libftdi', search_list=None)
-            libusb = driver._load_library(name='libusb', search_list=None)
-            self.assertIsNotNone(obj=libftdi, msg='libftdi library not found')
-            self.assertIsNotNone(obj=libusb, msg='libusb library not found')
+            libftdi = driver._load_library(name="libftdi", search_list=None)
+            libusb = driver._load_library(name="libusb", search_list=None)
+            self.assertIsNotNone(obj=libftdi, msg="libftdi library not found")
+            self.assertIsNotNone(obj=libusb, msg="libusb library not found")
         except LibraryMissingError:
-            self.fail('LibraryMissingError raised for default library names.')
+            self.fail("LibraryMissingError raised for default library names.")
+
 
 if __name__ == "__main__":
     unittest.main()

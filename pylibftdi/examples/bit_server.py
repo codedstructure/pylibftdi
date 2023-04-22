@@ -26,7 +26,8 @@ class ThreadingServer(ThreadingMixIn, HTTPServer):
 
 def get_page():
     port = switch.port
-    page = """
+    page = (
+        """
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,11 +35,13 @@ def get_page():
 </head>
 <body>
 <div>
-""" % port
+"""
+        % port
+    )
     for i in range(8):
         bit = 7 - i
         is_on = port & (1 << bit)
-        color = '#00FF00' if is_on else '#FF0000'
+        color = "#00FF00" if is_on else "#FF0000"
         page += """
 <fieldset style="background-color: %s; display: inline-block; margin:0px; padding: 8px;">
 <form action="" method="post" >
@@ -46,13 +49,22 @@ def get_page():
 <input type="hidden" name="bit%d" />
 </form>
 </fieldset>
-""" % (color, bit, i, 'checked="checked"' if is_on else '', bit)
-    page += """
+""" % (
+            color,
+            bit,
+            i,
+            'checked="checked"' if is_on else "",
+            bit,
+        )
+    page += (
+        """
 </div>
 DATA=%s
 </body>
 </html>
-""" % port
+"""
+        % port
+    )
     return page
 
 
@@ -64,16 +76,16 @@ class ReqHandler(BaseHTTPRequestHandler):
             f.close()
 
     def do_POST(self):
-        length = self.headers['content-length']
+        length = self.headers["content-length"]
         nbytes = int(length)
         query = self.rfile.read(nbytes).decode()
         # this is lazy and fragile - assumes only a single
         # query parameter XXX
-        if query.startswith('bit'):
+        if query.startswith("bit"):
             bit = int(query[3])
-            value = 1 if query.rsplit('=', 1)[-1] == 'true' else 0
+            value = 1 if query.rsplit("=", 1)[-1] == "true" else 0
             if value:
-                switch.port |= (1 << bit)
+                switch.port |= 1 << bit
             else:
                 switch.port &= 255 ^ (1 << bit)
 
@@ -95,11 +107,12 @@ class ReqHandler(BaseHTTPRequestHandler):
 
 
 def runserver(port=HTTP_PORT):
-    serveraddr = ('', port)
+    serveraddr = ("", port)
     srvr = ThreadingServer(serveraddr, ReqHandler)
     srvr.serve_forever()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     switch = BitBangDevice()
 
     try:
@@ -117,7 +130,7 @@ if __name__ == '__main__':
     retry = 10
     while retry:
         try:
-            webbrowser.open('http://localhost:%d' % HTTP_PORT)
+            webbrowser.open("http://localhost:%d" % HTTP_PORT)
         except EnvironmentError:
             time.sleep(1)
             retry -= 1

@@ -24,9 +24,9 @@ class LoopbackTester(object):
     def test_loopback(self, l):
         test_str = test_string(l)
         if self.device.write(test_str) != len(test_str):
-            sys.stdout.write('*')
+            sys.stdout.write("*")
         time.sleep(0.1)
-        result = ''
+        result = ""
         for _ in range(5):
             result = self.device.read(l)
             time.sleep(0.1)
@@ -66,6 +66,6 @@ class LoopbackTester(object):
             print("Buffer size: {}".format(result))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     tester = LoopbackTester()
     tester.main()

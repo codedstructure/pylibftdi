@@ -17,20 +17,33 @@ __VERSION__ = "0.20.0"
 __AUTHOR__ = "Ben Bass"
 
 
-__ALL__ = ['Driver', 'Device', 'BitBangDevice', 'Bus',
-           'FtdiError', 'MissingLibraryError',
-           'ALL_OUTPUTS', 'ALL_INPUTS', 'BB_OUTPUT', 'BB_INPUT',
-           'USB_VID_LIST', 'USB_PID_LIST']
+__ALL__ = [
+    "Driver",
+    "Device",
+    "BitBangDevice",
+    "Bus",
+    "FtdiError",
+    "MissingLibraryError",
+    "ALL_OUTPUTS",
+    "ALL_INPUTS",
+    "BB_OUTPUT",
+    "BB_INPUT",
+    "USB_VID_LIST",
+    "USB_PID_LIST",
+]
 
 from pylibftdi import _base, driver, device, util, bitbang, serial_device
 
 import sys
+
 if sys.version_info < (3, 6, 0):
     import warnings
 
     if sys.version_info.major < 3:
-        warnings.warn("""Python 2 has been end-of-life since 2020,
-and future releases of pylibftdi will require at least Python 3.6""")
+        warnings.warn(
+            """Python 2 has been end-of-life since 2020,
+and future releases of pylibftdi will require at least Python 3.6"""
+        )
     else:
         warnings.warn("Python version < 3.6.0: untested; expect issues.")
 

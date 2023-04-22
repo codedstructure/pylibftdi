@@ -16,7 +16,6 @@ from pylibftdi.util import Bus
 
 
 class TestBus(unittest.TestCase):
-
     class MockDevice(object):
         port = 0
 

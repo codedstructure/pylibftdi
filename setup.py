@@ -11,7 +11,7 @@ setup_args = dict(
     name="pylibftdi",
     version="0.20.0",
     description="Pythonic interface to FTDI devices using libftdi",
-    long_description=open('README.rst').read(),
+    long_description=open("README.rst").read(),
     author="Ben Bass",
     author_email="benbass@codedstructure.net",
     url="https://github.com/codedstructure/pylibftdi",
@@ -32,9 +32,9 @@ setup_args = dict(
         "Programming Language :: Python :: 3.11",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Embedded Systems",
-        "Topic :: System :: Hardware"
+        "Topic :: System :: Hardware",
     ],
-    python_requires=">=3.7"
+    python_requires=">=3.7",
 )
 
 setup(**setup_args)

@@ -66,7 +66,7 @@ def display_loop(interval=1, count=0, match=None, mask=0xFF):
     except KeyboardInterrupt:
         pass
     finally:
-        sys.stdout.write('\n')
+        sys.stdout.write("\n")
 
     if match is not None:
         # we quit early while looking for a match
@@ -78,17 +78,33 @@ def display_loop(interval=1, count=0, match=None, mask=0xFF):
 
 def main(args=None):
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--interval", dest="interval",
-                        default=1, type=float,
-                        help="refresh interval, default 1 second")
-    parser.add_argument("-c", "--count", dest="count",
-                        default=0, type=int,
-                        help="number of cycles to run for (0 = no limit - the default)")
-    parser.add_argument("-m", "--match", dest="match",
-                        help="value to match against (e.g. 0x1F, 7, etc)")
-    parser.add_argument("-k", "--mask", dest="mask",
-                        help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF")
+    parser.add_argument(
+        "-n",
+        "--interval",
+        dest="interval",
+        default=1,
+        type=float,
+        help="refresh interval, default 1 second",
+    )
+    parser.add_argument(
+        "-c",
+        "--count",
+        dest="count",
+        default=0,
+        type=int,
+        help="number of cycles to run for (0 = no limit - the default)",
+    )
+    parser.add_argument(
+        "-m", "--match", dest="match", help="value to match against (e.g. 0x1F, 7, etc)"
+    )
+    parser.add_argument(
+        "-k",
+        "--mask",
+        dest="mask",
+        help="mask to match with (e.g. 0x07, 2, etc) - default 0xFF",
+    )
     args = parser.parse_args(args)
 
     if args.interval < 0.001:
@@ -114,5 +130,5 @@ def main(args=None):
     sys.exit(0 if ok else 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
