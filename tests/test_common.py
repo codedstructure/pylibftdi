@@ -10,6 +10,8 @@ This module contains some basic tests for the higher-level
 functionality without requiring an actual hardware device
 to be attached.
 """
+
+import gc
 import logging
 import sys
 
@@ -56,6 +58,8 @@ class CallCheckMixin:
         self.assertNotIn(methodname, CallLog.get())
 
     def assertCallsExact(self, fn, call_list):
+        # ensure any pending Device.__del__ calls get triggered before running fn
+        gc.collect()
         CallLog.reset()
         fn()
         self.assertEqual(call_list, CallLog.get())
