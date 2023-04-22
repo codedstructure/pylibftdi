@@ -7,9 +7,9 @@ See LICENSE file for details and (absence of) warranty
 pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
-from pylibftdi.device import Device
+from ctypes import byref, c_uint16
 
-from ctypes import c_uint16, byref
+from pylibftdi.device import Device
 
 CTS_MASK = 1 << 4
 DSR_MASK = 1 << 5

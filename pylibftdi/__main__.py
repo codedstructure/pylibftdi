@@ -13,15 +13,15 @@ e.g.
 
 # This should be aligned with `__all__` in pylibftdi/__init__.py
 from pylibftdi import (  # noqa
-    Driver,
-    Device,
+    ALL_INPUTS,
+    ALL_OUTPUTS,
+    BB_INPUT,
+    BB_OUTPUT,
+    USB_PID_LIST,
+    USB_VID_LIST,
     BitBangDevice,
     Bus,
+    Device,
+    Driver,
     FtdiError,
-    ALL_OUTPUTS,
-    ALL_INPUTS,
-    BB_OUTPUT,
-    BB_INPUT,
-    USB_VID_LIST,
-    USB_PID_LIST,
 )

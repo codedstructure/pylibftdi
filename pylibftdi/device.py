@@ -9,35 +9,33 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 """
 from __future__ import annotations
 
-import os
-import sys
 import codecs
 import functools
 import itertools
-
+import os
+import sys
 from ctypes import (
+    POINTER,
+    Structure,
     byref,
-    create_string_buffer,
     c_char_p,
     c_void_p,
-    Structure,
     cast,
-    POINTER,
+    create_string_buffer,
 )
 from typing import Any, Optional, no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
-    Driver,
-    USB_VID_LIST,
-    USB_PID_LIST,
-    FTDI_ERROR_DEVICE_NOT_FOUND,
     BITMODE_RESET,
     FLUSH_BOTH,
     FLUSH_INPUT,
     FLUSH_OUTPUT,
+    FTDI_ERROR_DEVICE_NOT_FOUND,
+    USB_PID_LIST,
+    USB_VID_LIST,
+    Driver,
 )
-
 
 ERR_HELP_NOT_FOUND_FAIL = """
 No device matching the given specification could be found.

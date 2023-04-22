@@ -10,8 +10,8 @@ This module contains some basic tests for Driver class.
 """
 
 from pylibftdi import LibraryMissingError
-from tests.test_common import unittest
 from pylibftdi.driver import Driver
+from tests.test_common import unittest
 
 
 class DriverTest(unittest.TestCase):

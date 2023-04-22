@@ -11,8 +11,8 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 import logging
-
 import sys
+
 from tests.call_log import CallLog
 
 if sys.version_info < (2, 7):

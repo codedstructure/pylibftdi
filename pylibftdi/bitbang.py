@@ -8,10 +8,11 @@ pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
 
+from ctypes import byref, c_ubyte
+
 from pylibftdi._base import FtdiError
 from pylibftdi.device import Device
 from pylibftdi.driver import BITMODE_BITBANG
-from ctypes import c_ubyte, byref
 
 ALL_OUTPUTS = 0xFF
 ALL_INPUTS = 0x00

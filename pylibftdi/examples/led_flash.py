@@ -7,8 +7,9 @@ Copyright (c) 2010-2014 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
-import time
 import sys
+import time
+
 from pylibftdi import BitBangDevice
 
 

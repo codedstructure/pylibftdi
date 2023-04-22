@@ -12,9 +12,10 @@ import sys
 import threading
 import time
 import webbrowser
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from io import BytesIO
 from socketserver import ThreadingMixIn
+
 from pylibftdi import BitBangDevice
 
 HTTP_PORT = 8008

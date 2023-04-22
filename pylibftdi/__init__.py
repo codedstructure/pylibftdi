@@ -31,9 +31,9 @@ __all__ = [
     "USB_PID_LIST",
 ]
 
-from pylibftdi import _base, driver, device, util, bitbang, serial_device
-
 import sys
+
+from pylibftdi import _base, bitbang, device, driver, serial_device, util
 
 if sys.version_info < (3, 6, 0):
     import warnings

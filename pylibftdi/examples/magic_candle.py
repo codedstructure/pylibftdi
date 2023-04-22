@@ -11,8 +11,8 @@ pylibftdi - codedstructure 2013-2014
 
 import time
 
-from pylibftdi.util import Bus
 from pylibftdi import BitBangDevice
+from pylibftdi.util import Bus
 
 
 class Candle(object):

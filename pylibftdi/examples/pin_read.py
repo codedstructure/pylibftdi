@@ -13,9 +13,10 @@ All rights reserved.
 """
 
 import itertools
-import time
 import sys
-from pylibftdi import BitBangDevice, ALL_INPUTS
+import time
+
+from pylibftdi import ALL_INPUTS, BitBangDevice
 
 
 def get_value():

@@ -29,10 +29,10 @@ Copyright (c) 2015-2020 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
-import time
-import random
 import hashlib
+import random
 import threading
+import time
 from itertools import islice
 
 from pylibftdi import Device, FtdiError

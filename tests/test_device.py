@@ -11,9 +11,9 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from tests.test_common import LoopDevice, CallCheckMixin, unittest
-from pylibftdi.device import Device
 from pylibftdi import FtdiError
+from pylibftdi.device import Device
+from tests.test_common import CallCheckMixin, LoopDevice, unittest
 
 # and now some test cases...
 

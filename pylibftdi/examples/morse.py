@@ -7,6 +7,7 @@ connected to bit 0.
 
 from os import isatty
 from time import sleep
+
 from pylibftdi import BitBangDevice
 
 # See https://en.wikipedia.org/wiki/Morse_code

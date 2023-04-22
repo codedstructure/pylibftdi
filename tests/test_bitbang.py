@@ -11,9 +11,9 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-from tests.test_common import LoopDevice, CallCheckMixin, unittest
-from pylibftdi.bitbang import BitBangDevice
 from pylibftdi import FtdiError
+from pylibftdi.bitbang import BitBangDevice
+from tests.test_common import CallCheckMixin, LoopDevice, unittest
 
 
 class TestBitBangDevice(BitBangDevice, LoopDevice):

@@ -11,22 +11,22 @@ from __future__ import annotations
 
 import itertools
 from collections import namedtuple
-from typing import Any, Optional
 
 # be disciplined so pyflakes can check us...
 from ctypes import (
-    cdll,
-    byref,
-    c_int,
-    c_char_p,
-    c_void_p,
-    c_uint16,
-    cast,
-    create_string_buffer,
-    Structure,
     POINTER,
+    Structure,
+    byref,
+    c_char_p,
+    c_int,
+    c_uint16,
+    c_void_p,
+    cast,
+    cdll,
+    create_string_buffer,
 )
 from ctypes.util import find_library
+from typing import Any, Optional
 
 from pylibftdi._base import FtdiError, LibraryMissingError
 
