@@ -258,26 +258,26 @@ install (with the 'develop' target ideally) as follows::
     $ cd pylibftdi
     $ python3 -m venv env
     $ source env/bin/activate
-    (env) $ python3 setup.py develop
+    (env) $ python3 -m pip install -e .
 
 Note this also creates a virtual environment within the project directory;
 see here_
 
 .. _here: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
-Note for now there is only the master branch, so need to worry about which
+Note for now there is only the main branch, so need to worry about which
 branch is required.
 
 How do I run the tests?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Tests aren't included in the distutils distribution, so clone the
-repository and run from there. pylibftdi supports Python 3.6+::
+repository and run from there. pylibftdi supports Python 3.7+::
 
     $ git clone https://github.com/codedstructure/pylibftdi
     <various output stuff>
     $ cd pylibftdi
-    $ python3.6 -m unittest discover
+    $ python3 -m unittest discover
     ..........................
     ----------------------------------------------------------------------
     Ran 26 tests in 0.007s
