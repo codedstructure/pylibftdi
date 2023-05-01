@@ -15,6 +15,7 @@ import unittest
 
 from pylibftdi import FtdiError
 from pylibftdi.bitbang import BitBangDevice
+
 from tests.test_common import CallCheckMixin, LoopDevice
 
 

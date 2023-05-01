@@ -15,6 +15,7 @@ import unittest
 
 from pylibftdi import FtdiError
 from pylibftdi.device import Device
+
 from tests.test_common import CallCheckMixin, LoopDevice
 
 # and now some test cases...

@@ -1,14 +1,15 @@
-[project]
+[tool.poetry]
 name = "pylibftdi"
 version="0.20.0"
-readme = "README.rst"
 description = "Pythonic interface to FTDI devices using libftdi."
+license = "MIT"
 authors = [
-    {name = "Ben Bass", email = "benbass@codedstructure.net"}
+    "Ben Bass <benbass@codedstructure.net>",
 ]
-license = {file = "LICENSE.txt"}
-requires-python = ">=3.7.0"
-dependencies = []
+readme = "README.rst"
+homepage = "https://github.com/codedstructure/pylibftdi"
+repository = "https://github.com/codedstructure/pylibftdi"
+documentation = "https://pylibftdi.readthedocs.io/en/latest/"
 keywords = [
     "ftdi",
     "libftdi",
@@ -33,17 +34,29 @@ classifiers = [
     "Topic :: System :: Hardware",
 ]
 
-[project.urls]
-repository = "https://github.com/codedstructure/pylibftdi"
-documentation = "https://pylibftdi.readthedocs.io/en/latest/"
-changelog = "https://github.com/codedstructure/pylibftdi/blob/main/CHANGES.txt"
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[bdist_wheel]
-universal = 1
+[tool.poetry.dependencies]
+python = ">=3.7.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.3.1"
+ruff = "^0.0.263"
+mypy = "^1.2.0"
 
 [tool.ruff]
 select = ["E", "W", "F", "B", "I", "UP", "PL"]
 ignore = [
   "PLR2004",  # Magic value used in comparison
   "PLR0913",  # Too many arguments to function call
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src", ".",
+]
+addopts = [
+    "--import-mode=importlib",
 ]
