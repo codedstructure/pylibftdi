@@ -20,7 +20,7 @@ test:
 
 .PHONY: lint
 lint:
-	docker run -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && (poetry run ruff src tests; poetry run mypy src)'
+	docker run -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && (poetry run black --check .; poetry run ruff src tests; poetry run mypy src)'
 
 .PHONY: shell
 shell:
