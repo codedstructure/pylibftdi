@@ -1,6 +1,20 @@
 pylibftdi changes
 =================
 
+0.21.0
+------
+* Breaking changes:
+  * Python 3.7+ is now required for pylibftdi.
+  * Driver.libusb_version() and libftdi_version() now return strings rather than bytestrings for textual version info
+* Development changes:
+  * Type hinting has been added - thanks @WhatTheFuzz!
+  * Moved to a `src` layout. See https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/
+  * Switched from `setuptools` to `poetry` for development.
+  * Linting and style changes (Ruff & black) have been applied throughout.
+  * Additional unit tests, especially covering library loading.
+  * Added a Dockerfile and Makefile for development and testing.
+  * Added GitHub Actions CI for linting and unittests.
+
 0.20.0
 ------
 * Removed claims of Python2 support, added warnings that Python2 support

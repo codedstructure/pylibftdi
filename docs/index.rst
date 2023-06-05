@@ -53,6 +53,7 @@ Contents
    advanced_usage
    how_to
    troubleshooting
+   developing
    pylibftdi
 
 Indices and tables
