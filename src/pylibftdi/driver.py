@@ -173,7 +173,12 @@ class Driver:
         """
         ver = self._libusb.libusb_get_version().contents
         return libusb_version(
-            ver.major, ver.minor, ver.micro, ver.nano, ver.rc, ver.describe
+            ver.major,
+            ver.minor,
+            ver.micro,
+            ver.nano,
+            ver.rc.decode(),
+            ver.describe.decode(),
         )
 
     @property
@@ -215,8 +220,8 @@ class Driver:
                 version.major,
                 version.minor,
                 version.micro,
-                version.version_str,
-                version.snapshot_str,
+                version.version_str.decode(),
+                version.snapshot_str.decode(),
             )
         else:
             # library versions <1.0 don't support this function...

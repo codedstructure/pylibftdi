@@ -5,9 +5,9 @@ example usage::
 
     $ python3 -m pylibftdi.examples.info
     pylibftdi version     : 0.15.0
-    libftdi version       : libftdi_version(major=1, minor=1, micro=0, version_str=b'1.1', snapshot_str=b'unknown')
+    libftdi version       : libftdi_version(major=1, minor=1, micro=0, version_str='1.1', snapshot_str='unknown')
     libftdi library path  : /usr/local/lib/libftdi1.dylib
-    libusb version        : libusb_version(major=1, minor=0, micro=19, nano=10903, rc=b'', describe=b'http://libusb.info')
+    libusb version        : libusb_version(major=1, minor=0, micro=19, nano=10903, rc='', describe='http://libusb.info')
     libusb library path   : /usr/local/lib/libusb-1.0.dylib
     Python version        : 3.4.0
     OS platform           : Darwin-14.1.0-x86_64-i386-64bit
