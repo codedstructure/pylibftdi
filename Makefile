@@ -12,20 +12,20 @@ container:
 
 .PHONY: build
 build:
-	docker run -t -v $$PWD:/app -w /app pylibftdi-dev:latest poetry build
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest poetry build
 
 .PHONY: test
 test:
-	docker run -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && poetry run pytest'
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && poetry run pytest'
 
 .PHONY: lint
 lint:
-	docker run -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && (poetry run black --check .; poetry run ruff src tests; poetry run mypy src)'
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && (poetry run black --check .; poetry run ruff src tests; poetry run mypy src)'
 
 .PHONY: shell
 shell:
 	# Drop into a poetry shell where e.g. `python3 -m pylibftdi.examples.list_devices` etc can be run
-	docker run -it -v $$PWD:/app -w /app pylibftdi-dev:latest bash -ic 'poetry install && poetry shell'
+	docker run --rm -it -v $$PWD:/app -w /app pylibftdi-dev:latest bash -ic 'poetry install && poetry shell'
 
 .PHONY: clean
 clean:
