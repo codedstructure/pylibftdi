@@ -43,7 +43,7 @@ pylibftdi Package
     :show-inheritance:
 
 :mod:`serial_device` Module
----------------------
+---------------------------
 
 .. automodule:: pylibftdi.serial_device
     :members:
