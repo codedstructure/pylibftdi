@@ -7,6 +7,7 @@ See LICENSE file for details and (absence of) warranty
 pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
+
 from ctypes import byref, c_uint16
 
 from pylibftdi.device import Device
