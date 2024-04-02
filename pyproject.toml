@@ -42,10 +42,10 @@ build-backend = "poetry.core.masonry.api"
 python = ">=3.7.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.3.1"
-ruff = "^0.0.263"
-mypy = "^1.2.0"
-black = "^23.3.0"
+ruff = "^0.3.5"
+pytest = { version="^8.1.1", python=">=3.8" }
+mypy = { version="^1.9.0", python=">=3.8" }
+black = { version="^24.3.0", python=">=3.8" }
 
 [tool.ruff]
 select = ["E", "W", "F", "B", "I", "UP", "PL"]
