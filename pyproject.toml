@@ -48,8 +48,8 @@ mypy = { version="^1.9.0", python=">=3.8" }
 black = { version="^24.3.0", python=">=3.8" }
 
 [tool.ruff]
-select = ["E", "W", "F", "B", "I", "UP", "PL"]
-ignore = [
+lint.select = ["E", "W", "F", "B", "I", "UP", "PL"]
+lint.ignore = [
   "PLR2004",  # Magic value used in comparison
   "PLR0913",  # Too many arguments to function call
 ]

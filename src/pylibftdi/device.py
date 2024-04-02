@@ -7,6 +7,7 @@ See LICENSE file for details and (absence of) warranty
 pylibftdi: https://github.com/codedstructure/pylibftdi
 
 """
+
 from __future__ import annotations
 
 import codecs

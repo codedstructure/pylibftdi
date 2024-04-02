@@ -11,7 +11,6 @@ functionality without requiring an actual hardware device
 to be attached.
 """
 
-
 import unittest
 
 from pylibftdi.util import Bus
