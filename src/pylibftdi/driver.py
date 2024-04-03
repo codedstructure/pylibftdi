@@ -143,7 +143,8 @@ class Driver:
                 # cdll access.
                 lib = getattr(cdll, dll)
                 break
-            except OSError:
+            # On DLL load fail, Python <3.12 raises OSError, 3.12+ AttributeError.
+            except (OSError, AttributeError):
                 lib_path = find_library(dll)
                 if lib_path is not None:
                     lib = getattr(cdll, lib_path)
