@@ -163,4 +163,5 @@ class BitBangDevice(Device):
         self._latch = value
         if self.sync:
             self.flush_output()
-        return super().write(value.to_bytes())
+        # note to_bytes() gets these as default args in Python3.11+
+        return super().write(value.to_bytes(1, "big"))
