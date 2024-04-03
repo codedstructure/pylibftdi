@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pylibftdi"
-version="0.21.0"
+version="0.22.0"
 description = "Pythonic interface to FTDI devices using libftdi."
 license = "MIT"
 authors = [

@@ -1,6 +1,12 @@
 pylibftdi changes
 =================
 
+0.22.0
+------
+* Fix: #7 - support for Python3.12
+* Fix: #6 - prevent BitBangDevice.port values exceeding 8 bits
+* Bumps to linting dependencies (ruff, mypy, black, pylint)
+
 0.21.0
 ------
 * Breaking changes:

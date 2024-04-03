@@ -43,16 +43,16 @@ master_doc = "index"
 
 # General information about the project.
 project = "pylibftdi"
-copyright = "2010-2023, Ben Bass"
+copyright = "2010-2024, Ben Bass"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = "0.21.0"
+version = "0.22.0"
 # The full version, including alpha/beta/rc tags.
-release = "0.21.0"
+release = "0.22.0"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

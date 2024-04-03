@@ -1,7 +1,7 @@
 """
 pylibftdi - python wrapper for libftdi
 
-Copyright (c) 2010-2020 Ben Bass <benbass@codedstructure.net>
+Copyright (c) 2010-2024 Ben Bass <benbass@codedstructure.net>
 See LICENSE file for details and (absence of) warranty
 
 pylibftdi: https://github.com/codedstructure/pylibftdi
@@ -13,7 +13,7 @@ if something goes wrong here, it's almost definitely my fault
 rather than a problem with the libftdi library.
 """
 
-__VERSION__ = "0.21.0"
+__VERSION__ = "0.22.0"
 __AUTHOR__ = "Ben Bass"
 
 
