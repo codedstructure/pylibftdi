@@ -158,7 +158,9 @@ class BitBangDevice(Device):
 
     @port.setter
     def port(self, value):
+        # restrict to a single byte
+        value &= 0xFF
         self._latch = value
         if self.sync:
             self.flush_output()
-        return super().write(chr(value))
+        return super().write(value.to_bytes())
