@@ -482,7 +482,7 @@ class Device:
             fn = self.fdll.ftdi_usb_purge_tx_buffer
         else:
             raise ValueError(
-                "Invalid value passed to %s.flush()" % self.__class__.__name__
+                f"Invalid value passed to {self.__class__.__name__}.flush()"
             )
         res = fn(byref(self.ctx))
         if res != 0:

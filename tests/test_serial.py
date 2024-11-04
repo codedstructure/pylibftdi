@@ -13,8 +13,9 @@ to be attached.
 
 import unittest
 
+from pylibftdi import add_custom_vid_pid
+from pylibftdi.driver import USB_PID_LIST, USB_VID_LIST
 from pylibftdi.serial_device import SerialDevice
-
 from tests.test_common import CallCheckMixin, LoopDevice
 
 
@@ -61,6 +62,17 @@ class SerialFunctions(CallCheckMixin, unittest.TestCase):
     def test_rts(self):
         """check setting and getting rts"""
         self._write_test("rts")
+
+    def test_add_custom_vid_pid(self):
+        """check adding custom VID and PID"""
+        initial_vid_list = USB_VID_LIST[:]
+        initial_pid_list = USB_PID_LIST[:]
+        add_custom_vid_pid(vids=[0x1234], pids=[0x5678])
+        self.assertIn(0x1234, USB_VID_LIST)
+        self.assertIn(0x5678, USB_PID_LIST)
+        # Restore the original lists to avoid side effects on other tests
+        USB_VID_LIST[:] = initial_vid_list
+        USB_PID_LIST[:] = initial_pid_list
 
 
 if __name__ == "__main__":

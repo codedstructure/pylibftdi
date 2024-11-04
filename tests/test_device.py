@@ -13,9 +13,9 @@ to be attached.
 
 import unittest
 
-from pylibftdi import FtdiError
+from pylibftdi import FtdiError, add_custom_vid_pid
 from pylibftdi.device import Device
-
+from pylibftdi.driver import USB_PID_LIST, USB_VID_LIST
 from tests.test_common import CallCheckMixin, LoopDevice
 
 # and now some test cases...
@@ -74,6 +74,24 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
         d = Device()
         d.close()
         self.assertRaises(FtdiError, d.read, 1)
+
+    def testAddCustomVidPid(self):
+        """
+        Test adding custom VIDs and PIDs to the global lists.
+        """
+        add_custom_vid_pid(vids=[0x1234], pids=[0x5678])
+        self.assertIn(0x1234, USB_VID_LIST)
+        self.assertIn(0x5678, USB_PID_LIST)
+
+    def testAddMultipleCustomVidPid(self):
+        """
+        Test adding multiple custom VIDs and PIDs to the global lists.
+        """
+        add_custom_vid_pid(vids=[0x1234, 0x5678], pids=[0x9ABC, 0xDEF0])
+        self.assertIn(0x1234, USB_VID_LIST)
+        self.assertIn(0x5678, USB_VID_LIST)
+        self.assertIn(0x9ABC, USB_PID_LIST)
+        self.assertIn(0xDEF0, USB_PID_LIST)
 
 
 class LoopbackTest(unittest.TestCase):

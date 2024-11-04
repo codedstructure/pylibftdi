@@ -11,8 +11,8 @@ This module contains some basic tests for Driver class.
 
 import unittest
 
-from pylibftdi import LibraryMissingError
-from pylibftdi.driver import Driver
+from pylibftdi import LibraryMissingError, add_custom_vid_pid
+from pylibftdi.driver import USB_PID_LIST, USB_VID_LIST, Driver
 
 
 class DriverTest(unittest.TestCase):
@@ -30,6 +30,9 @@ class DriverTest(unittest.TestCase):
             "libftdi": ["ftdi1", "libftdi1", "ftdi", "libftdi"],
             "libusb": ["usb-1.0", "libusb-1.0"],
         }
+        # Reset USB_VID_LIST and USB_PID_LIST before each test
+        USB_VID_LIST[:] = [0x0403]
+        USB_PID_LIST[:] = [0x6001, 0x6010, 0x6011, 0x6014]
 
     def testNoneLibrary(self):
         """
@@ -106,6 +109,24 @@ class DriverTest(unittest.TestCase):
             self.assertIsNotNone(obj=libusb, msg="libusb library not found")
         except LibraryMissingError:
             self.fail("LibraryMissingError raised for default library names.")
+
+    def testAddCustomVidPid(self):
+        """
+        Test adding custom VIDs and PIDs to the global lists.
+        """
+        add_custom_vid_pid(vids=[0x1234], pids=[0x5678])
+        self.assertIn(0x1234, USB_VID_LIST)
+        self.assertIn(0x5678, USB_PID_LIST)
+
+    def testAddMultipleCustomVidPid(self):
+        """
+        Test adding multiple custom VIDs and PIDs to the global lists.
+        """
+        add_custom_vid_pid(vids=[0x1234, 0x5678], pids=[0x9ABC, 0xDEF0])
+        self.assertIn(0x1234, USB_VID_LIST)
+        self.assertIn(0x5678, USB_VID_LIST)
+        self.assertIn(0x9ABC, USB_PID_LIST)
+        self.assertIn(0xDEF0, USB_PID_LIST)
 
 
 if __name__ == "__main__":

@@ -24,4 +24,5 @@ from pylibftdi import (  # noqa
     Device,
     Driver,
     FtdiError,
+    add_custom_vid_pid,
 )
