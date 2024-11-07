@@ -128,6 +128,8 @@ class Device:
         encoding: str = "latin1",
         interface_select: int | None = None,
         device_index: int = 0,
+        vid: int | None = None,
+        pid: int | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -209,6 +211,8 @@ class Device:
         # list_index (from parameter `index`) is an optional integer index
         # into list_devices() entries.
         self.list_index = kwargs.pop("index", None)
+        self.vid = vid
+        self.pid = pid
 
         # lazy_open tells us not to open immediately.
         if not self.lazy_open:
@@ -321,7 +325,11 @@ class Device:
         """
         # FTDI vendor/product ids required here.
         res: int = -1
-        for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
+        for usb_vid, usb_pid in itertools.product(
+            USB_VID_LIST + [self.vid], USB_PID_LIST + [self.pid]
+        ):
+            if usb_vid is None or usb_pid is None:
+                continue
             open_args = [byref(self.ctx), usb_vid, usb_pid, 0, 0, self.device_index]
             if self.device_id is None:
                 res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))

@@ -82,25 +82,6 @@ USB_PID_LIST = [0x6001, 0x6010, 0x6011, 0x6014, 0x6015]
 FTDI_ERROR_DEVICE_NOT_FOUND = -3
 
 
-def add_custom_vid_pid(
-    vids: list[int] | int | None = None, pids: list[int] | int | None = None
-) -> None:
-    """
-    Add custom vendor IDs and product IDs to the global lists.
-
-    :param vids: List of custom vendor IDs to add.
-    :param pids: List of custom product IDs to add.
-    """
-    if isinstance(vids, int):
-        vids = [vids]
-    if isinstance(pids, int):
-        pids = [pids]
-    if vids is not None:
-        USB_VID_LIST.extend(vids)
-    if pids is not None:
-        USB_PID_LIST.extend(pids)
-
-
 class Driver:
     """
     This is where it all happens...

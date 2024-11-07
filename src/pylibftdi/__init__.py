@@ -29,7 +29,6 @@ __all__ = [
     "BB_INPUT",
     "USB_VID_LIST",
     "USB_PID_LIST",
-    "add_custom_vid_pid",
 ]
 
 import sys
@@ -53,7 +52,6 @@ SerialDevice = serial_device.SerialDevice
 BitBangDevice = bitbang.BitBangDevice
 USB_VID_LIST = driver.USB_VID_LIST
 USB_PID_LIST = driver.USB_PID_LIST
-add_custom_vid_pid = driver.add_custom_vid_pid
 
 ALL_OUTPUTS = bitbang.ALL_OUTPUTS
 ALL_INPUTS = bitbang.ALL_INPUTS
