@@ -23,7 +23,15 @@ To see the vendor / product IDs which are supported, run the following::
     0x6001, 0x6010, 0x6011, 0x6014, 0x6015
 
 If a FTDI device with a VID / PID not matching the above is required, then
-the device's values should be appended to the appropriate list after import::
+the device's vendor ID and product ID can be specified with `vid` or `pid`
+keyword arguments passed to Device constructors. For example, to open a device
+with VID 0x1234 and PID 0x5678, use::
+
+    >>> from pylibftdi import Device
+    >>> dev = Device(vid=0x1234, pid=0x5678)
+
+Alternatively, the device's vendor or product ID can be appended to the appropriate
+list after import::
 
     >>> from pylibftdi import USB_PID_LIST, USB_VID_LIST, Device
     >>> USB_PID_LIST.append(0x1234)
