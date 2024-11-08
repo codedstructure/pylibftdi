@@ -172,6 +172,12 @@ class Device:
             Useful in the event that multiple devices of differing VID/PID
             are attached, where `device_index` is insufficient to select
             as device indexing restarts at 0 for each VID/PID combination.
+
+        :param vid: optional vendor ID to open. If omitted, the default USB_VID_LIST
+            is used to search for devices.
+
+        :param pid: optional product ID to open. If omitted, the default USB_PID_LIST
+            is used to search for devices.
         """
         self._opened = False
 
@@ -209,6 +215,8 @@ class Device:
         # list_index (from parameter `index`) is an optional integer index
         # into list_devices() entries.
         self.list_index = kwargs.pop("index", None)
+        self.vid = kwargs.pop("vid", None)
+        self.pid = kwargs.pop("pid", None)
 
         # lazy_open tells us not to open immediately.
         if not self.lazy_open:
@@ -321,7 +329,9 @@ class Device:
         """
         # FTDI vendor/product ids required here.
         res: int = -1
-        for usb_vid, usb_pid in itertools.product(USB_VID_LIST, USB_PID_LIST):
+        vid_list = [self.vid] if self.vid is not None else USB_VID_LIST
+        pid_list = [self.pid] if self.pid is not None else USB_PID_LIST
+        for usb_vid, usb_pid in itertools.product(vid_list, pid_list):
             open_args = [byref(self.ctx), usb_vid, usb_pid, 0, 0, self.device_index]
             if self.device_id is None:
                 res = self.fdll.ftdi_usb_open_desc_index(*tuple(open_args))
@@ -482,7 +492,7 @@ class Device:
             fn = self.fdll.ftdi_usb_purge_tx_buffer
         else:
             raise ValueError(
-                "Invalid value passed to %s.flush()" % self.__class__.__name__
+                f"Invalid value passed to {self.__class__.__name__}.flush()"
             )
         res = fn(byref(self.ctx))
         if res != 0:

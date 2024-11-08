@@ -14,7 +14,6 @@ to be attached.
 import unittest
 
 from pylibftdi.serial_device import SerialDevice
-
 from tests.test_common import CallCheckMixin, LoopDevice
 
 
