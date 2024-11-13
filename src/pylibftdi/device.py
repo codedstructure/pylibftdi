@@ -24,7 +24,7 @@ from ctypes import (
     cast,
     create_string_buffer,
 )
-from typing import Any, no_type_check
+from typing import no_type_check
 
 from pylibftdi._base import FtdiError
 from pylibftdi.driver import (
@@ -128,7 +128,14 @@ class Device:
         encoding: str = "latin1",
         interface_select: int | None = None,
         device_index: int = 0,
-        **kwargs: Any,
+        *,
+        auto_detach: bool | None = None,
+        lazy_open: bool | None = None,
+        chunk_size: int | None = None,
+        index: int | None = None,
+        vid: int | None = None,
+        pid: int | None = None,
+        driver: Driver | None = None,
     ) -> None:
         """
         Device([device_id[, mode, [OPTIONS ...]]) -> Device instance
@@ -181,14 +188,16 @@ class Device:
         """
         self._opened = False
 
-        # Some behavioural attributes are extracted from kwargs and override
-        # existing attribute defaults. This allows subclassing to easily
-        # change these.
-        for param in ["auto_detach", "lazy_open", "chunk_size"]:
-            if param in kwargs:
-                setattr(self, param, kwargs.pop(param))
+        # These args allow overriding default class attributes, which can
+        # also be overridden in subclasses.
+        if auto_detach is not None:
+            self.auto_detach = auto_detach
+        if lazy_open is not None:
+            self.lazy_open = lazy_open
+        if chunk_size is not None:
+            self.chunk_size = chunk_size
 
-        self.driver: Driver = Driver(**kwargs)
+        self.driver = Driver() if driver is None else driver
         self.fdll = self.driver.fdll
         # device_id is an optional serial number of the requested device.
         self.device_id = device_id
@@ -214,9 +223,9 @@ class Device:
         self.device_index = device_index
         # list_index (from parameter `index`) is an optional integer index
         # into list_devices() entries.
-        self.list_index = kwargs.pop("index", None)
-        self.vid = kwargs.pop("vid", None)
-        self.pid = kwargs.pop("pid", None)
+        self.list_index = index
+        self.vid = vid
+        self.pid = pid
 
         # lazy_open tells us not to open immediately.
         if not self.lazy_open:

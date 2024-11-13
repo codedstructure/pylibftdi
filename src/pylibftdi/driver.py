@@ -96,9 +96,7 @@ class Driver:
         "libusb": ["usb-1.0", "libusb-1.0"],
     }
 
-    def __init__(
-        self, libftdi_search: str | list[str] | None = None, **kwargs: dict[str, Any]
-    ) -> None:
+    def __init__(self, libftdi_search: str | list[str] | None = None) -> None:
         """
         :param libftdi_search: force a particular version of libftdi to be used
             can specify either library name(s) or path(s)
