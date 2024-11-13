@@ -28,38 +28,34 @@ class ThreadingServer(ThreadingMixIn, HTTPServer):
 def get_page():
     port = switch.port
     page = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>{port} - pylibftdi</title>
-    </head>
-    <body>
-    <div>
-    """
-    for i in range(8):
-        bit = 7 - i
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{port} - pylibftdi</title>
+  </head>
+  <body>
+<div>
+"""
+    for idx in range(8):
+        bit = 7 - idx
         is_on = port & (1 << bit)
         color = "#00FF00" if is_on else "#FF0000"
         page += f"""
-        <fieldset style="background-color: {
-          color
-          }; display: inline-block; margin:0px; padding: 8px;">
-        <form action="" method="post" >
-        <input type="checkbox" onchange="document.querySelector('[name=bit{
-          bit
-          }]').value=this.checked; document.forms[{
-            i
-            }].submit()" {
-              'checked="checked"' if is_on else ""
-              } />
-        <input type="hidden" name="bit{bit}" />
-        </form>
-        </fieldset>
-        </div>
-        DATA={port}
-        </body>
-        </html>
-        """
+<fieldset style="background-color: { color }; display: inline-block;
+                 margin:0px; padding: 3px;">
+<form action="" method="post">
+<input type="checkbox"
+  onchange="document.querySelector('[name=bit{ bit }]').value=this.checked;
+  document.forms[{idx}].submit()" { 'checked="checked"' if is_on else "" } />
+<input type="hidden" name="bit{bit}" />
+</form>
+</fieldset>"""
+    page += f"""
+</div>
+DATA={port}
+</body>
+</html>
+"""
     return page
 
 
