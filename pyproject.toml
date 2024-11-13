@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pylibftdi"
-version="0.22.0"
+version="0.23.0"
 description = "Pythonic interface to FTDI devices using libftdi."
 license = "MIT"
 authors = [
@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Embedded Systems",
     "Topic :: System :: Hardware",
@@ -43,14 +44,14 @@ build-backend = "poetry.core.masonry.api"
 python = ">=3.7.0"
 
 [tool.poetry.dev-dependencies]
-ruff = "^0.3.5"
-pytest = { version="^8.1.1", python=">=3.8" }
-mypy = { version="^1.9.0", python=">=3.8" }
-black = { version="^24.3.0", python=">=3.8" }
+ruff = "^0.7.3"
+pytest = { version="^8.3.3", python=">=3.8" }
+mypy = { version="^1.13.0", python=">=3.8" }
+black = { version="^24.10.0", python=">=3.9" }
 
-[tool.ruff]
-lint.select = ["E", "W", "F", "B", "I", "UP", "PL"]
-lint.ignore = [
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "I", "UP", "PL"]
+ignore = [
   "PLR2004",  # Magic value used in comparison
   "PLR0913",  # Too many arguments to function call
 ]

@@ -1,6 +1,18 @@
 pylibftdi changes
 =================
 
+0.23.0
+------
+* Added: #12 - pid & vid selection when opening a new `Device` - thanks @maraxen!
+* Minor API change:
+  * removed use of kwargs for Device() and Driver() arguments, replacing with keyword-only
+    arguments. Tthis is unlikely to cause issues in most cases, and protects against typos
+    or incorrect arguments.
+  * one valid case requiring change is passing in a `libftdi_search` argument; if this is
+    required, create a driver instance separately (with this parameter) and pass it to
+    `Device()` using the new `driver` keyword-only parameter.
+* Various bumps and fixes to linting dependencies
+
 0.22.0
 ------
 * Fix: #7 - support for Python3.12

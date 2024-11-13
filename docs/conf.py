@@ -50,9 +50,9 @@ copyright = "2010-2024, Ben Bass"
 # built documents.
 #
 # The short X.Y version.
-version = "0.22.0"
+version = "0.23.0"
 # The full version, including alpha/beta/rc tags.
-release = "0.22.0"
+release = "0.23.0"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
