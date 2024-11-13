@@ -18,7 +18,7 @@ import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath("../src"))
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx_rtd_theme"]
 
 # Sort members by type
 autodoc_member_order = "groupwise"
@@ -66,8 +66,8 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "default"
-# html_theme = 'sphinx_rtd_theme'
+# html_theme = "default"
+html_theme = 'sphinx_rtd_theme'
 # html_theme_path = ["_themes", ]
 # html_static_path = ['_static']
 
