@@ -121,11 +121,11 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
         self.assertCallsExact(
             x,
             [
-                "ftdi_usb_purge_tx_buffer",
+                "ftdi_tcoflush",
                 "ftdi_write_data",
-                "ftdi_usb_purge_tx_buffer",
+                "ftdi_tcoflush",
                 "ftdi_write_data",
-                "ftdi_usb_purge_tx_buffer",
+                "ftdi_tcoflush",
                 "ftdi_write_data",
             ],
         )
@@ -155,10 +155,10 @@ class BitBangFunctions(CallCheckMixin, unittest.TestCase):
             dev.port |= 2
 
         self.assertCallsExact(
-            _1, ["ftdi_read_pins", "ftdi_usb_purge_tx_buffer", "ftdi_write_data"]
+            _1, ["ftdi_read_pins", "ftdi_tcoflush", "ftdi_write_data"]
         )
         self.assertCallsExact(
-            _2, ["ftdi_read_pins", "ftdi_usb_purge_tx_buffer", "ftdi_write_data"]
+            _2, ["ftdi_read_pins", "ftdi_tcoflush", "ftdi_write_data"]
         )
 
 

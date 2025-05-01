@@ -62,9 +62,9 @@ class DeviceFunctions(CallCheckMixin, unittest.TestCase):
 
     def testFlush(self):
         with Device() as dev:
-            self.assertCalls(dev.flush_input, "ftdi_usb_purge_rx_buffer")
-            self.assertCalls(dev.flush_output, "ftdi_usb_purge_tx_buffer")
-            self.assertCalls(dev.flush, "ftdi_usb_purge_buffers")
+            self.assertCalls(dev.flush_input, "ftdi_tciflush")
+            self.assertCalls(dev.flush_output, "ftdi_tcoflush")
+            self.assertCalls(dev.flush, "ftdi_tcioflush")
 
     def testClose(self):
         d = Device()
