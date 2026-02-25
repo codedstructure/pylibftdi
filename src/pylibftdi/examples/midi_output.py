@@ -23,9 +23,9 @@ def scale():
 
     note = START_NOTE
     for i in range(8):
-        midi.write("\x90%c%c" % (chr(note), chr(volume(i))))
+        midi.write(f"\x90{chr(note)}{chr(volume(i))}")
         time.sleep(0.25)
-        midi.write("\x90%c\x00" % chr(note))
+        midi.write(f"\x90{chr(note)}\x00")
         note += MAJOR_INTERVAL[i]
         time.sleep(0.125)
 
@@ -33,9 +33,9 @@ def scale():
 
     for i in range(8):
         note -= MINOR_INTERVAL[7 - i]
-        midi.write("\x90%c%c" % (chr(note), chr(volume(i))))
+        midi.write(f"\x90{chr(note)}{chr(volume(i))}")
         time.sleep(0.35)
-        midi.write("\x90%c\x00" % chr(note))
+        midi.write(f"\x90{chr(note)}\x00")
         time.sleep(0.125)
 
 

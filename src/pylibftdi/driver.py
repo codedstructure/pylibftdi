@@ -270,7 +270,7 @@ class Driver:
                 )
                 if res < 0:
                     err_msg = self.fdll.ftdi_get_error_string(byref(ctx))
-                    msg = "%s (%d)" % (err_msg, res)
+                    msg = f"{err_msg} ({res})"
                     raise FtdiError(msg)
                 elif res > 0:
                     # take a copy of the dev_list for subsequent list_free
@@ -292,7 +292,7 @@ class Driver:
                             # error codes: -7: manuf, -8: desc, -9: serial
                             if res < 0 and res not in (-7, -8, -9):
                                 err_msg = self.fdll.ftdi_get_error_string(byref(ctx))
-                                msg = "%s (%d)" % (err_msg, res)
+                                msg = f"{err_msg} ({res})"
                                 raise FtdiError(msg)
                             devices.append(
                                 (_s(manuf.value), _s(desc.value), _s(serial.value))

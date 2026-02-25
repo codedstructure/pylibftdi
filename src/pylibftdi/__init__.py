@@ -37,8 +37,6 @@ __all__ = [
     "USB_PID_LIST",
 ]
 
-import sys
-
 from pylibftdi import _base, bitbang, device, driver, serial_device, util
 
 # Bring them in to package scope so we can treat pylibftdi

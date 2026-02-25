@@ -266,14 +266,14 @@ class Device:
         self.ctx = create_string_buffer(1024)
         res = self.fdll.ftdi_init(byref(self.ctx))
         if res != 0:
-            msg = "%s (%d)" % (self.get_error_string(), res)
+            msg = f"{self.get_error_string()} ({res})"
             del self.ctx
             raise FtdiError(msg)
 
         if self.interface_select is not None:
             res = self.fdll.ftdi_set_interface(byref(self.ctx), self.interface_select)
             if res != 0:
-                msg = "%s (%d)" % (self.get_error_string(), res)
+                msg = f"{self.get_error_string()} ({res})"
                 del self.ctx
                 raise FtdiError(msg)
 
@@ -326,7 +326,7 @@ class Device:
                 err_help = ERR_HELP_MACOS_CLAIM_FAIL
             else:
                 err_help = ERR_HELP_CLAIM_FAIL
-        msg = "%s (%d)\n%s" % (self.get_error_string(), errcode, err_help)
+        msg = f"{self.get_error_string()} ({errcode})\n{err_help}"
         return msg
 
     def _open_device(self) -> int:
@@ -507,7 +507,7 @@ class Device:
 
         res = fn(byref(self.ctx))
         if res != 0:
-            msg = "%s (%d)" % (self.get_error_string(), res)
+            msg = f"{self.get_error_string()} ({res})"
             raise FtdiError(msg)
 
     def flush_input(self) -> None:

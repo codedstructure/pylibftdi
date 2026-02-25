@@ -114,14 +114,14 @@ if __name__ == "__main__":
         pass
 
     t = threading.Thread(target=runserver, args=(HTTP_PORT,))
-    t.setDaemon(True)
+    t.daemon = True
     t.start()
-    print("Webserver running on localhost port %d" % HTTP_PORT)
+    print(f"Webserver running on localhost port {HTTP_PORT}")
     time.sleep(0.5)
     retry = 10
     while retry:
         try:
-            webbrowser.open("http://localhost:%d" % HTTP_PORT)
+            webbrowser.open(f"http://localhost:{HTTP_PORT}")
         except OSError:
             time.sleep(1)
             retry -= 1
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     # wait for Ctrl-C
     try:
-        while 1:
+        while True:
             time.sleep(100)
     except KeyboardInterrupt:
         pass

@@ -12,6 +12,7 @@ Copyright (c) 2011-2014 Ben Bass <benbass@codedstructure.net>
 All rights reserved.
 """
 
+import argparse
 import itertools
 import sys
 import time
@@ -36,7 +37,7 @@ def display_value(value):
     sys.stdout.write("\b" * 32)
     for n in range(8):
         sys.stdout.write("1 " if value & (1 << (7 - n)) else "0 ")
-    sys.stdout.write("  (%d/0x%02X)" % (value, value))
+    sys.stdout.write(f"  ({value}/0x{value:02X})")
     sys.stdout.flush()
 
 
@@ -78,8 +79,6 @@ def display_loop(interval=1, count=0, match=None, mask=0xFF):
 
 
 def main(args=None):
-    import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-n",
