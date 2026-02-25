@@ -41,12 +41,12 @@ def get_page():
         is_on = port & (1 << bit)
         color = "#00FF00" if is_on else "#FF0000"
         page += f"""
-<fieldset style="background-color: { color }; display: inline-block;
+<fieldset style="background-color: {color}; display: inline-block;
                  margin:0px; padding: 3px;">
 <form action="" method="post">
 <input type="checkbox"
-  onchange="document.querySelector('[name=bit{ bit }]').value=this.checked;
-  document.forms[{idx}].submit()" { 'checked="checked"' if is_on else "" } />
+  onchange="document.querySelector('[name=bit{bit}]').value=this.checked;
+  document.forms[{idx}].submit()" {'checked="checked"' if is_on else ""} />
 <input type="hidden" name="bit{bit}" />
 </form>
 </fieldset>"""

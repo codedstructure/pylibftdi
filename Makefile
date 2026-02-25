@@ -12,20 +12,24 @@ container:
 
 .PHONY: build
 build:
-	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest poetry build
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest uv build
 
 .PHONY: test
 test:
-	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && poetry run pytest'
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest uv run pytest
 
 .PHONY: lint
 lint:
-	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'poetry install && (poetry run black --check .; poetry run ruff check src tests; poetry run mypy src)'
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'uv run ruff format --check . && uv run ruff check src tests && uv run mypy src'
+
+.PHONY: format
+format:
+	docker run --rm -t -v $$PWD:/app -w /app pylibftdi-dev:latest bash -c 'uv run ruff format . && uv run ruff check --fix src tests'
 
 .PHONY: shell
 shell:
-	# Drop into a poetry shell where e.g. `python3 -m pylibftdi.examples.list_devices` etc can be run
-	docker run --rm -it -v $$PWD:/app -w /app pylibftdi-dev:latest bash -ic 'poetry install && poetry shell'
+	# Drop into a shell where e.g. `uv run python -m pylibftdi.examples.list_devices` etc can be run
+	docker run --rm -it -v $$PWD:/app -w /app pylibftdi-dev:latest bash
 
 .PHONY: clean
 clean:
