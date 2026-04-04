@@ -4,26 +4,31 @@ Developing pylibftdi
 How do I checkout and use the latest development version?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`pylibftdi` is currently developed on GitHub, though started out as a Mercurial
-repository on bitbucket.org. There may still be references to old bitbucket issues
-in the docs.
+.. note::
+    `pylibftdi` is currently developed on GitHub, though started out as a Mercurial
+    repository on bitbucket.org. There may still be references to old bitbucket issues
+    in the docs.
 
-`pylibftdi` is developed using poetry_, and a Dockerfile plus Makefile make use
-development tasks straightforward. In any case, start with a local clone of the
-repository::
+`pylibftdi` is developed using uv_, and a Dockerfile plus Makefile make development
+tasks straightforward. In any case, start with a local clone of the repository::
 
     $ git clone https://github.com/codedstructure/pylibftdi
     $ cd pylibftdi
 
-.. _poetry: https://python-poetry.org/
+.. _uv: https://docs.astral.sh/uv/
+
+Note that `pylibftdi` itself only requires the Python standard library for normal use.
+The development dependencies (``pytest``, ``ruff``, ``mypy``) are declared in the
+``[dependency-groups]`` section of ``pyproject.toml`` and are only needed for
+development and testing.
 
 There are then two main approaches, though pick and mix the different elements to suit:
 
-**poetry and docker**
+**uv and docker**
 If `make` and `docker` are available in your environment, the easiest way to do development
 may be to simply run `make shell`. This creates an Ubuntu-based docker environment with
-`libftdi`, `poetry`, and other requirements pre-installed, and drops into a shell where the
-current `pylibftdi` code is installed.
+`libftdi`, `uv`, and other requirements pre-installed, and drops into a shell where the
+current `pylibftdi` code is available.
 
 `make` on its own will run through all the unittests and linting available for `pylibftdi`,
 and is a useful check to make sure things haven't been broken.
@@ -31,69 +36,78 @@ and is a useful check to make sure things haven't been broken.
 The downside of running in a docker container is that USB support to actual FTDI devices
 may be lacking...
 
-**editable install with pip**
-This assumes that the `venv` and `pip` packages are installed; on some (e.g. Ubuntu)
-Linux environments, these may need installing as OS packages. Once installed, perform
-an 'editable' install as follows::
+**local install with uv**
+With uv_ installed, run ``uv sync`` from the project root. This creates a ``.venv``
+virtual environment, installs the development dependencies from ``uv.lock``, and
+installs ``pylibftdi`` itself in editable mode — no separate activation step is needed
+to run tools::
 
-    .../pylibftdi$ python3 -m venv env
-    .../pylibftdi$ source env/bin/activate
-    (env) .../pylibftdi$ python3 -m pip install -e .
+    .../pylibftdi$ uv sync
+    .../pylibftdi$ uv run pytest
+    .../pylibftdi$ uv run ruff check src tests
 
-Note this also creates a virtual environment within the project directory;
-see here_
+If you prefer to work inside an activated virtual environment::
 
-.. _here: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+    .../pylibftdi$ uv sync
+    .../pylibftdi$ source .venv/bin/activate
+    (pylibftdi) .../pylibftdi$ pytest
+
+.. note::
+
+    The ``uv.lock`` file pins all dependency versions for reproducible installs.
+    To upgrade all dependencies to their latest allowed versions, run ``uv lock
+    --upgrade``, or target a single package with ``uv lock --upgrade-package
+    pytest``. Follow either with ``uv sync`` to apply the changes to the virtual
+    environment.
 
 How do I run the tests?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-From the root directory of a cloned pylibftdi repository, run the following::
+From the root directory of a cloned pylibftdi repository, run::
 
-    (env) .../pylibftdi$ python3 -m unittest discover
-    .....................................
-    ----------------------------------------------------------------------
-    Ran 37 tests in 0.038s
+    .../pylibftdi$ uv run pytest
 
-    OK
+Or, with a virtualenv already activated::
 
-Note that other test runners (such as `pytest`) will also run the tests and may be
-easier to extend.
+    (pylibftdi) .../pylibftdi$ pytest
 
-How can I determine and select the underlying libftdi library?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The standard ``unittest`` runner also works if preferred::
 
-Since pylibftdi 0.12, the Driver exposes ``libftdi_version()`` and ``libusb_version()``
-methods, which return a tuple whose first three entries correspond to major, minor,
-and micro versions of the libftdi driver being used.
+    (pylibftdi) .../pylibftdi$ python3 -m unittest discover
 
-Note there are two major versions of `libftdi` - libftdi1 can coexist with
-the earlier 0.x versions - it is now possible to select which library to
-load when instantiating the Driver. Note on at least Ubuntu Linux, the `libftdi1`
-*OS package* actually refers to `libftdi 0.20` (or similar), whereas `libftdi1-2`
-refers to the more recent 1.x release (currently 1.5)::
+How do I make a PyPI release?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Python 3.10.6 (main, May 29 2023, 11:10:38) [GCC 11.3.0] on linux
-    Type "help", "copyright", "credits" or "license" for more information.
-    >>> from pylibftdi import Driver
-    >>> Driver().libftdi_version()
-    libftdi_version(major=1, minor=5, micro=0, version_str='1.5', snapshot_str='unknown')
-    >>> Driver("ftdi1").libftdi_version()
-    libftdi_version(major=1, minor=5, micro=0, version_str='1.5', snapshot_str='unknown')
-    >>> Driver("ftdi").libftdi_version()
-    libftdi_version(major=0, minor=0, micro=0, version_str='< 1.0 - no ftdi_get_library_version()', snapshot_str='unknown')
+Ensure the working tree is clean, all tests pass, and ``CHANGES.txt`` is up to date.
+Update the version number in ``pyproject.toml``, then tag the commit::
 
-If both are installed, ``pylibftdi`` prefers libftdi1 (e.g. libftdi 1.5) over libftdi (e.g. 0.20).
-Since different OSs require different parameters to be given to find a library,
-the default search list given to ctypes.util.find_library is defined by the
-`Driver._lib_search` attribute, and this may be updated as appropriate.
-By default it is as follows::
+    .../pylibftdi$ git add pyproject.toml CHANGES.txt
+    .../pylibftdi$ git commit -m "Release 0.x.0"
+    .../pylibftdi$ git tag 0.x.0
 
-    _lib_search = {
-        "libftdi": ["ftdi1", "libftdi1", "ftdi", "libftdi"],
-        "libusb": ["usb-1.0", "libusb-1.0"],
-    }
+Build the distribution artifacts using ``uv build`` (or ``make build``, which runs
+the same command inside the docker container)::
 
-This covers Windows (which requires the 'lib' prefix), Linux (which requires
-its absence), and Mac OS X, which is happy with either.
+    .../pylibftdi$ uv build
 
+This produces a source distribution and a wheel under ``dist/``.
+
+Publish to PyPI using ``uv publish``. A PyPI API token is required; either
+export it as an environment variable or pass it directly::
+
+    .../pylibftdi$ uv publish --token pypi-...
+
+    # or via environment variable
+    .../pylibftdi$ UV_PUBLISH_TOKEN=pypi-... uv publish
+
+.. note::
+
+    To do a dry run first, publish to TestPyPI::
+
+        .../pylibftdi$ uv publish --publish-url https://test.pypi.org/legacy/ --token pypi-...
+
+    You can verify the result at https://test.pypi.org/project/pylibftdi/
+
+Finally, push the tag::
+
+    .../pylibftdi$ git push origin main --tags

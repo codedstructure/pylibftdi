@@ -47,7 +47,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "pylibftdi"
-copyright = "2010-2024, Ben Bass"
+copyright = "2010-2026, Ben Bass"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

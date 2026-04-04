@@ -12,3 +12,6 @@ docs/_build
 *.egg-info
 
 .venv
+
+_build
+docout

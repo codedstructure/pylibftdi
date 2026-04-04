@@ -31,7 +31,12 @@ shell:
 	# Drop into a shell where e.g. `uv run python -m pylibftdi.examples.list_devices` etc can be run
 	docker run --rm -it -v $$PWD:/app -w /app pylibftdi-dev:latest bash
 
+.PHONY: docs
+docs:
+	uv run --group docs sphinx-build -b html docs docout/html
+	uv run python -m webbrowser "file://$(abspath docout/html/index.html)"
+
 .PHONY: clean
 clean:
 	# Ideally this would remove all relevant dev containers too...
-	rm -rf dist/ .venv/
+	rm -rf dist/ .venv/ docout/

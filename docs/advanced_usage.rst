@@ -57,3 +57,39 @@ ctypes_ reference for guidance on using these features.
 .. _libftdi: http://www.intra2net.com/en/developer/libftdi/documentation/
 .. _ctypes: http://docs.python.org/library/ctypes.html
 
+Selecting the underlying libftdi library
+----------------------------------------
+
+Since pylibftdi 0.12, the Driver exposes ``libftdi_version()`` and ``libusb_version()``
+methods, which return a tuple whose first three entries correspond to major, minor,
+and micro versions of the libftdi driver being used.
+
+Note there are two major versions of `libftdi` - libftdi1 can coexist with
+the earlier 0.x versions - it is now possible to select which library to
+load when instantiating the Driver. Note on at least Ubuntu Linux, the `libftdi1`
+*OS package* actually refers to `libftdi 0.20` (or similar), whereas `libftdi1-2`
+refers to the more recent 1.x release (currently 1.5)::
+
+    Python 3.10.6 (main, May 29 2023, 11:10:38) [GCC 11.3.0] on linux
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from pylibftdi import Driver
+    >>> Driver().libftdi_version()
+    libftdi_version(major=1, minor=5, micro=0, version_str='1.5', snapshot_str='unknown')
+    >>> Driver("ftdi1").libftdi_version()
+    libftdi_version(major=1, minor=5, micro=0, version_str='1.5', snapshot_str='unknown')
+    >>> Driver("ftdi").libftdi_version()
+    libftdi_version(major=0, minor=0, micro=0, version_str='< 1.0 - no ftdi_get_library_version()', snapshot_str='unknown')
+
+If both are installed, ``pylibftdi`` prefers libftdi1 (e.g. libftdi 1.5) over libftdi (e.g. 0.20).
+Since different OSs require different parameters to be given to find a library,
+the default search list given to ctypes.util.find_library is defined by the
+`Driver._lib_search` attribute, and this may be updated as appropriate.
+By default it is as follows::
+
+    _lib_search = {
+        "libftdi": ["ftdi1", "libftdi1", "ftdi", "libftdi"],
+        "libusb": ["usb-1.0", "libusb-1.0"],
+    }
+
+This covers Windows (which requires the 'lib' prefix), Linux (which requires
+its absence), and Mac OS X, which is happy with either.
