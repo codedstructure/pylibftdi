@@ -1,6 +1,13 @@
 pylibftdi changes
 =================
 
+0.24.0
+------
+* Fix: `flush()` now uses `ftdi_tc[io]flush` functions (libftdi >= 1.5) rather
+  than the deprecated `ftdi_usb_purge_*` functions - thanks @syha6821!
+* Build: switched from poetry to uv for development and packaging
+* Dropped support for Python < 3.10
+
 0.23.0
 ------
 * Added: #12 - pid & vid selection when opening a new `Device` - thanks @maraxen!
