@@ -1,12 +1,23 @@
 import os
 import sys
-from importlib.metadata import version as _version
+from importlib.metadata import PackageNotFoundError, version as _version
 
 sys.path.insert(0, os.path.abspath("../src"))
 
 project = "pylibftdi"
 copyright = "2010-2026, Ben Bass"
-release = _version("pylibftdi")
+try:
+    release = _version("pylibftdi")
+except PackageNotFoundError:
+    # Package not installed; install it first (e.g. `pip install -e .`)
+    # Once Python 3.11+ is required, tomllib could read pyproject.toml directly.
+    import warnings
+    warnings.warn(
+        "pylibftdi package not found; install it before building docs. "
+        "Version will be reported as 'unknown'.",
+        stacklevel=1,
+    )
+    release = "unknown"
 version = ".".join(release.split(".")[:2])
 
 extensions = [

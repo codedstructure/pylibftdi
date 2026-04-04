@@ -21,3 +21,6 @@ sphinx:
 python:
   install:
     - requirements: docs/requirements.txt
+    # Install the package itself for importlib.metadata
+    - method: pip
+      path: .
