@@ -1,6 +1,10 @@
 pylibftdi changes
 =================
 
+0.24.1
+------
+* No functional changes; CI & docs fixes only
+
 0.24.0
 ------
 * Fix: `flush()` now uses `ftdi_tc[io]flush` functions (libftdi >= 1.5) rather

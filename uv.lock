@@ -499,7 +499,7 @@ wheels = [
 
 [[package]]
 name = "pylibftdi"
-version = "0.24.0"
+version = "0.24.1"
 source = { editable = "." }
 
 [package.dev-dependencies]

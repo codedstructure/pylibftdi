@@ -1,6 +1,6 @@
 [project]
 name = "pylibftdi"
-version = "0.24.0"
+version = "0.24.1"
 description = "Pythonic interface to FTDI devices using libftdi."
 license = "MIT"
 authors = [
