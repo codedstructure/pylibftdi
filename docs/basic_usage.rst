@@ -6,7 +6,7 @@ Rather than simply expose all the methods of the underlying library directly,
 it aims to provide a simpler API for the main use-cases of serial and parallel
 IO, while still allowing the use of the more advanced functions of the library.
 
-.. _libftdi: http://www.intra2net.com/en/developer/libftdi/
+.. _libftdi: https://www.intra2net.com/en/developer/libftdi/
 
 General
 -------
@@ -57,4 +57,3 @@ operation through the ``port`` and ``direction`` properties.  These provide an
 
 There is support for a number of external devices and protocols, specifically
 for interfacing with HD44780 LCDs using the 4-bit interface.
-

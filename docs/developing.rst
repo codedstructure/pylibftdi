@@ -79,9 +79,12 @@ How do I make a PyPI release?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Ensure the working tree is clean, all tests pass, and ``CHANGES.txt`` is up to date.
-Update the version number in ``pyproject.toml``, then tag the commit::
+Update the version number in ``pyproject.toml``, sync uv, then tag the commit::
 
-    .../pylibftdi$ git add pyproject.toml CHANGES.txt
+    .../pylibftdi$ vim pyproject.toml CHANGES.txt  # update with new version
+    .../pylibftdi$ uv sync --upgrade
+    .../pylibftdi$ make  # ensure everything works
+    .../pylibftdi$ git add pyproject.toml uv.lock CHANGES.txt
     .../pylibftdi$ git commit -m "Release 0.x.0"
     .../pylibftdi$ git tag 0.x.0
 

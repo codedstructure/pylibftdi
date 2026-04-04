@@ -5,7 +5,7 @@ The default mode of pylibftdi devices is to behave as a serial UART device, simi
 
 The default serial configuration is 9600 baud, 8 data bits, 1 stop bit and no parity (sometimes referred to as 8-N-1_). This is the default configuration of the old 'COM' devices back to the days of the original IBM PC and MS-DOS.
 
-.. _8-N-1: http://en.wikipedia.org/wiki/8-N-1
+.. _8-N-1: https://en.wikipedia.org/wiki/8-N-1
 
 
 Setting line parameters
@@ -37,7 +37,7 @@ Subclassing `Device` - A MIDI device
 
 To abstract application code from the details of any particular interface, it may be helpful to subclass the ``Device`` class, providing the required configuration in the ``__init__`` method to act in a certain way. For example, the MIDI_ protocol used by electronic music devices is an asynchronous serial protocol operating at 31250 baud, and with the same 8-N-1 parameters which pylibftdi defaults to.
 
-.. _MIDI: http://www.midi.org
+.. _MIDI: https://www.midi.org
 
 Creating a ``MidiDevice`` subclass of ``Device`` is straightforward::
 
@@ -56,4 +56,3 @@ Use of the ``MidiDevice`` class is simple - as a pylibftdi Device instance, it p
     >>> m.write('\x90\x80\x80')
     >>> time.sleep(1)
     >>> m.write('\x80\x00')
-

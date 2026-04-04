@@ -170,7 +170,7 @@ latch value, rather than reading the inputs, and it would simply count up from
 ignored in the case of input lines).
 
 Similar concepts exist in many microcontrollers, for example see
-http://stackoverflow.com/a/2623498 for a possibly better explanation, though
+https://stackoverflow.com/a/2623498 for a possibly better explanation, though
 in a slightly different context :)
 
 If you aren't using read-modify-write operations (e.g. augmented assignment),
@@ -247,4 +247,3 @@ pin and ground (possibly with a low value - e.g. 100 ohm -  series resistor to
 prevent accidents should it be set to an output and set high...). Note that
 with a normal push-to-make switch, the value will read '1' when the switch is
 not pressed; pressing it will set the input line value to '0'.
-

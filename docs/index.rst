@@ -26,10 +26,10 @@ The two main use cases it serves are:
 * the need to interact with existing devices which are known to contain
   FTDI chipsets for their USB interface.
 
-FTDI (http://www.ftdichip.com) create devices (chipsets, modules,
+FTDI (https://www.ftdichip.com) create devices (chipsets, modules,
 cables etc) to interface devices to the USB port of your computer.
 
-libftdi (http://www.intra2net.com/en/developer/libftdi/) is an open source
+libftdi (https://www.intra2net.com/en/developer/libftdi/) is an open source
 driver to communicate with these devices, and runs on top of libusb.
 It works on Windows, Linux, and Mac OS X, and likely other systems too.
 
@@ -62,4 +62,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

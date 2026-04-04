@@ -3,7 +3,7 @@ pylibftdi
 
 pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
 
-.. _libftdi: http://www.intra2net.com/en/developer/libftdi/
+.. _libftdi: https://www.intra2net.com/en/developer/libftdi/
 
 :Features:
 
@@ -12,10 +12,6 @@ pylibftdi is a minimal Pythonic interface to FTDI devices using libftdi_.
  - Support for multiple devices
  - File-like interface wherever appropriate
  - Cross-platform
-
-:Limitations:
-
- - The API might change prior to reaching a 1.0 release.
 
 Usage
 -----
@@ -73,7 +69,7 @@ best for some projects. Some aim at closely wrapping the libftdi interface,
 others use FTDI's own D2XX driver (ftd2xx_) or talk directly to USB via
 libusb or similar (such as pyftdi_).
 
-.. _ftd2xx: http://pypi.python.org/pypi/ftd2xx
+.. _ftd2xx: https://pypi.org/project/ftd2xx/
 .. _pyftdi: https://github.com/eblot/pyftdi
 
 The aim for pylibftdi is to work with libftdi, but to provide
@@ -101,4 +97,3 @@ holders.
 libFTDI itself is developed by Intra2net AG.  No association with
 Intra2net is claimed or implied, but I have found their library
 helpful and had fun with it...
-

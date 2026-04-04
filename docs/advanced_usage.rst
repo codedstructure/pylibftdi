@@ -54,8 +54,8 @@ Why this would be wanted is anyone's guess ;-)
 The libftdi_ documentation should be consulted in conjunction with the
 ctypes_ reference for guidance on using these features.
 
-.. _libftdi: http://www.intra2net.com/en/developer/libftdi/documentation/
-.. _ctypes: http://docs.python.org/library/ctypes.html
+.. _libftdi: https://www.intra2net.com/en/developer/libftdi/documentation/
+.. _ctypes: https://docs.python.org/3/library/ctypes.html
 
 Selecting the underlying libftdi library
 ----------------------------------------

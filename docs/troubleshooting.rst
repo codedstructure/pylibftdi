@@ -11,65 +11,32 @@ Error messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This indicates a conflict with FTDI's own drivers, and is (as far as I know)
-mainly a problem on Mac OS X, where they can be disabled (until reboot) by
+mainly a problem on macOS, where they can be disabled (until reboot) by
 unloading the appropriate kernel module.
 
-MacOS (Mavericks and later)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _macos:
 
-Starting with OS X Mavericks, OS X includes kernel drivers which will reserve
-the FTDI device by default. In addition, the FTDI-provided VCP driver will
-claim the device by default. These need unloading before `libftdi` will be able`
-to communicate with the device::
+macOS
+~~~~~
 
-    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
+Since macOS Monterey (12.0, 2021), Apple removed their built-in FTDI kernel
+driver (``com.apple.driver.AppleUSBFTDI``), so that is no longer a source of
+conflict. However, FTDI's own VCP driver (``com.FTDI.driver.FTDIUSBSerialDriver``)
+may have been installed by other software (e.g. the Arduino IDE) and will claim
+the device by default. Unload it to allow libftdi access::
+
     sudo kextunload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
 
-Similarly to reload them::
+To reload it::
 
-    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
     sudo kextload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
 
 Earlier versions of ``pylibftdi`` (prior to 0.18.0) included scripts for
-MacOS which unloaded / reloaded these drivers, but these complicated cross-platform
-packaging so have been removed. If you are on using MacOS with programs which
-need these drivers on a frequent basis (such as the Arduino IDE when using
-older FTDI-based Arduino boards), consider implementing these yourself, along the
-lines of the following (which assumes ~/bin is in your path)::
+macOS which automated this, but these were removed due to cross-platform
+packaging complexity. If you need to toggle the driver frequently (e.g.
+because other software also uses it), consider wrapping these commands in
+small shell scripts in your ``~/bin`` or ``/usr/local/bin``.
 
-    cat << EOF > /usr/local/bin/ftdi_osx_driver_unload
-    sudo kextunload -bundle-id com.apple.driver.AppleUSBFTDI
-    sudo kextunload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
-    EOF
-
-    cat << EOF > /usr/local/bin/ftdi_osx_driver_reload
-    sudo kextload -bundle-id com.apple.driver.AppleUSBFTDI
-    sudo kextload -bundle-id com.FTDI.driver.FTDIUSBSerialDriver
-    EOF
-
-    chmod +x /usr/local/bin/ftdi_osx_driver_*
-
-
-OS X Mountain Lion and earlier
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Whereas Mavericks includes an FTDI driver directly, earlier versions of OS X
-did not, and if this issue occurred it would typically as a result of
-installing some other program - for example the Arduino IDE.
-
-As a result, the kernel module may have different names, but `FTDIUSBSerialDriver.kext`
-is the usual culprit. Unload the kernel driver as follows::
-
-    sudo kextunload /System/Library/Extensions/FTDIUSBSerialDriver.kext
-
-To reload the kernel driver, do the following::
-
-    sudo kextload /System/Library/Extensions/FTDIUSBSerialDriver.kext
-
-If you aren't using whatever program might have installed it, the driver
-could be permanently removed (to prevent the need to continually unload it),
-but this is dangerous::
-
-    sudo rm /System/Library/Extensions/FTDIUSBSerialDriver.kext
 
 Diagnosis
 ---------
@@ -115,7 +82,7 @@ Use ``lsusb``. Example from my laptop::
     Bus 007 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
     Bus 008 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
     Bus 008 Device 011: ID 0a5c:217f Broadcom Corp. Bluetooth Controller
-    Bus 002 Device 009: ID 17ef:481d Lenovo 
+    Bus 002 Device 009: ID 17ef:481d Lenovo
     Bus 002 Device 016: ID 0403:6014 Future Technology Devices International, Ltd FT232H Single HS USB-UART/FIFO IC
 
 
@@ -144,7 +111,7 @@ FTDI's Application Note AN134_ details this further (see section 'Using
 Apple-provided VCP or D2XX with OS X 10.9 & 10.10'). See the section above
 under Installation for further details on resolving this.
 
-.. _AN134: http://www.ftdichip.com/Support/Documents/AppNotes/AN_134_FTDI_Drivers_Installation_Guide_for_MAC_OSX.pdf
+.. _AN134: https://www.ftdichip.com/Support/Documents/AppNotes/AN_134_FTDI_Drivers_Installation_Guide_for_MAC_OSX.pdf
 
 Gathering information
 ---------------------
@@ -165,4 +132,3 @@ libusb in use, as well as the system platform and Python version, for example::
     libusb library name   : libusb-1.0.so.0
     Python version        : 3.7.3
     OS platform           : Linux-5.0.0-32-generic-x86_64-with-Ubuntu-19.04-disco
-

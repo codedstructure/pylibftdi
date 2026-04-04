@@ -15,9 +15,7 @@ standard library for installation. Don't expect it to work happily without
 
     $ pip install pylibftdi
 
-Depending on your environment, you may want to set up a `virtual environment`_
-or use either the ``--user`` flag, or prefix the command with ``sudo`` to
-gain root privileges.
+Depending on your environment, you may want to set up a `virtual environment`_.
 
 .. _virtual environment: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
@@ -29,14 +27,11 @@ correctly provided the requirements of libftdi and libusb are correctly
 installed.
 
 Recent libftdi binaries for Windows seem to be available from the picusb_
-project on Sourceforge. Download libftdi1-1.1_devkit_x86_x64_21Feb2014.zip
-or later from that site, which includes the required
+project on Sourceforge. Download libftdi1-1.5_devkit_x86_x64_19July2020.zip
+or later from that site, which includes the required drivers, or search for
+'libftdi windows' for other options.
 
-.. _picusb: http://sourceforge.net/projects/picusb/files/
-
-Installing libraries on Windows is easier with recent versions of Python
-(2.7.9, 3.4+) installing `pip` directly, so the standard approach of
-`pip install pylibftdi` will now easily work on Windows.
+.. _picusb: https://sourceforge.net/projects/picusb/files/
 
 Mac OS X
 --------
@@ -45,13 +40,13 @@ I suggest using homebrew_ to install libftdi::
 
     $ brew install libftdi
 
-.. _homebrew: http://mxcl.github.com/homebrew/
+.. _homebrew: https://brew.sh/
 
-On OS X Mavericks (and presumably future versions) Apple include a driver for
-FTDI devices. This needs unloading before ``libftdi`` can access FTDI devices
-directly. See the Troubleshooting_ section for instructions.
+On macOS, Apple does not include a built-in FTDI driver (it was removed in
+macOS Monterey), but FTDI's own VCP driver may be installed by other software
+and will conflict with libftdi. See the Troubleshooting_ section for details.
 
-.. _Troubleshooting: troubleshooting.html#os-x-mavericks
+.. _Troubleshooting: troubleshooting.html#macos
 
 Linux
 -----
@@ -65,21 +60,17 @@ There are two steps in getting a sensible installation in Linux systems:
    other cases.
 
 Each of these steps will be slightly different depending on the distribution
-in use. I've tested ``pylibftdi`` on Debian Wheezy (on a Raspberry Pi),
-Ubuntu (various versions, running on a fairly standard ThinkPad laptop),
-and Arch Linux (running on a PogoPlug - one of the early pink ones).
+in use.
 
 Debian (Raspberry Pi) / Ubuntu etc
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On Debian like systems (including Ubuntu, Mint, Debian, etc), the package
-``libftdi1-dev`` should give you what you need as far as the libftdi library
-is concerned::
+On Debian-based systems (including Ubuntu, Raspberry Pi OS, etc), the
+runtime library package provides what pylibftdi needs::
 
-    $ sudo apt-get install libftdi1-dev
+    $ sudo apt-get install libftdi1-2
 
-The following works for both a Raspberry Pi (Debian Wheezy) and Ubuntu 12.04,
-getting ordinary users (e.g. 'pi' on the RPi) access to the FTDI device without
+The following works to give normal users access to FTDI devices without
 needing root permissions:
 
 1. Create a file ``/etc/udev/rules.d/99-libftdi.rules``. You will need sudo
@@ -115,7 +106,7 @@ will not apply immediately, not a full reboot may be needed on some systems::
 
    sudo usermod -aG dialout $USER
 
-See http://wiki.debian.org/udev for more on writing udev rules.
+See https://wiki.debian.org/udev for more on writing udev rules.
 
 Arch Linux
 ~~~~~~~~~~
@@ -152,7 +143,3 @@ Even without any LED connected, this should 'work' without any error - quit
 with Ctrl-C. Likely errors at this point are either permissions problems
 (e.g. udev rules not working), or not finding the device at all - although
 the earlier stage is likely to have failed if this were the case.
-
-Feel free to contact me (@codedstructure on Twitter) if you have any issues with
-installation, though be aware I don't have much in the way of Windows systems
-to test.
